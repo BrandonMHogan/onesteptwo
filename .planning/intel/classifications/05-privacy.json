@@ -1,0 +1,11 @@
+{
+  "filepath": "docs/05-privacy.md",
+  "type": "SPEC",
+  "title": "Privacy & Compliance",
+  "scope_summary": "Defines privacy obligations and implementation contracts for child data handling under COPPA, GDPR, PIPEDA, and POPIA, including consent logging, erasure, data minimisation, and portability requirements.",
+  "cross_references": [
+    "docs/04-data-model.md",
+    "docs/06-data-map.md"
+  ],
+  "precedence": 1
+}

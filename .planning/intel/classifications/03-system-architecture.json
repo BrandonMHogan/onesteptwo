@@ -1,0 +1,12 @@
+{
+  "filepath": "docs/03-system-architecture.md",
+  "type": "SPEC",
+  "title": "System Architecture",
+  "scope_summary": "Component topology, API contracts, error format, auth flow, deployment environments, and offline sync behaviour for the OneStepTwo mobile + backend system.",
+  "cross_references": [
+    "api/openapi.yaml",
+    "docs/07-sync-and-notifications.md",
+    "docs/06-auth.md"
+  ],
+  "precedence": 1
+}

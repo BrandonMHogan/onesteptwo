@@ -1,0 +1,10 @@
+{
+  "filepath": "docs/07-sync-and-notifications.md",
+  "type": "SPEC",
+  "title": "Sync Strategy & Push Notifications",
+  "scope_summary": "Defines the offline-first sync model (write/read paths, retry strategy, conflict handling, SQLDelight migrations) and push notification infrastructure (FCM, device token lifecycle, notification preferences) for the OneStepTwo mobile app.",
+  "cross_references": [
+    "docs/04-data-model.md"
+  ],
+  "precedence": 1
+}

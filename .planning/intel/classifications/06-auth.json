@@ -1,0 +1,8 @@
+{
+  "filepath": "docs/06-auth.md",
+  "type": "SPEC",
+  "title": "Authentication & Family Model",
+  "scope_summary": "Defines the Clerk-based authentication system, family org model, roles, invitation flow, KMP SDK integration patterns, Go JWT validation middleware, and multi-org user handling.",
+  "cross_references": [],
+  "precedence": 1
+}

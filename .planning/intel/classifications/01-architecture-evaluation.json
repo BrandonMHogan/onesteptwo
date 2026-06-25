@@ -1,0 +1,8 @@
+{
+  "filepath": "docs/01-architecture-evaluation.md",
+  "type": "DOC",
+  "title": "OneStepTwo — Architecture Evaluation (Historical)",
+  "scope_summary": "Historical evaluation of three stack decisions — Ktor vs Go backend, Clerk vs Kinde auth, and KMP + SKIE stability — with rationale and final recommendations.",
+  "cross_references": ["docs/02-stack.md"],
+  "precedence": 3
+}

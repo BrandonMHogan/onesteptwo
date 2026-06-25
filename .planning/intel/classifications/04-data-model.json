@@ -1,0 +1,11 @@
+{
+  "filepath": "docs/04-data-model.md",
+  "type": "SPEC",
+  "title": "Data Model Decisions",
+  "scope_summary": "Defines the database schema and data model contracts for children, potty events, device tokens, notification preferences, consent events, and deletion cascades.",
+  "cross_references": [
+    "docs/05-privacy.md",
+    "/backend/migrations/"
+  ],
+  "precedence": 1
+}

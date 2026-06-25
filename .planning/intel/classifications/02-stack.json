@@ -1,0 +1,8 @@
+{
+  "filepath": "docs/02-stack.md",
+  "type": "ADR",
+  "title": "Confirmed Tech Stack",
+  "scope_summary": "Locked technology choices for mobile (KMP, Compose, SwiftUI), backend (Go, Railway), database (Postgres, goose), auth (Clerk), web frontend (SvelteKit), and infrastructure (FCM, Cloudflare R2).",
+  "cross_references": ["/api/openapi.yaml"],
+  "precedence": 0
+}
