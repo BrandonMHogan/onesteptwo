@@ -28,7 +28,11 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
   3. Clerk dev and production organizations are provisioned; headless SDK keys are in place for Android and iOS
   4. Staging and production Firebase projects exist; two-project FCM configuration is confirmed
   5. CI pipeline runs on every commit — Go build + test passes, Android and iOS builds succeed, and 1.sqm migration applies cleanly
-**Plans**: TBD
+**Plans**: 4 plans
+  - [ ] 01-01-PLAN.md — Go backend skeleton: /healthz, RFC 7807 helper, server + migrate entrypoints, first goose migration, railway.json (REQ-001, REQ-002, REQ-NF-001)
+  - [ ] 01-02-PLAN.md — Gradle/KMP monorepo + toolchain: JDK 21 + Android SDK + Gradle 8.10.2, version catalog, :shared + :androidApp, SQLDelight 1.sqm (REQ-025)
+  - [ ] 01-03-PLAN.md — GitHub Actions CI (Go + Android, Linux-only) and production branch creation (REQ-001, REQ-002, REQ-025, REQ-NF-001)
+  - [ ] 01-04-PLAN.md — External provisioning: Railway services + Postgres, R2 backup cron, Clerk apps, Firebase projects, /healthz live (REQ-001)
 
 ### Phase 2: Compliance & Privacy Architecture
 **Goal**: All legal obligations are enforced in the database schema and Go API before any child profile can be created — consent gate, erasure cascade, audit log, and data minimisation constraints are provably correct.
@@ -137,7 +141,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Infrastructure | 0/TBD | Not started | - |
+| 1. Foundation & Infrastructure | 0/4 | Planned | - |
 | 2. Compliance & Privacy Architecture | 0/TBD | Not started | - |
 | 3. Authentication & Family Model | 0/TBD | Not started | - |
 | 4. UI/UX Design | 0/TBD | Not started | - |
