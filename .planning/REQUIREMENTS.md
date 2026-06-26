@@ -156,7 +156,7 @@ docs/06-auth.md, docs/07-sync-and-notifications.md.
 | REQ-022 | Phase 8 | Pending |
 | REQ-023 | Phase 8 | Pending |
 | REQ-024 | Phase 8 | Pending |
-| REQ-025 | Phase 1 | Pending |
+| REQ-025 | Phase 1 | Complete |
 | REQ-026 | Phase 3 | Pending |
 | REQ-027 | Phase 3 | Pending |
 | REQ-028 | Phase 6 | Pending |
