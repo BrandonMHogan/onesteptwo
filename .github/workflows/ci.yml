@@ -1,0 +1,41 @@
+name: CI
+on:
+  push:
+    branches: [main, production]
+  pull_request:
+    branches: [main, production]
+
+env:
+  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4096M -Dorg.gradle.daemon=false -Dorg.gradle.parallel=true"
+
+jobs:
+  ci:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # --- Go ---
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+      - name: Go build
+        run: cd backend && go build ./...
+      - name: Go test
+        run: cd backend && go test ./...
+      - name: Validate migrations
+        run: |
+          cd backend && go run github.com/pressly/goose/v3/cmd/goose@v3.27.1 \
+            -dir db/migrations validate
+
+      # --- Android / KMP ---
+      - uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+      - uses: gradle/actions/setup-gradle@v3
+      - name: Write local.properties
+        run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+      - name: Build Android (assembleDebug)
+        run: ./gradlew :androidApp:assembleDebug
