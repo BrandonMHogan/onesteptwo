@@ -74,7 +74,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 
 **Wave 4** *(gap closure — from 02-VERIFICATION.md)*
 
-  - [ ] 02-05-PLAN.md — RFC 7807 error handler: ProblemErrorHandler wired via HandlerWithOptions so malformed path params return application/problem+json, not text/plain (REQ-NF-001) [Gap 1]
+  - [x] 02-05-PLAN.md — RFC 7807 error handler: ProblemErrorHandler wired via HandlerWithOptions so malformed path params return application/problem+json, not text/plain (REQ-NF-001) [Gap 1]
   - [ ] 02-06-PLAN.md — Account erasure completion: org-wide device_tokens delete via Clerk member list, Clerk Organization deletion after commit, org-traceable audit target_id, REQUIREMENTS.md traceability update (REQ-012, REQ-011, REQ-014, REQ-C-002/003/004/008) [Gaps 2 & 3]
 
 ### Phase 3: Authentication & Family Model
@@ -194,7 +194,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Infrastructure | 4/4 | Complete    | 2026-06-26 |
-| 2. Compliance & Privacy Architecture | 4/4 | Complete   | 2026-06-26 |
+| 2. Compliance & Privacy Architecture | 5/6 | In Progress|  |
 | 3. Authentication & Family Model | 0/TBD | Not started | - |
 | 4. UI/UX Design | 0/TBD | Not started | - |
 | 5. Core Event Logging | 0/TBD | Not started | - |
