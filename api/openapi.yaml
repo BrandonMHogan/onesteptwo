@@ -1,0 +1,12 @@
+openapi: "3.0.3"
+info:
+  title: OneStepTwo API
+  version: "0.1.0"
+paths:
+  /healthz:
+    get:
+      operationId: getHealthz
+      summary: Health check
+      responses:
+        "200":
+          description: Service is healthy
