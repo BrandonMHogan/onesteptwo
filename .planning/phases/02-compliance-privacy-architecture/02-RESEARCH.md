@@ -780,22 +780,25 @@ The wrapper uses `r.PathValue("id")` (Go 1.22 net/http) internally and passes th
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Success criterion #3 vs D-05 conflict**
+1. **Success criterion #3 vs D-05 conflict** ✓ RESOLVED
    - What we know: Success criterion #3 says "The children table migration contains only id, clerk_org_id, nickname, birth_month, birth_year, created_at, updated_at — no additional columns." D-05 says children gains `consent_event_id`.
    - What's unclear: Was consent_event_id intended to be excluded from the "additional columns" check, or was this criterion written before D-05 was finalized?
    - Recommendation: Treat success criterion #3 as referring to PII columns (no gender, no IP, no legal name). Proceed with consent_event_id per D-05. The planner should include a note that the verification agent should check for ABSENCE of PII columns, not enforce exact column count.
+   - **Resolution (02-01 Task 2):** Plan 02-01 creates the schema with 8 columns including consent_event_id per D-05. Verification note added to docs/04-data-model.md update task: check for absence of PII columns, not exact column count.
 
-2. **Auth placeholder strategy for Phase 2 endpoints**
+2. **Auth placeholder strategy for Phase 2 endpoints** ✓ RESOLVED
    - What we know: Phase 3 adds Clerk JWT middleware. Phase 2 handlers need clerk_user_id and clerk_org_id from somewhere.
    - What's unclear: Is X-header placeholder acceptable, or should the endpoints simply return 503 until Phase 3?
    - Recommendation: Use placeholder X-Clerk-User-Id / X-Clerk-Org-Id headers with prominent TODO comments. This allows integration testing in Phase 2 without requiring Phase 3 to be complete first.
+   - **Resolution (02-02 Task 2):** All three handlers use `r.Header.Get("X-Clerk-User-Id")` / `r.Header.Get("X-Clerk-Org-Id")` with `// TODO Phase 3: replace with JWT claim extraction` comments. Endpoints are staging-only until Phase 3.
 
-3. **Account deletion scope of device_tokens**
+3. **Account deletion scope of device_tokens** ✓ RESOLVED (partial — deferred to Phase 3)
    - What we know: D-09 says hard DELETE device_tokens for all clerk_user_ids "in the org". The device_tokens table has no clerk_org_id column — it only has clerk_user_id.
    - What's unclear: How does the handler know which clerk_user_ids belong to the org without calling the Clerk API? The DB alone cannot answer "who is a member of org X".
    - Recommendation: The DELETE /v1/account handler needs to call the Clerk API to get org member list before deleting device_tokens. This requires the Clerk SDK to be available in Phase 2 handlers. If Clerk SDK is not yet wired in Phase 2, device_token deletion can be a Phase 3 concern (since Phase 3 wires auth and the Clerk SDK). Flag this in the plan.
+   - **Resolution (02-03 Task 2):** Plan 02-03 implements `DELETE FROM device_tokens WHERE clerk_user_id = $1` (requesting user only) with a `// TODO Phase 3: delete tokens for all org members via Clerk API` comment. Full org-wide deletion deferred to Phase 3 when Clerk SDK is wired. This is acceptable since device_tokens are not populated until Phase 8 anyway.
 
 ---
 
