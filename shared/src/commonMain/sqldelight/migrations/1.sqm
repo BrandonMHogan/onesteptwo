@@ -1,0 +1,7 @@
+-- shared/src/commonMain/sqldelight/migrations/1.sqm
+-- Phase 1: placeholder migration. No schema tables yet.
+-- Real schema (children, potty_events, etc.) is created in Phase 2.
+-- This file must exist from day one per REQ-025.
+
+-- SQLDelight .sqm files are plain SQL with no transaction wrappers.
+-- Do NOT wrap in BEGIN/END TRANSACTION.
