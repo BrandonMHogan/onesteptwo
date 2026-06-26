@@ -66,6 +66,20 @@ docs/06-auth.md, docs/07-sync-and-notifications.md.
 
 - [REQ-029] Data portability (GDPR Article 20): GET /v1/account/export endpoint returns a JSON bundle of all children, events, preferences, and consent records for the requesting user's org. **Deferred to v2 — must not be forgotten.** (source: docs/05-privacy.md)
 
+- [REQ-030] Event type field: the potty_events table must include a nullable event_type column. Valid values: pee, poo, both, accident_pee, accident_poo, tried. NULL is valid and represents a "count only" quick-tap where the caregiver chose not to specify a type. event_type may be set at creation or updated after the fact via a PATCH request.
+
+- [REQ-031] Child switcher: the home screen must display the active child's name and a visible switcher control when the family's Clerk org has more than one child profile. Selecting a different child updates the active child context across all tabs (Home, History, Progress). A family with one child shows no switcher.
+
+- [REQ-032] Pending details banner: the home screen must display a persistent banner showing the count of potty events logged today that have event_type = NULL. The banner is hidden when no such events exist. Tapping the banner navigates to or opens the first incomplete event for editing.
+
+- [REQ-033] History tab heatmap: the History tab must display a rolling heatmap calendar in a GitHub-contribution-graph style. Each day cell reflects the event count for that day using intensity levels (empty / low / medium / high). The rolling window focuses on the most recent days and weeks rather than a fixed-month calendar. Tapping a day cell opens a drill-down view listing that day's events with event_type and notes.
+
+- [REQ-034] Progress tab: the Progress tab must display for the active child: (a) current streak — the number of consecutive calendar days with at least one logged event ending on the most recent active day; (b) best-ever streak — the longest streak achieved all time; (c) total events this week (Mon–Sun); (d) total events all time; (e) milestone badges for: first successful potty trip, first day with zero accident events, a 7-day streak, and a 30-day streak. All calculations are derived from the local SQLDelight database.
+
+- [REQ-035] Four-tab navigation: the main app must use a bottom tab bar with exactly four tabs in order: Home, History, Progress, Settings. Tab icons, labels, and active/inactive visual states must be defined in the Phase 4 UI design spec. Navigation between tabs is always available from the main app; the tab bar is hidden during onboarding and full-screen detail flows.
+
+- [REQ-036] Admin onboarding wizard: a first-time admin must complete a linear wizard before accessing the main app. Steps in order: (1) Clerk sign-up (email/password or OAuth); (2) enter a family display name to create the Clerk org; (3) enter first child's nickname and birth month/year; (4) display plain-language data explanation and self-attestation consent checkbox — user must check before proceeding; (5) a consent_events row is inserted, then a children row is created — the wizard must enforce this order with no bypass path; (6) admin lands on the Home tab with the child's name visible. A returning caregiver who accepts a Clerk invitation skips the wizard and lands on Home.
+
 ---
 
 ## Non-Functional
@@ -120,11 +134,11 @@ docs/06-auth.md, docs/07-sync-and-notifications.md.
 |-------------|-------|--------|
 | REQ-001 | Phase 1 | Pending |
 | REQ-002 | Phase 1 | Pending |
-| REQ-003 | Phase 4 | Pending |
-| REQ-004 | Phase 5 | Pending |
-| REQ-005 | Phase 5 | Pending |
-| REQ-006 | Phase 4 | Pending |
-| REQ-007 | Phase 4 | Pending |
+| REQ-003 | Phase 5 | Pending |
+| REQ-004 | Phase 6 | Pending |
+| REQ-005 | Phase 6 | Pending |
+| REQ-006 | Phase 5 | Pending |
+| REQ-007 | Phase 5 | Pending |
 | REQ-008 | Phase 2 | Pending |
 | REQ-009 | Phase 2 | Pending |
 | REQ-010 | Phase 2 | Pending |
@@ -137,34 +151,41 @@ docs/06-auth.md, docs/07-sync-and-notifications.md.
 | REQ-017 | Phase 3 | Pending |
 | REQ-018 | Phase 3 | Pending |
 | REQ-019 | Phase 3 | Pending |
-| REQ-020 | Phase 6 | Pending |
-| REQ-021 | Phase 6 | Pending |
-| REQ-022 | Phase 6 | Pending |
-| REQ-023 | Phase 6 | Pending |
-| REQ-024 | Phase 6 | Pending |
+| REQ-020 | Phase 8 | Pending |
+| REQ-021 | Phase 8 | Pending |
+| REQ-022 | Phase 8 | Pending |
+| REQ-023 | Phase 8 | Pending |
+| REQ-024 | Phase 8 | Pending |
 | REQ-025 | Phase 1 | Pending |
 | REQ-026 | Phase 3 | Pending |
 | REQ-027 | Phase 3 | Pending |
-| REQ-028 | Phase 5 | Pending |
+| REQ-028 | Phase 6 | Pending |
 | REQ-029 | v2 | Deferred |
+| REQ-030 | Phase 5 | Pending |
+| REQ-031 | Phase 5 | Pending |
+| REQ-032 | Phase 5 | Pending |
+| REQ-033 | Phase 5 | Pending |
+| REQ-034 | Phase 7 | Pending |
+| REQ-035 | Phase 4 | Pending |
+| REQ-036 | Phase 5 | Pending |
 | REQ-NF-001 | Phase 1 | Pending |
-| REQ-NF-002 | Phase 5 | Pending |
+| REQ-NF-002 | Phase 6 | Pending |
 | REQ-NF-003 | Phase 2 | Pending |
-| REQ-NF-004 | Phase 7 | Pending |
-| REQ-NF-005 | Phase 5 | Pending |
+| REQ-NF-004 | Phase 9 | Pending |
+| REQ-NF-005 | Phase 6 | Pending |
 | REQ-NF-006 | Phase 3 | Pending |
 | REQ-NF-007 | Phase 3 | Pending |
-| REQ-NF-008 | Phase 5 | Pending |
-| REQ-NF-009 | Phase 5 | Pending |
+| REQ-NF-008 | Phase 6 | Pending |
+| REQ-NF-009 | Phase 6 | Pending |
 | REQ-NF-010 | Phase 3 | Pending |
 | REQ-C-001 | Phase 2 | Pending |
 | REQ-C-002 | Phase 2 | Pending |
 | REQ-C-003 | Phase 2 | Pending |
 | REQ-C-004 | Phase 2 | Pending |
 | REQ-C-005 | Phase 2 | Pending |
-| REQ-C-006 | Phase 7 | Pending |
-| REQ-C-007 | Phase 7 | Pending |
+| REQ-C-006 | Phase 9 | Pending |
+| REQ-C-007 | Phase 9 | Pending |
 | REQ-C-008 | Phase 2 | Pending |
 | REQ-C-009 | Phase 2 | Pending |
 
-**Coverage:** 47 active v1 requirements mapped across 7 phases. REQ-029 (data portability export) explicitly deferred to v2 per requirements spec.
+**Coverage:** 54 active v1 requirements mapped across 9 phases. REQ-029 (data portability export) explicitly deferred to v2 per requirements spec.

@@ -2,17 +2,19 @@
 
 ## Overview
 
-Seven phases deliver a fully store-published, privacy-compliant, offline-first potty tracking app. Phase 1 establishes the technical skeleton end-to-end. Phase 2 locks in all compliance architecture before any child data can flow. Phase 3 completes authentication and the family model. Phases 4 through 6 build core event logging, offline sync, and push notifications — the three pillars of the v1 value proposition. Phase 7 prepares and submits both apps to their respective stores with all legal deliverables in place.
+Nine phases deliver a fully store-published, privacy-compliant, offline-first potty tracking app. Phase 1 establishes the technical skeleton end-to-end. Phase 2 locks in all compliance architecture before any child data can flow. Phase 3 completes authentication and the family model. Phase 4 produces the complete UI/UX specification before any production UI code is written. Phases 5 through 7 build core event logging, offline sync, and progress/milestones — the three pillars of the user experience. Phase 8 adds push notifications. Phase 9 prepares and submits both apps to their respective stores with all legal deliverables in place.
 
 ## Phases
 
 - [ ] **Phase 1: Foundation & Infrastructure** - Monorepo scaffold, CI/CD, Railway deploy, PostgreSQL + R2 backup, Clerk + Firebase provisioning, Go healthcheck, SQLDelight and goose migrations initialized
 - [ ] **Phase 2: Compliance & Privacy Architecture** - Consent gate, erasure cascade, audit log, data minimisation constraints, and all COPPA/GDPR/PIPEDA/POPIA obligations enforced in schema and API before any child data flows
 - [ ] **Phase 3: Authentication & Family Model** - Sign up/in on Android + iOS, Clerk org enforcement, role-gated access, invitation flow, multi-org picker, JWT validation with azp and org context checks
-- [ ] **Phase 4: Core Event Logging** - Child profile creation with consent gate, one-tap potty event logging on both platforms, event editing, soft delete, client-generated UUIDs
-- [ ] **Phase 5: Offline-First Sync** - Pending queue in SQLDelight, connectivity-triggered retry, pending count indicator, pull-to-refresh, last-write-wins conflict resolution
-- [ ] **Phase 6: Push Notifications** - FCM integration on Android + iOS, device token lifecycle, per-child notification preferences, Go dispatch logic
-- [ ] **Phase 7: Launch Preparation & Store Submission** - SvelteKit marketing site live, privacy policy + ToS finalized, data map produced, both apps submitted to Play Store and App Store
+- [ ] **Phase 4: UI/UX Design** - Screen flows, lo-fi wireframes, design tokens (color, type, spacing), component specs, and navigation/animation patterns for all screens on both platforms — spec complete before implementation begins
+- [ ] **Phase 5: Core Event Logging** - Onboarding wizard (family setup + consent + child profile), 4-tab navigation, one-tap logging with details-later flow, event types, pending-details banner, heatmap history tab, child switcher, Settings screens
+- [ ] **Phase 6: Offline-First Sync** - Pending queue in SQLDelight, connectivity-triggered retry, pending count indicator, pull-to-refresh, last-write-wins conflict resolution
+- [ ] **Phase 7: Progress & Milestones** - Progress tab with streak (current + best), total event counts, and milestone badges; heatmap history reflects synced data
+- [ ] **Phase 8: Push Notifications** - FCM integration on Android + iOS, device token lifecycle, per-child notification preferences, Go dispatch logic
+- [ ] **Phase 9: Launch Preparation & Store Submission** - SvelteKit marketing site live, privacy policy + ToS finalized, data map produced, both apps submitted to Play Store and App Store
 
 ## Phase Details
 
@@ -53,22 +55,36 @@ Seven phases deliver a fully store-published, privacy-compliant, offline-first p
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 4: Core Event Logging
-**Goal**: A parent can create a child profile (gated behind the consent screen), and any caregiver can log, edit, and soft-delete potty events on both Android and iOS with immediate local feedback.
+### Phase 4: UI/UX Design
+**Goal**: The complete UI/UX specification for OneStepTwo is documented before any production UI code is written — covering all screen flows, lo-fi wireframes, design tokens, component specs, and navigation/animation patterns for both Jetpack Compose and SwiftUI. Engineers implement from this spec; design decisions do not happen during Phase 5+.
 **Depends on**: Phase 3
-**Requirements**: REQ-003, REQ-006, REQ-007
+**Requirements**: REQ-035
 **Success Criteria** (what must be TRUE):
-  1. An admin completes the consent screen (self-attestation checkbox + plain-language data explanation); a consent_events row is inserted; then the children row is created — enforced in that order with no path to skip the consent step
-  2. A caregiver taps once to log a potty event; the event appears immediately in local event history before any network round-trip
-  3. A logged event can be edited to add or change event_type detail after the initial quick-tap
-  4. A caregiver soft-deletes an event; the deleted event no longer appears in normal history; the row remains in the database with deleted_at set
-  5. Submitting the same event UUID twice to the server (e.g. after a sync retry) is a safe no-op — the second INSERT is silently discarded via ON CONFLICT DO NOTHING
+  1. A screen flow diagram covers every user path: admin onboarding wizard, caregiver first login, main app (4-tab navigation), child switcher, one-tap log → "add details later" toast, history heatmap drill-down, progress tab, settings screens (admin vs caregiver role differences), invite caregiver flow, empty states, error states, and offline state indicators
+  2. Lo-fi wireframes or annotated mockups exist for every distinct screen and state — with sufficient layout and content detail that an engineer can implement without making design guesses
+  3. Design tokens are documented for both platforms: color palette (primary, secondary, background, surface, error, success — with dark mode variants), typography scale (Compose TextStyle and SwiftUI Font equivalents), spacing grid, corner radii, and elevation/shadow
+  4. Component specs cover: bottom tab bar (4 tabs, active/inactive states), bottom-anchored log button (placement, size, tap area, haptic feedback spec), event card (complete variant and pending-details variant), heatmap calendar cell (empty/low/medium/high intensity), milestone badge (locked and unlocked states), toast/snackbar, "add details" bottom sheet, pending details banner, child switcher, empty state, error state, and loading state
+  5. Navigation and animation patterns are documented: tab switch transitions, push/pop navigation for drill-down screens, log button tap feedback (haptic + visual confirmation), toast appear/dismiss timing, bottom sheet open/close, and any platform-specific motion guidance for Compose vs SwiftUI
+**Plans**: TBD
+
+### Phase 5: Core Event Logging
+**Goal**: A parent completes the onboarding wizard (family creation + consent + first child profile), and any caregiver can immediately log potty events with one tap, optionally add details later, view the complete event history in a heatmap calendar, manage family and children settings, and switch between multiple children — all within the 4-tab navigation structure.
+**Depends on**: Phase 4
+**Requirements**: REQ-003, REQ-006, REQ-007, REQ-030, REQ-031, REQ-032, REQ-033, REQ-035, REQ-036
+**Success Criteria** (what must be TRUE):
+  1. A new admin completes the full onboarding wizard: sign up via Clerk → enter family name → add first child (nickname + birth month/year) → read plain-language data explanation and check self-attestation consent box → a consent_events row is inserted before the children row → admin lands on the Home tab with the child's name displayed
+  2. A caregiver taps the log button and the event is registered immediately in SQLDelight without requiring event_type; a long-lived toast appears offering "Add details now or later"
+  3. A logged event can have event_type (pee / poo / both / accident_pee / accident_poo / tried) and a text note appended after the initial tap; the event retains its original created_at timestamp regardless of when details are added
+  4. The pending details banner on the home screen shows the count of today's events without event_type set; the banner is hidden when all events have event_type set or no events have been logged today
+  5. The History tab shows a rolling heatmap calendar (GitHub-style); cell intensity reflects the event count for that day; tapping a cell opens a day-detail view listing that day's events with type and notes
+  6. A family with multiple children shows a child switcher on the home screen; switching the active child updates the Home, History, and Progress tabs to show that child's data
+  7. The Settings tab (tab 4) shows: family members list + invite caregiver by email (admin only), child management — add/edit/remove (admin only), notification preferences toggle per child, account info, sign out, and a clearly labelled "Delete my data" erasure request
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 5: Offline-First Sync
+### Phase 6: Offline-First Sync
 **Goal**: Events logged without connectivity are queued locally and automatically synced to the server when the network is restored; the UI clearly communicates pending state and pull-to-refresh merges server data.
-**Depends on**: Phase 4
+**Depends on**: Phase 5
 **Requirements**: REQ-004, REQ-005, REQ-028, REQ-NF-002, REQ-NF-005, REQ-NF-008, REQ-NF-009
 **Success Criteria** (what must be TRUE):
   1. With no network connection, a caregiver logs events and sees them immediately in local history; each event is stored with sync_status = 'pending' in SQLDelight
@@ -79,9 +95,21 @@ Seven phases deliver a fully store-published, privacy-compliant, offline-first p
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 6: Push Notifications
+### Phase 7: Progress & Milestones
+**Goal**: The Progress tab is live, showing the active child's streak, total event counts, and earned milestone badges — all computed from the local SQLDelight database after sync.
+**Depends on**: Phase 6
+**Requirements**: REQ-034
+**Success Criteria** (what must be TRUE):
+  1. The Progress tab displays for the active child: current streak (consecutive days with at least one logged event), best-ever streak (all time), total events this week, and total events all time
+  2. Milestone badges are awarded and visually displayed when earned: first successful potty trip (pee, poo, or both), first full day with zero accidents, 7-day streak, and 30-day streak
+  3. All progress calculations are computed from the local SQLDelight database and reflect post-sync data from Phase 6; switching the active child via the child switcher updates the Progress tab
+  4. The Progress tab shows an appropriate empty state (no streak, no milestones) when the child has no logged events
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 8: Push Notifications
 **Goal**: Every opted-in family member receives an FCM push notification on both Android and iOS when any caregiver logs a new potty event; device tokens are managed correctly through their full lifecycle.
-**Depends on**: Phase 5
+**Depends on**: Phase 7
 **Requirements**: REQ-020, REQ-021, REQ-022, REQ-023, REQ-024
 **Success Criteria** (what must be TRUE):
   1. When a caregiver logs an event, all other family members with notifications enabled receive an FCM push notification on their registered Android and iOS devices within a few seconds
@@ -92,9 +120,9 @@ Seven phases deliver a fully store-published, privacy-compliant, offline-first p
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 7: Launch Preparation & Store Submission
+### Phase 9: Launch Preparation & Store Submission
 **Goal**: Both Android and iOS apps are submitted to their respective app stores with all compliance deliverables complete, the SvelteKit marketing site is live, and the v1 success metric is achieved.
-**Depends on**: Phase 6
+**Depends on**: Phase 8
 **Requirements**: REQ-NF-004, REQ-C-006, REQ-C-007
 **Success Criteria** (what must be TRUE):
   1. The SvelteKit marketing site is live at the production URL on Cloudflare Pages
@@ -112,7 +140,9 @@ Seven phases deliver a fully store-published, privacy-compliant, offline-first p
 | 1. Foundation & Infrastructure | 0/TBD | Not started | - |
 | 2. Compliance & Privacy Architecture | 0/TBD | Not started | - |
 | 3. Authentication & Family Model | 0/TBD | Not started | - |
-| 4. Core Event Logging | 0/TBD | Not started | - |
-| 5. Offline-First Sync | 0/TBD | Not started | - |
-| 6. Push Notifications | 0/TBD | Not started | - |
-| 7. Launch Preparation & Store Submission | 0/TBD | Not started | - |
+| 4. UI/UX Design | 0/TBD | Not started | - |
+| 5. Core Event Logging | 0/TBD | Not started | - |
+| 6. Offline-First Sync | 0/TBD | Not started | - |
+| 7. Progress & Milestones | 0/TBD | Not started | - |
+| 8. Push Notifications | 0/TBD | Not started | - |
+| 9. Launch Preparation & Store Submission | 0/TBD | Not started | - |
