@@ -8,13 +8,67 @@ package api
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/oapi-codegen/runtime"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
+
+// ChildResponse defines model for ChildResponse.
+type ChildResponse struct {
+	BirthMonth *int                `json:"birth_month,omitempty"`
+	BirthYear  *int                `json:"birth_year,omitempty"`
+	ClerkOrgId *string             `json:"clerk_org_id,omitempty"`
+	Id         *openapi_types.UUID `json:"id,omitempty"`
+	Nickname   *string             `json:"nickname,omitempty"`
+}
+
+// CreateChildRequest defines model for CreateChildRequest.
+type CreateChildRequest struct {
+	BirthMonth int `json:"birth_month"`
+	BirthYear  int `json:"birth_year"`
+	Consent    struct {
+		AppVersion         string `json:"app_version"`
+		ConsentTextVersion string `json:"consent_text_version"`
+	} `json:"consent"`
+	Nickname string `json:"nickname"`
+}
+
+// ErasureConfirmation defines model for ErasureConfirmation.
+type ErasureConfirmation struct {
+	DeletedChildren                *int    `json:"deleted_children,omitempty"`
+	DeletedConsentEvents           *int    `json:"deleted_consent_events,omitempty"`
+	DeletedDeviceTokens            *int    `json:"deleted_device_tokens,omitempty"`
+	DeletedEvents                  *int    `json:"deleted_events,omitempty"`
+	DeletedNotificationPreferences *int    `json:"deleted_notification_preferences,omitempty"`
+	RequestedAt                    *string `json:"requested_at,omitempty"`
+	RequestedBy                    *string `json:"requested_by,omitempty"`
+}
+
+// ProblemDetail defines model for ProblemDetail.
+type ProblemDetail struct {
+	Detail *string `json:"detail,omitempty"`
+	Status *int    `json:"status,omitempty"`
+	Title  *string `json:"title,omitempty"`
+	Type   *string `json:"type,omitempty"`
+}
+
+// PostV1ChildrenJSONRequestBody defines body for PostV1Children for application/json ContentType.
+type PostV1ChildrenJSONRequestBody = CreateChildRequest
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Health check
 	// (GET /healthz)
 	GetHealthz(w http.ResponseWriter, r *http.Request)
+	// Delete the entire account and all associated data (GDPR/COPPA erasure)
+	// (DELETE /v1/account)
+	DeleteV1Account(w http.ResponseWriter, r *http.Request)
+	// Create a child profile with parental consent (atomic consent gate)
+	// (POST /v1/children)
+	PostV1Children(w http.ResponseWriter, r *http.Request)
+	// Delete a child profile and all associated data (GDPR/COPPA erasure)
+	// (DELETE /v1/children/{id})
+	DeleteV1ChildrenId(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -31,6 +85,60 @@ func (siw *ServerInterfaceWrapper) GetHealthz(w http.ResponseWriter, r *http.Req
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetHealthz(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DeleteV1Account operation middleware
+func (siw *ServerInterfaceWrapper) DeleteV1Account(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteV1Account(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostV1Children operation middleware
+func (siw *ServerInterfaceWrapper) PostV1Children(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostV1Children(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DeleteV1ChildrenId operation middleware
+func (siw *ServerInterfaceWrapper) DeleteV1ChildrenId(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteV1ChildrenId(w, r, id)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -161,6 +269,9 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	}
 
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/healthz", wrapper.GetHealthz)
+	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/v1/account", wrapper.DeleteV1Account)
+	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/v1/children", wrapper.PostV1Children)
+	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/v1/children/{id}", wrapper.DeleteV1ChildrenId)
 
 	return m
 }

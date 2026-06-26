@@ -6,13 +6,8 @@ import (
 )
 
 // ProblemDetail is the RFC 7807 error response format.
+// Type is defined in generated.go (generated from openapi.yaml ProblemDetail schema).
 // The `detail` field is for developers only — never shown to end users.
-type ProblemDetail struct {
-	Type   string `json:"type"`
-	Title  string `json:"title"`
-	Status int    `json:"status"`
-	Detail string `json:"detail"`
-}
 
 // WriteProblem writes an RFC 7807 problem response.
 // All Go handlers must use this function for error responses (REQ-NF-001).
@@ -21,9 +16,9 @@ func WriteProblem(w http.ResponseWriter, status int, typ, title, detail string) 
 	w.Header().Set("Content-Type", "application/problem+json")
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(ProblemDetail{
-		Type:   typ,
-		Title:  title,
-		Status: status,
-		Detail: detail,
+		Type:   &typ,
+		Title:  &title,
+		Status: &status,
+		Detail: &detail,
 	})
 }
