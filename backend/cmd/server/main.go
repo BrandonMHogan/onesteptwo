@@ -26,6 +26,7 @@ func main() {
 	db.SetMaxIdleConns(5)
 
 	srv := &api.Server{DB: db}
+	srv.Clerk = api.NewClerkClient(os.Getenv("CLERK_SECRET_KEY"))
 	mux := http.NewServeMux()
 	api.HandlerWithOptions(srv, api.StdHTTPServerOptions{BaseRouter: mux, ErrorHandlerFunc: api.ProblemErrorHandler})
 

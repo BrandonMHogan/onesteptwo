@@ -11,7 +11,8 @@ import (
 
 // Server implements the generated ServerInterface for all API handlers.
 type Server struct {
-	DB *sql.DB
+	DB    *sql.DB
+	Clerk ClerkOrgClient
 }
 
 // GetHealthz satisfies the oapi-codegen ServerInterface for GET /healthz.
