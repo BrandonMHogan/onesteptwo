@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 01 Plan 02 complete — KMP scaffold + assembleDebug
-last_updated: "2026-06-26T12:30:00.000Z"
-last_activity: 2026-06-26 -- Plan 01-02 executed (KMP monorepo scaffold + debug APK)
+stopped_at: Phase 01 Plan 03 complete — CI pipeline + production branch
+last_updated: "2026-06-26T13:51:17Z"
+last_activity: 2026-06-26 -- Plan 01-03 executed (GitHub Actions CI + production branch)
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 4
-  completed_plans: 2
-  percent: 5
+  completed_plans: 3
+  percent: 8
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-25)
 ## Current Position
 
 Phase: 01 (foundation-infrastructure) — EXECUTING
-Plan: 3 of 4
-Status: Ready to execute Plan 03
-Last activity: 2026-06-26 -- Plan 01-02 complete (KMP scaffold + assembleDebug)
+Plan: 4 of 4
+Status: Ready to execute Plan 04
+Last activity: 2026-06-26 -- Plan 01-03 complete (GitHub Actions CI + production branch)
 
-Progress: [█░░░░░░░░░] 5%
+Progress: [█░░░░░░░░░] 8%
 
 ## Phase Status
 
@@ -56,6 +56,7 @@ Progress: [█░░░░░░░░░] 5%
 |-------|------|----------|-------|-------|
 | 01 | 01 (Backend skeleton) | ~30 min | 3 | 12 |
 | 01 | 02 (KMP scaffold) | ~30 min | 3 | 15 |
+| 01 | 03 (CI pipeline + production branch) | ~2 min | 2 | 1 |
 
 *Updated after each plan completion*
 
@@ -69,6 +70,11 @@ All 27 locked decisions are recorded in PROJECT.md Decisions section.
 - Added `com.android.library` plugin to catalog + root build: the KMP `android {}` DSL block requires it (Kotlin plugin alone does not provide the `android` extension for shared modules)
 - Added `org.jetbrains.kotlin.plugin.compose` to catalog: mandatory from Kotlin 2.0 when `compose = true` in Android modules
 - Committed `androidApp/src/debug/google-services.json` as a structurally valid placeholder; Plan 01-04 replaces with real staging Firebase config
+
+**Plan 01-03 decisions:**
+- CI uses a single ubuntu-latest job for both Go and Android tiers (D-01 — iOS CI skipped, no macOS runner)
+- goose validate runs via `go run` at pinned v3.27.1; no separate install step needed
+- `production` branch created from main tip (62632cb) — starts as exact mirror per D-05 (release = manual PR from main → production)
 
 ### Pending Todos
 
@@ -92,6 +98,6 @@ None yet — see Open Questions below for pre-execution items to resolve.
 
 ## Session Continuity
 
-Last session: 2026-06-26T12:30:00.000Z
-Stopped at: Phase 01 Plan 02 complete — KMP scaffold + assembleDebug
-Resume file: .planning/phases/01-foundation-infrastructure/01-03-PLAN.md
+Last session: 2026-06-26T13:51:17Z
+Stopped at: Phase 01 Plan 03 complete — CI pipeline + production branch
+Resume file: .planning/phases/01-foundation-infrastructure/01-04-PLAN.md
