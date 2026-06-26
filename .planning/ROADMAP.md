@@ -61,7 +61,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 
 **Wave 1**
 
-  - [ ] 02-01-PLAN.md — Server-side schema: 00002_schema.sql (6 tables, event_type/device_platform enums, consent-gate FK per D-05) + docs/04-data-model.md reconciliation (REQ-008, REQ-NF-003, REQ-C-005, REQ-C-009)
+  - [x] 02-01-PLAN.md — Server-side schema: 00002_schema.sql (6 tables, event_type/device_platform enums, consent-gate FK per D-05) + docs/04-data-model.md reconciliation (REQ-008, REQ-NF-003, REQ-C-005, REQ-C-009)
   - [ ] 02-04-PLAN.md — SQLDelight client schema: .sq current schema + 2.sqm migration for children, potty_events, consent_events with client-only sync_status (REQ-C-005)
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -189,7 +189,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Infrastructure | 4/4 | Complete    | 2026-06-26 |
-| 2. Compliance & Privacy Architecture | 0/4 | Planned     | - |
+| 2. Compliance & Privacy Architecture | 1/4 | In Progress|  |
 | 3. Authentication & Family Model | 0/TBD | Not started | - |
 | 4. UI/UX Design | 0/TBD | Not started | - |
 | 5. Core Event Logging | 0/TBD | Not started | - |

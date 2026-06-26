@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 02 context gathered
-last_updated: "2026-06-26T20:33:56.469Z"
-last_activity: 2026-06-26 -- Phase 02 planning complete
+last_updated: "2026-06-26T20:58:55.714Z"
+last_activity: 2026-06-26 -- Phase 02 execution started
 progress:
   total_phases: 9
   completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
+  total_plans: 8
+  completed_plans: 5
   percent: 11
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-25)
 
 **Core value:** Offline-first potty tracking for multi-caregiver families — log instantly, sync when connected, notify everyone
-**Current focus:** Phase 01 — foundation-infrastructure
+**Current focus:** Phase 02 — compliance-privacy-architecture
 
 ## Current Position
 
-Phase: 04
-Plan: Not started
+Phase: 02 (compliance-privacy-architecture) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-06-26 -- Phase 02 planning complete
+Last activity: 2026-06-26 -- Phase 02 execution started
 
 Progress: [█░░░░░░░░░] 11%
 
@@ -60,6 +60,7 @@ Progress: [█░░░░░░░░░] 11%
 | 01 | 04 (External service provisioning) | ~4h | 3 | 2 |
 
 *Updated after each plan completion*
+| Phase 02 P01 | 3min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,8 @@ All 27 locked decisions are recorded in PROJECT.md Decisions section.
 - Railpack replaces NIXPACKS: Railway migrated to Railpack; explicit buildCommand/startCommand required for Go monorepo; railway.json updated accordingly
 - Production custom domain: api.onesteptwo.com via Namecheap CNAME → Railway (not the generated up.railway.app URL)
 - R2 backup cron deferred to post-v1 backlog: requires Cloudflare payment method; PostgreSQL is healthy; backup is operational risk, not a v1 launch blocker
+- [Phase ?]: D-01: event_type ENUM uses pee,poo,both,accident,tried — supersedes legacy dry and split accident values
+- [Phase ?]: D-05: FK direction — children.consent_event_id NOT NULL REFERENCES consent_events; consent_events has no child_id
 
 ### Service URLs
 
@@ -116,6 +119,6 @@ None yet — see Open Questions below for pre-execution items to resolve.
 
 ## Session Continuity
 
-Last session: 2026-06-26T19:45:35.385Z
+Last session: 2026-06-26T20:58:19.475Z
 Stopped at: Phase 02 context gathered
 Resume file: .planning/phases/02-compliance-privacy-architecture/02-CONTEXT.md

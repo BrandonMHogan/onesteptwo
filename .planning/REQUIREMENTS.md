@@ -139,7 +139,7 @@ docs/06-auth.md, docs/07-sync-and-notifications.md.
 | REQ-005 | Phase 6 | Pending |
 | REQ-006 | Phase 5 | Pending |
 | REQ-007 | Phase 5 | Pending |
-| REQ-008 | Phase 2 | Pending |
+| REQ-008 | Phase 2 | Complete |
 | REQ-009 | Phase 2 | Pending |
 | REQ-010 | Phase 2 | Pending |
 | REQ-011 | Phase 2 | Pending |
@@ -170,7 +170,7 @@ docs/06-auth.md, docs/07-sync-and-notifications.md.
 | REQ-036 | Phase 5 | Pending |
 | REQ-NF-001 | Phase 1 | Complete |
 | REQ-NF-002 | Phase 6 | Pending |
-| REQ-NF-003 | Phase 2 | Pending |
+| REQ-NF-003 | Phase 2 | Complete |
 | REQ-NF-004 | Phase 9 | Pending |
 | REQ-NF-005 | Phase 6 | Pending |
 | REQ-NF-006 | Phase 3 | Pending |
@@ -182,10 +182,10 @@ docs/06-auth.md, docs/07-sync-and-notifications.md.
 | REQ-C-002 | Phase 2 | Pending |
 | REQ-C-003 | Phase 2 | Pending |
 | REQ-C-004 | Phase 2 | Pending |
-| REQ-C-005 | Phase 2 | Pending |
+| REQ-C-005 | Phase 2 | Complete |
 | REQ-C-006 | Phase 9 | Pending |
 | REQ-C-007 | Phase 9 | Pending |
 | REQ-C-008 | Phase 2 | Pending |
-| REQ-C-009 | Phase 2 | Pending |
+| REQ-C-009 | Phase 2 | Complete |
 
 **Coverage:** 54 active v1 requirements mapped across 9 phases. REQ-029 (data portability export) explicitly deferred to v2 per requirements spec.
