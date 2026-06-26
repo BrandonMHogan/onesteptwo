@@ -7,7 +7,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 ## Phases
 
 - [x] **Phase 1: Foundation & Infrastructure** - Monorepo scaffold, CI/CD, Railway deploy, PostgreSQL + R2 backup, Clerk + Firebase provisioning, Go healthcheck, SQLDelight and goose migrations initialized
-- [ ] **Phase 2: Compliance & Privacy Architecture** - Consent gate, erasure cascade, audit log, data minimisation constraints, and all COPPA/GDPR/PIPEDA/POPIA obligations enforced in schema and API before any child data flows
+- [x] **Phase 2: Compliance & Privacy Architecture** - Consent gate, erasure cascade, audit log, data minimisation constraints, and all COPPA/GDPR/PIPEDA/POPIA obligations enforced in schema and API before any child data flows (completed 2026-06-26)
 - [ ] **Phase 3: Authentication & Family Model** - Sign up/in on Android + iOS, Clerk org enforcement, role-gated access, invitation flow, multi-org picker, JWT validation with azp and org context checks
 - [ ] **Phase 4: UI/UX Design** - Screen flows, lo-fi wireframes, design tokens (color, type, spacing), component specs, and navigation/animation patterns for all screens on both platforms — spec complete before implementation begins
 - [ ] **Phase 5: Core Event Logging** - Onboarding wizard (family setup + consent + child profile), 4-tab navigation, one-tap logging with details-later flow, event types, pending-details banner, heatmap history tab, child switcher, Settings screens
@@ -70,7 +70,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-  - [ ] 02-03-PLAN.md — Erasure cascade + audit: DELETE /v1/children/{id} (FK-safe), DELETE /v1/account, 90-day sweep-on-request audit (REQ-011, REQ-012, REQ-013, REQ-014, REQ-C-002, REQ-C-003, REQ-C-004, REQ-C-008)
+  - [x] 02-03-PLAN.md — Erasure cascade + audit: DELETE /v1/children/{id} (FK-safe), DELETE /v1/account, 90-day sweep-on-request audit (REQ-011, REQ-012, REQ-013, REQ-014, REQ-C-002, REQ-C-003, REQ-C-004, REQ-C-008)
 
 ### Phase 3: Authentication & Family Model
 
@@ -189,7 +189,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Infrastructure | 4/4 | Complete    | 2026-06-26 |
-| 2. Compliance & Privacy Architecture | 3/4 | In Progress|  |
+| 2. Compliance & Privacy Architecture | 4/4 | Complete   | 2026-06-26 |
 | 3. Authentication & Family Model | 0/TBD | Not started | - |
 | 4. UI/UX Design | 0/TBD | Not started | - |
 | 5. Core Event Logging | 0/TBD | Not started | - |
