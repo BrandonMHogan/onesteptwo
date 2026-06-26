@@ -1,0 +1,53 @@
+# Gradle build outputs and caches
+.gradle/
+build/
+
+# Local configuration — contains local SDK path, never commit
+local.properties
+
+# IntelliJ / Android Studio project files
+*.iml
+.idea/
+
+# macOS metadata
+.DS_Store
+
+# Security: production Firebase config must never be committed (T-02-01)
+# Only the release (production) config is gitignored; the debug (staging) config is committed.
+androidApp/src/release/google-services.json
+
+# Kotlin / Android build output
+*.class
+*.apk
+*.aab
+
+# Go build output
+backend/server
+*.exe
+*.test
+*.out
+
+# Go local environment
+backend/.env
+
+# Standard Go ignores
+vendor/
+
+# NOTE: oapi-codegen output in backend/internal/api/ is committed (D-03 — do not gitignore it)
+# NOTE: Staging Firebase config at androidApp/src/debug/ is committed (non-sensitive)
+
+# SvelteKit / frontend
+frontend/.svelte-kit/
+frontend/node_modules/
+frontend/build/
+
+# iOS / Xcode
+iosApp/*.xcworkspace/xcuserdata/
+iosApp/build/
+iosApp/DerivedData/
+*.xcuserstate
+
+# Environment files
+.env
+.env.local
+.env.*.local
