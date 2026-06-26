@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Phase 01 Plan 04 complete — external service provisioning (Railway + Clerk + Firebase)
-last_updated: "2026-06-26T18:12:29Z"
-last_activity: 2026-06-26 -- Plan 01-04 executed (Railway services, PostgreSQL, Clerk, Firebase)
+status: completed
+stopped_at: Phase 01 Plan 04 complete — all 4 Phase 1 plans done; Phase 1 COMPLETE
+last_updated: "2026-06-26T18:34:26.770Z"
+last_activity: 2026-06-26
 progress:
   total_phases: 9
   completed_phases: 1
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-06-25)
 
 ## Current Position
 
-Phase: 01 (foundation-infrastructure) — COMPLETE
-Plan: 4 of 4 — ALL PLANS COMPLETE
+Phase: 04
+Plan: Not started
 Status: Phase 01 complete; ready to begin Phase 02
-Last activity: 2026-06-26 -- Plan 01-04 complete (Railway + Clerk + Firebase provisioning)
+Last activity: 2026-06-26
 
 Progress: [█░░░░░░░░░] 11%
 
@@ -48,7 +48,7 @@ Progress: [█░░░░░░░░░] 11%
 
 **Velocity:**
 
-- Total plans completed: 4
+- Total plans completed: 8
 - Average duration: ~1.5h
 - Total execution time: ~5h
 
@@ -68,16 +68,19 @@ Progress: [█░░░░░░░░░] 11%
 All 27 locked decisions are recorded in PROJECT.md Decisions section.
 
 **Plan 01-02 decisions:**
+
 - Added `com.android.library` plugin to catalog + root build: the KMP `android {}` DSL block requires it (Kotlin plugin alone does not provide the `android` extension for shared modules)
 - Added `org.jetbrains.kotlin.plugin.compose` to catalog: mandatory from Kotlin 2.0 when `compose = true` in Android modules
 - Committed `androidApp/src/debug/google-services.json` as a structurally valid placeholder; Plan 01-04 replaces with real staging Firebase config
 
 **Plan 01-03 decisions:**
+
 - CI uses a single ubuntu-latest job for both Go and Android tiers (D-01 — iOS CI skipped, no macOS runner)
 - goose validate runs via `go run` at pinned v3.27.1; no separate install step needed
 - `production` branch created from main tip (62632cb) — starts as exact mirror per D-05 (release = manual PR from main → production)
 
 **Plan 01-04 decisions:**
+
 - Railpack replaces NIXPACKS: Railway migrated to Railpack; explicit buildCommand/startCommand required for Go monorepo; railway.json updated accordingly
 - Production custom domain: api.onesteptwo.com via Namecheap CNAME → Railway (not the generated up.railway.app URL)
 - R2 backup cron deferred to post-v1 backlog: requires Cloudflare payment method; PostgreSQL is healthy; backup is operational risk, not a v1 launch blocker

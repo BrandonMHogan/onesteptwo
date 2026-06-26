@@ -175,7 +175,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Infrastructure | 4/4 | Complete | 2026-06-26 |
+| 1. Foundation & Infrastructure | 4/4 | Complete    | 2026-06-26 |
 | 2. Compliance & Privacy Architecture | 0/TBD | Not started | - |
 | 3. Authentication & Family Model | 0/TBD | Not started | - |
 | 4. UI/UX Design | 0/TBD | Not started | - |
