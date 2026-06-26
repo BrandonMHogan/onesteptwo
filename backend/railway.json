@@ -1,10 +1,10 @@
 {
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
-    "buildCommand": "go build -o /app/server ./cmd/server"
+    "buildCommand": "go build -o /app/server ./cmd/server && go build -o /app/migrate ./cmd/migrate"
   },
   "deploy": {
-    "startCommand": "/app/server",
+    "startCommand": "/app/migrate up && /app/server",
     "healthcheckPath": "/healthz",
     "healthcheckTimeout": 300,
     "restartPolicyType": "ALWAYS",
