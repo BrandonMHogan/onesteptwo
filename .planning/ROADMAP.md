@@ -184,3 +184,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 | 7. Progress & Milestones | 0/TBD | Not started | - |
 | 8. Push Notifications | 0/TBD | Not started | - |
 | 9. Launch Preparation & Store Submission | 0/TBD | Not started | - |
+
+## Post-v1 Backlog
+
+- **Cloudflare R2 backup cron** — Daily pg_dump from Railway PostgreSQL to R2. Deferred from Phase 1 (requires payment method; not needed for v1 launch). Set up after v1 ships.
