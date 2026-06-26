@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "000000000000",
+    "project_number": "162166871959",
     "project_id": "onesteptwo-staging",
     "storage_bucket": "onesteptwo-staging.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:000000000000:android:0000000000000000",
+        "mobilesdk_app_id": "1:162166871959:android:3afee7ba38ec84ba0f56d2",
         "android_client_info": {
           "package_name": "com.onesteptwo.android"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "placeholder-replace-with-real-staging-key-in-plan-01-04"
+          "current_key": "AIzaSyA75sOcZIT076zZrnDVyAiuwo4g_SEvK6o"
         }
       ],
       "services": {
