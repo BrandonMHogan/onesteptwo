@@ -27,7 +27,7 @@ func main() {
 
 	srv := &api.Server{DB: db}
 	mux := http.NewServeMux()
-	api.HandlerFromMux(srv, mux)
+	api.HandlerWithOptions(srv, api.StdHTTPServerOptions{BaseRouter: mux, ErrorHandlerFunc: api.ProblemErrorHandler})
 
 	log.Printf("starting server on :%s", port)
 	if err := http.ListenAndServe(":"+port, mux); err != nil {
