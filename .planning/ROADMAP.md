@@ -57,7 +57,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
   4. The consent_events table has no IP address column; the Go handler does not write one
   5. An erasure audit row is inserted on every deletion; a scheduled process (or DB rule) purges audit rows older than 90 days
 
-**Plans**: 4 plans
+**Plans**: 6 plans (4 original + 2 gap-closure)
 
 **Wave 1**
 
@@ -71,6 +71,11 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 **Wave 3** *(blocked on Wave 2 completion)*
 
   - [x] 02-03-PLAN.md — Erasure cascade + audit: DELETE /v1/children/{id} (FK-safe), DELETE /v1/account, 90-day sweep-on-request audit (REQ-011, REQ-012, REQ-013, REQ-014, REQ-C-002, REQ-C-003, REQ-C-004, REQ-C-008)
+
+**Wave 4** *(gap closure — from 02-VERIFICATION.md)*
+
+  - [ ] 02-05-PLAN.md — RFC 7807 error handler: ProblemErrorHandler wired via HandlerWithOptions so malformed path params return application/problem+json, not text/plain (REQ-NF-001) [Gap 1]
+  - [ ] 02-06-PLAN.md — Account erasure completion: org-wide device_tokens delete via Clerk member list, Clerk Organization deletion after commit, org-traceable audit target_id, REQUIREMENTS.md traceability update (REQ-012, REQ-011, REQ-014, REQ-C-002/003/004/008) [Gaps 2 & 3]
 
 ### Phase 3: Authentication & Family Model
 
