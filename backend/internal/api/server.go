@@ -139,10 +139,105 @@ func (s *Server) PostV1Children(w http.ResponseWriter, r *http.Request) {
 }
 
 // DeleteV1ChildrenId implements DELETE /v1/children/{id} — child erasure cascade.
-// TODO 02-03: full erasure cascade implemented in plan 02-03.
+// Hard-deletes a child's data in FK-safe order (REQ-011, REQ-013, REQ-014, REQ-C-002, REQ-C-003, REQ-C-004).
+// Each call first purges erasure_audit rows older than 90 days (D-12, REQ-C-008).
+//
+// Auth path returns before DB use — nil DB is safe for unit tests of the auth code path.
 func (s *Server) DeleteV1ChildrenId(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
-	// TODO 02-03: full erasure cascade implemented in plan 02-03
-	WriteProblem(w, http.StatusNotImplemented, "about:blank", "Not Implemented", "implemented in plan 02-03")
+	// TODO Phase 3: replace with JWT claim extraction
+	clerkUserID := r.Header.Get("X-Clerk-User-Id")
+	if clerkUserID == "" {
+		WriteProblem(w, http.StatusUnauthorized, "about:blank", "Unauthorized", "missing identity header")
+		return
+	}
+
+	ctx := r.Context()
+	childID := id.String()
+
+	tx, err := s.DB.BeginTx(ctx, nil)
+	if err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not begin transaction")
+		return
+	}
+	defer tx.Rollback() //nolint:errcheck // safe no-op after Commit
+
+	// D-12: purge erasure_audit rows older than 90 days (sweep-on-request, REQ-C-008).
+	_, _ = tx.ExecContext(ctx, `DELETE FROM erasure_audit WHERE deleted_at < NOW() - INTERVAL '90 days'`)
+
+	// Capture consent_event_id BEFORE deleting the children row.
+	// CRITICAL (RESEARCH.md Pitfall 1): D-05 FK direction means children.consent_event_id REFERENCES consent_events(id).
+	// Deleting consent_events BEFORE children throws a FK violation — children must be deleted first.
+	// SELECT consent_event_id FROM children must come here, before any DELETE, so the value is preserved.
+	var consentEventID string
+	err = tx.QueryRowContext(ctx,
+		`SELECT consent_event_id FROM children WHERE id = $1`, childID,
+	).Scan(&consentEventID)
+	if err == sql.ErrNoRows {
+		WriteProblem(w, http.StatusNotFound, "about:blank", "Not Found", "child not found")
+		return
+	}
+	if err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not look up child")
+		return
+	}
+
+	// TODO Phase 3: verify children.clerk_org_id matches the requester's active org before deleting (IDOR gap T-2-02).
+
+	// FK-safe deletion order (D-05 FK: children → consent_events).
+	// children must be deleted BEFORE consent_events to release the FK reference (Pitfall 1).
+	r1, err := tx.ExecContext(ctx, `DELETE FROM potty_events WHERE child_id = $1`, childID)
+	if err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not delete potty events")
+		return
+	}
+	r2, err := tx.ExecContext(ctx, `DELETE FROM notification_preferences WHERE child_id = $1`, childID)
+	if err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not delete notification preferences")
+		return
+	}
+	_, err = tx.ExecContext(ctx, `DELETE FROM children WHERE id = $1`, childID) // FK released here
+	if err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not delete child")
+		return
+	}
+	r3, err := tx.ExecContext(ctx, `DELETE FROM consent_events WHERE id = $1`, consentEventID) // now safe
+	if err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not delete consent event")
+		return
+	}
+
+	// Audit row written inside the same tx — no deletion without an audit row (T-2-04).
+	_, err = tx.ExecContext(ctx,
+		`INSERT INTO erasure_audit (clerk_user_id, action, target_id, target_type, deleted_at)
+		 VALUES ($1, 'child_deletion', $2, 'child', NOW())`,
+		clerkUserID, childID,
+	)
+	if err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not write audit record")
+		return
+	}
+
+	if err = tx.Commit(); err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not commit deletion")
+		return
+	}
+
+	eventsDeleted, _ := r1.RowsAffected()
+	prefsDeleted, _ := r2.RowsAffected()
+	consentDeleted, _ := r3.RowsAffected()
+
+	// D-10: structured erasure confirmation JSON (not 204 No Content per REQ-013/REQ-014).
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]any{
+		"deleted_children":                 1,
+		"deleted_events":                   eventsDeleted,
+		"deleted_consent_events":           consentDeleted,
+		"deleted_notification_preferences": prefsDeleted,
+		"deleted_device_tokens":            0, // device tokens are removed only on account deletion
+		"requested_by":                     clerkUserID,
+		"requested_at":                     time.Now().UTC().Format(time.RFC3339),
+	})
 }
 
 // DeleteV1Account implements DELETE /v1/account — full account erasure cascade.
