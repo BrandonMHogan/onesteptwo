@@ -241,8 +241,127 @@ func (s *Server) DeleteV1ChildrenId(w http.ResponseWriter, r *http.Request, id o
 }
 
 // DeleteV1Account implements DELETE /v1/account — full account erasure cascade.
-// TODO 02-03: full erasure cascade implemented in plan 02-03.
+// Hard-deletes every child in the requesting org and all their dependents, in FK-safe order
+// (REQ-012, REQ-013, REQ-014, REQ-C-002, REQ-C-003, REQ-C-004).
+// Each call first purges erasure_audit rows older than 90 days (D-12, REQ-C-008).
+//
+// Auth path returns before DB use — nil DB is safe for unit tests of the auth code path.
 func (s *Server) DeleteV1Account(w http.ResponseWriter, r *http.Request) {
-	// TODO 02-03: full erasure cascade implemented in plan 02-03
-	WriteProblem(w, http.StatusNotImplemented, "about:blank", "Not Implemented", "implemented in plan 02-03")
+	// TODO Phase 3: replace with JWT claim extraction
+	clerkUserID := r.Header.Get("X-Clerk-User-Id")
+	clerkOrgID := r.Header.Get("X-Clerk-Org-Id")
+	if clerkUserID == "" || clerkOrgID == "" {
+		WriteProblem(w, http.StatusUnauthorized, "about:blank", "Unauthorized", "missing identity headers")
+		return
+	}
+
+	ctx := r.Context()
+	tx, err := s.DB.BeginTx(ctx, nil)
+	if err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not begin transaction")
+		return
+	}
+	defer tx.Rollback() //nolint:errcheck // safe no-op after Commit
+
+	// D-12: purge erasure_audit rows older than 90 days (sweep-on-request, REQ-C-008).
+	_, _ = tx.ExecContext(ctx, `DELETE FROM erasure_audit WHERE deleted_at < NOW() - INTERVAL '90 days'`)
+
+	// Enumerate all children in the org for FK-safe cascade deletion.
+	rows, err := tx.QueryContext(ctx, `SELECT id, consent_event_id FROM children WHERE clerk_org_id = $1`, clerkOrgID)
+	if err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not query children")
+		return
+	}
+	type childRow struct {
+		id             string
+		consentEventID string
+	}
+	var children []childRow
+	for rows.Next() {
+		var c childRow
+		if err := rows.Scan(&c.id, &c.consentEventID); err != nil {
+			rows.Close() //nolint:errcheck
+			WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not scan children")
+			return
+		}
+		children = append(children, c)
+	}
+	rows.Close() //nolint:errcheck
+	if err := rows.Err(); err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not enumerate children")
+		return
+	}
+
+	var totalEvents, totalConsent, totalPrefs, totalChildren int64
+	for _, c := range children {
+		r1, err := tx.ExecContext(ctx, `DELETE FROM potty_events WHERE child_id = $1`, c.id)
+		if err != nil {
+			WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not delete potty events")
+			return
+		}
+		r2, err := tx.ExecContext(ctx, `DELETE FROM notification_preferences WHERE child_id = $1`, c.id)
+		if err != nil {
+			WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not delete notification preferences")
+			return
+		}
+		_, err = tx.ExecContext(ctx, `DELETE FROM children WHERE id = $1`, c.id) // FK released here
+		if err != nil {
+			WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not delete child")
+			return
+		}
+		r3, err := tx.ExecContext(ctx, `DELETE FROM consent_events WHERE id = $1`, c.consentEventID) // now safe
+		if err != nil {
+			WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not delete consent event")
+			return
+		}
+		n1, _ := r1.RowsAffected()
+		n2, _ := r2.RowsAffected()
+		n3, _ := r3.RowsAffected()
+		totalEvents += n1
+		totalPrefs += n2
+		totalConsent += n3
+		totalChildren++
+	}
+
+	// Delete requesting user's own device tokens (best-effort; org-wide deletion requires Clerk API).
+	// TODO Phase 3: delete device_tokens for ALL org members (requires Clerk org member list) and
+	// delete the Clerk Organization (REQ-012). Org-wide token cleanup is moot until device_tokens are
+	// populated in Phase 8.
+	r4, err := tx.ExecContext(ctx, `DELETE FROM device_tokens WHERE clerk_user_id = $1`, clerkUserID)
+	if err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not delete device tokens")
+		return
+	}
+	tokensDeleted, _ := r4.RowsAffected()
+
+	// Audit row written inside the same tx — no deletion without an audit row (T-2-04).
+	// TODO Phase 3: use the Clerk org UUID here (clerk_org_id is not a UUID in Phase 2 placeholder testing).
+	_, err = tx.ExecContext(ctx,
+		`INSERT INTO erasure_audit (clerk_user_id, action, target_id, target_type, deleted_at)
+		 VALUES ($1, 'account_deletion', gen_random_uuid(), 'family', NOW())`,
+		clerkUserID,
+	)
+	if err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not write audit record")
+		return
+	}
+
+	// Commit DB work BEFORE any external call (RESEARCH.md Pitfall 2 — Clerk-API-after-commit).
+	if err = tx.Commit(); err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not commit deletion")
+		return
+	}
+
+	// D-10: structured erasure confirmation JSON (not 204 No Content per REQ-013/REQ-014).
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]any{
+		"deleted_children":                 totalChildren,
+		"deleted_events":                   totalEvents,
+		"deleted_consent_events":           totalConsent,
+		"deleted_notification_preferences": totalPrefs,
+		"deleted_device_tokens":            tokensDeleted,
+		"requested_by":                     clerkUserID,
+		"requested_at":                     time.Now().UTC().Format(time.RFC3339),
+	})
 }
