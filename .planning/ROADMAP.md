@@ -66,7 +66,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-  - [ ] 02-02-PLAN.md — API contract + consent gate: openapi.yaml 3 endpoints, make generate, Server DB wiring, atomic POST /v1/children (REQ-009, REQ-010, REQ-013, REQ-C-001, REQ-C-009)
+  - [x] 02-02-PLAN.md — API contract + consent gate: openapi.yaml 3 endpoints, make generate, Server DB wiring, atomic POST /v1/children (REQ-009, REQ-010, REQ-013, REQ-C-001, REQ-C-009)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -189,7 +189,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Infrastructure | 4/4 | Complete    | 2026-06-26 |
-| 2. Compliance & Privacy Architecture | 2/4 | In Progress|  |
+| 2. Compliance & Privacy Architecture | 3/4 | In Progress|  |
 | 3. Authentication & Family Model | 0/TBD | Not started | - |
 | 4. UI/UX Design | 0/TBD | Not started | - |
 | 5. Core Event Logging | 0/TBD | Not started | - |
