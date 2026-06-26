@@ -1,0 +1,14 @@
+-- Phase 2: client-side children table
+-- Stores only clerk_org_id (org identifier), nickname, and birth month/year — no PII (REQ-C-005).
+-- consent_event_id FK (D-05): each child requires a prior consent record.
+-- No gender, legal_name, dob, or photo columns.
+CREATE TABLE children (
+    id TEXT NOT NULL PRIMARY KEY,
+    clerk_org_id TEXT NOT NULL,
+    nickname TEXT NOT NULL,
+    birth_month INTEGER NOT NULL,
+    birth_year INTEGER NOT NULL,
+    consent_event_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);

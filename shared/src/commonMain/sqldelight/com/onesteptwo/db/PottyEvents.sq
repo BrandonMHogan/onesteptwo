@@ -1,0 +1,19 @@
+-- Phase 2: client-side potty_events table
+-- event_type is plain nullable TEXT (no ENUM on SQLite) matching D-01 values: pee, poo, both, accident, tried.
+-- sync_status is a client-only column (D-14): tracks offline pending queue; absent from server schema.
+-- deleted_at / deleted_by retained for sync-down soft-delete visibility (D-15).
+-- logged_by stores clerk_user_id of the caregiver who logged the event (REQ-C-005).
+CREATE TABLE potty_events (
+    id TEXT NOT NULL PRIMARY KEY,
+    child_id TEXT NOT NULL,
+    logged_by TEXT NOT NULL,
+    occurred_at TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    updated_by TEXT,
+    event_type TEXT,
+    notes TEXT,
+    deleted_at TEXT,
+    deleted_by TEXT,
+    sync_status TEXT NOT NULL DEFAULT 'pending'
+);
