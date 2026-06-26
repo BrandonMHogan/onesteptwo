@@ -57,7 +57,20 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
   4. The consent_events table has no IP address column; the Go handler does not write one
   5. An erasure audit row is inserted on every deletion; a scheduled process (or DB rule) purges audit rows older than 90 days
 
-**Plans**: TBD
+**Plans**: 4 plans
+
+**Wave 1**
+
+  - [ ] 02-01-PLAN.md — Server-side schema: 00002_schema.sql (6 tables, event_type/device_platform enums, consent-gate FK per D-05) + docs/04-data-model.md reconciliation (REQ-008, REQ-NF-003, REQ-C-005, REQ-C-009)
+  - [ ] 02-04-PLAN.md — SQLDelight client schema: .sq current schema + 2.sqm migration for children, potty_events, consent_events with client-only sync_status (REQ-C-005)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+  - [ ] 02-02-PLAN.md — API contract + consent gate: openapi.yaml 3 endpoints, make generate, Server DB wiring, atomic POST /v1/children (REQ-009, REQ-010, REQ-013, REQ-C-001, REQ-C-009)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+  - [ ] 02-03-PLAN.md — Erasure cascade + audit: DELETE /v1/children/{id} (FK-safe), DELETE /v1/account, 90-day sweep-on-request audit (REQ-011, REQ-012, REQ-013, REQ-014, REQ-C-002, REQ-C-003, REQ-C-004, REQ-C-008)
 
 ### Phase 3: Authentication & Family Model
 
@@ -176,7 +189,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Infrastructure | 4/4 | Complete    | 2026-06-26 |
-| 2. Compliance & Privacy Architecture | 0/TBD | Not started | - |
+| 2. Compliance & Privacy Architecture | 0/4 | Planned     | - |
 | 3. Authentication & Family Model | 0/TBD | Not started | - |
 | 4. UI/UX Design | 0/TBD | Not started | - |
 | 5. Core Event Logging | 0/TBD | Not started | - |
