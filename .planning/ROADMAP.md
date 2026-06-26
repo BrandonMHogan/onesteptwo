@@ -6,7 +6,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 
 ## Phases
 
-- [ ] **Phase 1: Foundation & Infrastructure** - Monorepo scaffold, CI/CD, Railway deploy, PostgreSQL + R2 backup, Clerk + Firebase provisioning, Go healthcheck, SQLDelight and goose migrations initialized
+- [x] **Phase 1: Foundation & Infrastructure** - Monorepo scaffold, CI/CD, Railway deploy, PostgreSQL + R2 backup, Clerk + Firebase provisioning, Go healthcheck, SQLDelight and goose migrations initialized
 - [ ] **Phase 2: Compliance & Privacy Architecture** - Consent gate, erasure cascade, audit log, data minimisation constraints, and all COPPA/GDPR/PIPEDA/POPIA obligations enforced in schema and API before any child data flows
 - [ ] **Phase 3: Authentication & Family Model** - Sign up/in on Android + iOS, Clerk org enforcement, role-gated access, invitation flow, multi-org picker, JWT validation with azp and org context checks
 - [ ] **Phase 4: UI/UX Design** - Screen flows, lo-fi wireframes, design tokens (color, type, spacing), component specs, and navigation/animation patterns for all screens on both platforms — spec complete before implementation begins
@@ -42,7 +42,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-  - [ ] 01-04-PLAN.md — External provisioning: Railway services + Postgres, R2 backup cron, Clerk apps, Firebase projects, /healthz live (REQ-001)
+  - [x] 01-04-PLAN.md — External provisioning: Railway services + Postgres, Clerk apps, Firebase projects, /healthz live (REQ-001) — R2 backup cron deferred to post-v1
 
 ### Phase 2: Compliance & Privacy Architecture
 
@@ -175,7 +175,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Infrastructure | 3/4 | In Progress|  |
+| 1. Foundation & Infrastructure | 4/4 | Complete | 2026-06-26 |
 | 2. Compliance & Privacy Architecture | 0/TBD | Not started | - |
 | 3. Authentication & Family Model | 0/TBD | Not started | - |
 | 4. UI/UX Design | 0/TBD | Not started | - |
