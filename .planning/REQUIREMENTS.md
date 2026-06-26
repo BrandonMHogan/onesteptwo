@@ -132,8 +132,8 @@ docs/06-auth.md, docs/07-sync-and-notifications.md.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| REQ-001 | Phase 1 | Pending |
-| REQ-002 | Phase 1 | Pending |
+| REQ-001 | Phase 1 | Complete |
+| REQ-002 | Phase 1 | Complete |
 | REQ-003 | Phase 5 | Pending |
 | REQ-004 | Phase 6 | Pending |
 | REQ-005 | Phase 6 | Pending |
@@ -168,7 +168,7 @@ docs/06-auth.md, docs/07-sync-and-notifications.md.
 | REQ-034 | Phase 7 | Pending |
 | REQ-035 | Phase 4 | Pending |
 | REQ-036 | Phase 5 | Pending |
-| REQ-NF-001 | Phase 1 | Pending |
+| REQ-NF-001 | Phase 1 | Complete |
 | REQ-NF-002 | Phase 6 | Pending |
 | REQ-NF-003 | Phase 2 | Pending |
 | REQ-NF-004 | Phase 9 | Pending |

@@ -33,7 +33,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 
 **Wave 1**
 
-  - [ ] 01-01-PLAN.md — Go backend skeleton: /healthz, RFC 7807 helper, server + migrate entrypoints, first goose migration, railway.json (REQ-001, REQ-002, REQ-NF-001)
+  - [x] 01-01-PLAN.md — Go backend skeleton: /healthz, RFC 7807 helper, server + migrate entrypoints, first goose migration, railway.json (REQ-001, REQ-002, REQ-NF-001)
   - [ ] 01-02-PLAN.md — Gradle/KMP monorepo + toolchain: JDK 21 + Android SDK + Gradle 8.10.2, version catalog, :shared + :androidApp, SQLDelight 1.sqm (REQ-025)
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -175,7 +175,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Infrastructure | 0/4 | Planned | - |
+| 1. Foundation & Infrastructure | 1/4 | In Progress|  |
 | 2. Compliance & Privacy Architecture | 0/TBD | Not started | - |
 | 3. Authentication & Family Model | 0/TBD | Not started | - |
 | 4. UI/UX Design | 0/TBD | Not started | - |
