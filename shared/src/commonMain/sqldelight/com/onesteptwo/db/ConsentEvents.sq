@@ -1,5 +1,5 @@
 -- Phase 2: client-side consent_events table
--- No child_id (D-05 FK direction: children.consent_event_id → consent_events).
+-- FK direction (D-05): children.consent_event_id references this table, not the other way around.
 -- No IP address column (REQ-C-009 / D-06).
 CREATE TABLE consent_events (
     id                   TEXT NOT NULL PRIMARY KEY,
