@@ -37,6 +37,9 @@ sqldelight {
         create("OneStepTwoDatabase") {
             packageName.set("com.onesteptwo.db")
             verifyMigrations.set(true)    // fails build if sqm file is invalid; enforces REQ-025
+            // schemaOutputDirectory enables the generateSchema Gradle task which produces {version}.db
+            // required for verifySqlDelightMigration to compare migrations against the current schema
+            schemaOutputDirectory.set(file("src/commonMain/sqldelight/migrations"))
         }
     }
 }

@@ -1,0 +1,46 @@
+-- shared/src/commonMain/sqldelight/migrations/2.sqm
+-- Phase 2: client-side schema — creates children, potty_events, and consent_events tables.
+-- Applies on top of 1.sqm (empty Phase 1 placeholder). No gaps in numbering (REQ-025).
+-- SQLite types only: TEXT for UUIDs and timestamps, INTEGER for numeric fields.
+-- No transaction wrappers — see 1.sqm comment for rationale.
+
+-- consent_events first: children.consent_event_id references this table (D-05 FK direction).
+-- No child_id column. No IP address column (REQ-C-009 / D-06).
+CREATE TABLE consent_events (
+    id TEXT NOT NULL PRIMARY KEY,
+    clerk_user_id TEXT NOT NULL,
+    consented_at TEXT NOT NULL,
+    app_version TEXT NOT NULL,
+    consent_text_version TEXT NOT NULL
+);
+
+-- children: consent_event_id ensures a consent record exists before any child profile (D-05).
+-- Stores only clerk_org_id + nickname + birth_month/year — no PII (REQ-C-005).
+CREATE TABLE children (
+    id TEXT NOT NULL PRIMARY KEY,
+    clerk_org_id TEXT NOT NULL,
+    nickname TEXT NOT NULL,
+    birth_month INTEGER NOT NULL,
+    birth_year INTEGER NOT NULL,
+    consent_event_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
+-- potty_events: event_type is plain nullable TEXT (D-01 values: pee, poo, both, accident, tried).
+-- sync_status is a client-only column (D-14) for the offline pending queue; absent from server schema.
+-- deleted_at / deleted_by retained for sync-down soft-delete visibility (D-15).
+CREATE TABLE potty_events (
+    id TEXT NOT NULL PRIMARY KEY,
+    child_id TEXT NOT NULL,
+    logged_by TEXT NOT NULL,
+    occurred_at TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    updated_by TEXT,
+    event_type TEXT,
+    notes TEXT,
+    deleted_at TEXT,
+    deleted_by TEXT,
+    sync_status TEXT NOT NULL DEFAULT 'pending'
+);
