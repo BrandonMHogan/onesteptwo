@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
     alias(libs.plugins.sqldelight)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
@@ -14,12 +15,19 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.sqldelight.runtime)
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.auth)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
         }
         androidMain.dependencies {
             implementation(libs.sqldelight.android.driver)
+            implementation(libs.ktor.client.okhttp)
+            implementation(libs.clerk.android.api)
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native.driver)
+            implementation(libs.ktor.client.darwin)
         }
     }
 }
