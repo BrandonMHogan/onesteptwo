@@ -6,6 +6,7 @@ skie = "0.10.12"
 compose-bom = "2024.09.00"
 ktor = "3.5.1"
 clerk-android = "1.0.31"
+navigation = "2.8.3"
 
 [libraries]
 sqldelight-runtime = { group = "app.cash.sqldelight", name = "runtime", version.ref = "sqldelight" }
@@ -22,6 +23,8 @@ ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serializatio
 ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
 ktor-client-darwin = { group = "io.ktor", name = "ktor-client-darwin", version.ref = "ktor" }
 clerk-android-api = { group = "com.clerk", name = "clerk-android-api", version.ref = "clerk-android" }
+compose-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
+navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
