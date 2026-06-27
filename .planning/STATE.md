@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 03 Plan 01 complete
-last_updated: "2026-06-27T21:10:00Z"
-last_activity: 2026-06-27 -- Phase 03 Plan 01 (Go JWT auth) complete
+stopped_at: Phase 03 Plan 02 complete
+last_updated: "2026-06-27T22:00:00Z"
+last_activity: 2026-06-27 -- Phase 03 Plan 02 (KMP shared HTTP auth layer) complete
 progress:
   total_phases: 9
   completed_phases: 2
   total_plans: 16
-  completed_plans: 11
-  percent: 24
+  completed_plans: 12
+  percent: 26
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-25)
 ## Current Position
 
 Phase: 03 (authentication-family-model) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Executing Phase 03
-Last activity: 2026-06-27 -- Phase 03 Plan 01 complete
+Last activity: 2026-06-27 -- Phase 03 Plan 02 complete
 
-Progress: [█░░░░░░░░░] 24%
+Progress: [██░░░░░░░░] 26%
 
 ## Phase Status
 
@@ -65,12 +65,19 @@ Progress: [█░░░░░░░░░] 24%
 | Phase 02-compliance-privacy-architecture P02 | 6min | 2 tasks | 7 files |
 | Phase 02-compliance-privacy-architecture P05 | 8min | 2 tasks | 3 files |
 | Phase 03-authentication-family-model P01 | ~5min | 3 tasks | 6 files |
+| Phase 03-authentication-family-model P02 | ~5min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
 ### Decisions
 
 All 27 locked decisions are recorded in PROJECT.md Decisions section.
+
+**Plan 03-02 decisions:**
+
+- Assumption A3 resolved: GetTokenOptions.skipCache confirmed in clerk-android-api 1.0.31 bytecode; getToken() uses skipCache=false, refreshToken() uses skipCache=true for fresh JWT on 401 retry
+- Clerk.isSignedIn is a Kotlin boolean property (not function) — accessed without parentheses
+- ClerkResult<String,_> unwrapped via is ClerkResult.Success -> result.value pattern
 
 **Plan 03-01 decisions:**
 
@@ -136,6 +143,6 @@ None yet — see Open Questions below for pre-execution items to resolve.
 
 ## Session Continuity
 
-Last session: 2026-06-27T21:10:00Z
-Stopped at: Phase 03 Plan 01 complete — Go JWT auth + IDOR fix + auth tests green
-Resume file: .planning/phases/03-authentication-family-model/03-02-PLAN.md
+Last session: 2026-06-27T22:00:00Z
+Stopped at: Phase 03 Plan 02 complete — KMP shared HTTP auth layer; AuthRepository + HttpClientFactory + ClerkAuthRepository compiled
+Resume file: .planning/phases/03-authentication-family-model/03-03-PLAN.md
