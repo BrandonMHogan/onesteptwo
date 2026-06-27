@@ -1,7 +1,8 @@
 ---
 phase: 3
 slug: authentication-family-model
-status: draft
+status: approved
+reviewed_at: 2026-06-27
 shadcn_initialized: false
 preset: none
 created: 2026-06-27
