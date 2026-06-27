@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 03 Plan 02 complete
-last_updated: "2026-06-27T22:00:00Z"
-last_activity: 2026-06-27 -- Phase 03 Plan 02 (KMP shared HTTP auth layer) complete
+stopped_at: Phase 03 Plan 03 — checkpoint:human-verify (Task 3 azp capture pending)
+last_updated: "2026-06-27T23:47:00Z"
+last_activity: 2026-06-27 -- Phase 03 Plan 03 (Android auth UI) Tasks 1-2 complete; checkpoint at Task 3
 progress:
   total_phases: 9
   completed_phases: 2
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-06-25)
 ## Current Position
 
 Phase: 03 (authentication-family-model) — EXECUTING
-Plan: 3 of 6
+Plan: 3 of 6 (checkpoint — Tasks 1-2 complete, Task 3 awaiting human verification)
 Status: Executing Phase 03
-Last activity: 2026-06-27 -- Phase 03 Plan 02 complete
+Last activity: 2026-06-27 -- Phase 03 Plan 03 Tasks 1-2 complete; stopped at checkpoint
 
 Progress: [██░░░░░░░░] 26%
 
@@ -66,12 +66,21 @@ Progress: [██░░░░░░░░] 26%
 | Phase 02-compliance-privacy-architecture P05 | 8min | 2 tasks | 3 files |
 | Phase 03-authentication-family-model P01 | ~5min | 3 tasks | 6 files |
 | Phase 03-authentication-family-model P02 | ~5min | 3 tasks | 5 files |
+| Phase 03-authentication-family-model P03 | ~10min | 2/3 tasks | 9 files | (Task 3 pending checkpoint) |
 
 ## Accumulated Context
 
 ### Decisions
 
 All 27 locked decisions are recorded in PROJECT.md Decisions section.
+
+**Plan 03-03 decisions:**
+
+- navigation-compose:2.8.3 added as explicit dep (not in compose-bom); material-icons-extended from BOM
+- androidx.browser forced to 1.8.0 — clerk-android-api:1.0.31 pulls in browser:1.10.0 (requires AGP 8.9.1); headless email/password auth does not use browser component
+- Clerk.auth.setActive called positionally (sessionId, organizationId) — R8 obfuscation strips named param metadata; named param call fails at compile time
+- Research Pattern 9 result.data.data incorrect — bytecode confirms ClerkResult.Success<T>.value; for org memberships T=ClerkPaginatedResponse<OrganizationMembership>; correct: result.value.data
+- azp value: PENDING — must be captured from a real Android device/emulator JWT before CLERK_AUTHORIZED_PARTY can be set in Railway (REQ-026 open until Task 3)
 
 **Plan 03-02 decisions:**
 
@@ -143,6 +152,6 @@ None yet — see Open Questions below for pre-execution items to resolve.
 
 ## Session Continuity
 
-Last session: 2026-06-27T22:00:00Z
-Stopped at: Phase 03 Plan 02 complete — KMP shared HTTP auth layer; AuthRepository + HttpClientFactory + ClerkAuthRepository compiled
-Resume file: .planning/phases/03-authentication-family-model/03-03-PLAN.md
+Last session: 2026-06-27T23:47:00Z
+Stopped at: Phase 03 Plan 03 Tasks 1-2 complete — Android auth UI (ClerkApp, AppNavigation, SignInScreen, SignUpScreen, PostAuthStub); checkpoint at Task 3 (azp capture + end-to-end device verification)
+Resume file: .planning/phases/03-authentication-family-model/03-03-PLAN.md (Task 3 checkpoint)
