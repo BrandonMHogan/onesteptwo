@@ -142,10 +142,10 @@ docs/06-auth.md, docs/07-sync-and-notifications.md.
 | REQ-008 | Phase 2 | Complete |
 | REQ-009 | Phase 2 | Complete |
 | REQ-010 | Phase 2 | Complete |
-| REQ-011 | Phase 2 | Pending |
-| REQ-012 | Phase 2 | Pending |
+| REQ-011 | Phase 2 | Complete |
+| REQ-012 | Phase 2 | Complete |
 | REQ-013 | Phase 2 | Complete |
-| REQ-014 | Phase 2 | Pending |
+| REQ-014 | Phase 2 | Complete |
 | REQ-015 | Phase 3 | Pending |
 | REQ-016 | Phase 3 | Pending |
 | REQ-017 | Phase 3 | Pending |
@@ -179,13 +179,13 @@ docs/06-auth.md, docs/07-sync-and-notifications.md.
 | REQ-NF-009 | Phase 6 | Pending |
 | REQ-NF-010 | Phase 3 | Pending |
 | REQ-C-001 | Phase 2 | Complete |
-| REQ-C-002 | Phase 2 | Pending |
-| REQ-C-003 | Phase 2 | Pending |
-| REQ-C-004 | Phase 2 | Pending |
+| REQ-C-002 | Phase 2 | Complete |
+| REQ-C-003 | Phase 2 | Complete |
+| REQ-C-004 | Phase 2 | Complete |
 | REQ-C-005 | Phase 2 | Complete |
 | REQ-C-006 | Phase 9 | Pending |
 | REQ-C-007 | Phase 9 | Pending |
-| REQ-C-008 | Phase 2 | Pending |
+| REQ-C-008 | Phase 2 | Complete |
 | REQ-C-009 | Phase 2 | Complete |
 
 **Coverage:** 54 active v1 requirements mapped across 9 phases. REQ-029 (data portability export) explicitly deferred to v2 per requirements spec.
