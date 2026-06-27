@@ -3,9 +3,12 @@ package api
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
+	"github.com/lib/pq"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
@@ -242,11 +245,13 @@ func (s *Server) DeleteV1ChildrenId(w http.ResponseWriter, r *http.Request, id o
 }
 
 // DeleteV1Account implements DELETE /v1/account — full account erasure cascade.
-// Hard-deletes every child in the requesting org and all their dependents, in FK-safe order
-// (REQ-012, REQ-013, REQ-014, REQ-C-002, REQ-C-003, REQ-C-004).
+// Hard-deletes every child in the requesting org and all their dependents, in FK-safe order,
+// then deletes all org members' device_tokens and the Clerk Organization after commit
+// (REQ-012, REQ-013, REQ-014, REQ-C-002, REQ-C-003, REQ-C-004, REQ-C-008).
 // Each call first purges erasure_audit rows older than 90 days (D-12, REQ-C-008).
 //
-// Auth path returns before DB use — nil DB is safe for unit tests of the auth code path.
+// Auth path returns before any external call — nil DB and nil Clerk are safe for auth tests.
+// Member fetch happens before BeginTx — a fetch failure returns 500 without opening a tx.
 func (s *Server) DeleteV1Account(w http.ResponseWriter, r *http.Request) {
 	// TODO Phase 3: replace with JWT claim extraction
 	clerkUserID := r.Header.Get("X-Clerk-User-Id")
@@ -257,6 +262,18 @@ func (s *Server) DeleteV1Account(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
+
+	// Fetch all org member user IDs from Clerk BEFORE opening a transaction (REQ-012).
+	// If the fetch fails, no data is deleted — no BeginTx has been called at this point.
+	// The response body from Clerk is never forwarded to the caller (T-2-15).
+	memberIDs, err := s.Clerk.ListOrgMemberUserIDs(ctx, clerkOrgID)
+	if err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not list organization members")
+		return
+	}
+	// Append the requesting user defensively — no dedup needed for SQL ANY($1).
+	memberIDs = append(memberIDs, clerkUserID)
+
 	tx, err := s.DB.BeginTx(ctx, nil)
 	if err != nil {
 		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not begin transaction")
@@ -324,23 +341,29 @@ func (s *Server) DeleteV1Account(w http.ResponseWriter, r *http.Request) {
 		totalChildren++
 	}
 
-	// Delete requesting user's own device tokens (best-effort; org-wide deletion requires Clerk API).
-	// TODO Phase 3: delete device_tokens for ALL org members (requires Clerk org member list) and
-	// delete the Clerk Organization (REQ-012). Org-wide token cleanup is moot until device_tokens are
-	// populated in Phase 8.
-	r4, err := tx.ExecContext(ctx, `DELETE FROM device_tokens WHERE clerk_user_id = $1`, clerkUserID)
+	// Delete device_tokens for ALL org members fetched from Clerk (REQ-012).
+	// memberIDs was populated pre-tx from the Clerk org member list, with the requesting user
+	// appended defensively. This replaces the prior single-user delete with an org-wide sweep
+	// that satisfies GDPR/COPPA erasure for multi-caregiver families.
+	r4, err := tx.ExecContext(ctx, `DELETE FROM device_tokens WHERE clerk_user_id = ANY($1)`, pq.Array(memberIDs))
 	if err != nil {
 		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not delete device tokens")
 		return
 	}
 	tokensDeleted, _ := r4.RowsAffected()
 
+	// Compute a deterministic UUIDv5 of the clerk_org_id for the erasure_audit target_id.
+	// Clerk org ids (e.g. "org_...") are not UUIDs; erasure_audit.target_id is UUID NOT NULL.
+	// A deterministic UUID means the same org always produces the same target_id — recompute
+	// uuid.NewSHA1(uuid.NameSpaceURL, []byte("onesteptwo:org:"+clerkOrgID)) at any time to
+	// locate the org's audit rows. (REQ-C-008 traceability)
+	orgTargetID := uuid.NewSHA1(uuid.NameSpaceURL, []byte("onesteptwo:org:"+clerkOrgID)).String()
+
 	// Audit row written inside the same tx — no deletion without an audit row (T-2-04).
-	// TODO Phase 3: use the Clerk org UUID here (clerk_org_id is not a UUID in Phase 2 placeholder testing).
 	_, err = tx.ExecContext(ctx,
 		`INSERT INTO erasure_audit (clerk_user_id, action, target_id, target_type, deleted_at)
-		 VALUES ($1, 'account_deletion', gen_random_uuid(), 'family', NOW())`,
-		clerkUserID,
+		 VALUES ($1, 'account_deletion', $2, 'family', NOW())`,
+		clerkUserID, orgTargetID,
 	)
 	if err != nil {
 		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not write audit record")
@@ -351,6 +374,13 @@ func (s *Server) DeleteV1Account(w http.ResponseWriter, r *http.Request) {
 	if err = tx.Commit(); err != nil {
 		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not commit deletion")
 		return
+	}
+
+	// Delete the Clerk Organization after the DB transaction commits (Pitfall 2 ordering, REQ-012).
+	// A Clerk failure is logged but does not fail the request — DB data is already erased and the
+	// lingering Clerk org holds only PII that Clerk owns. The request still returns success.
+	if err := s.Clerk.DeleteOrganization(ctx, clerkOrgID); err != nil {
+		log.Printf("clerk org deletion failed for %s: %v", clerkOrgID, err)
 	}
 
 	// D-10: structured erasure confirmation JSON (not 204 No Content per REQ-013/REQ-014).
