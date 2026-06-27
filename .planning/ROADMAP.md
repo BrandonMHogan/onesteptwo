@@ -90,8 +90,23 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
   4. A user who belongs to multiple Clerk orgs sees an org-picker screen after login and can activate a different org to switch families
   5. An admin invites a caregiver by email; the caregiver receives the Clerk email, accepts, logs in, and can log events but cannot create or delete child profiles
 
-**Plans**: TBD
+**Plans**: 6 plans
 **UI hint**: yes
+
+**Wave 1**
+
+  - [ ] 03-01-PLAN.md — Go API JWT auth: clerk-sdk-go/v2 middleware (azp + Leeway), per-handler org + admin-role enforcement, IDOR fix (T-2-02), auth_test.go (REQ-015, REQ-016, REQ-026, REQ-027, REQ-NF-007, REQ-NF-010)
+  - [ ] 03-02-PLAN.md — KMP shared HTTP client: Ktor 3.5.1 bearer auth with nonCancellableRefresh, AuthRepository interface, Android ClerkAuthRepository (REQ-019, REQ-NF-006)
+
+**Wave 2** *(blocked on Wave 1)*
+
+  - [ ] 03-03-PLAN.md — Android Clerk init + Sign In/Sign Up + auth-gated navigation; capture native azp → set CLERK_AUTHORIZED_PARTY (REQ-015, REQ-026)
+  - [ ] 03-05-PLAN.md — iOS project setup: Xcode project, ClerkKit SPM, shared framework, Swift AuthRepository, app shell (REQ-015)
+
+**Wave 3** *(blocked on Wave 2)*
+
+  - [ ] 03-04-PLAN.md — Android org picker + admin invite caregiver; Clerk custom roles (REQ-016, REQ-017, REQ-018)
+  - [ ] 03-06-PLAN.md — iOS auth screens: SignIn/SignUp/OrgPicker/InviteCaregiver views (REQ-015, REQ-016, REQ-017, REQ-018)
 
 ### Phase 4: UI/UX Design
 
@@ -195,7 +210,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 |-------|----------------|--------|-----------|
 | 1. Foundation & Infrastructure | 4/4 | Complete    | 2026-06-26 |
 | 2. Compliance & Privacy Architecture | 6/6 | Complete   | 2026-06-27 |
-| 3. Authentication & Family Model | 0/TBD | Not started | - |
+| 3. Authentication & Family Model | 0/6 | Not started | - |
 | 4. UI/UX Design | 0/TBD | Not started | - |
 | 5. Core Event Logging | 0/TBD | Not started | - |
 | 6. Offline-First Sync | 0/TBD | Not started | - |
