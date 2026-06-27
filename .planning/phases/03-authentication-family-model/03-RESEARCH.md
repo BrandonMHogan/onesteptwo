@@ -716,27 +716,31 @@ Note: `clerk.ContextWithSessionClaims` is the test injection point — no real J
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **`azp` value for native mobile apps**
    - What we know: `WithHeaderAuthorization` + `AuthorizedPartyMatches` validates the `azp` claim; the Clerk docs say "the SDK does not validate azp by default" and the project's docs specify it must be set
    - What's unclear: The actual `azp` value emitted by Clerk's Android and iOS SDKs for native apps — it may be absent (Clerk SDK Python issue #90 shows azp can be missing), or it may be a Clerk frontend API URL
    - Recommendation: Add a debug-only Ktor interceptor in Wave 2 that logs the raw JWT, sign in on the Android emulator, and inspect the payload. Set `CLERK_AUTHORIZED_PARTY` to the actual value found. If `azp` is consistently absent, remove `AuthorizedPartyMatches` and document why (REQ-026 still satisfied if native SDKs don't include azp).
+   - RESOLVED: Captured empirically in plan 03-03 Task 3 — a debug Ktor interceptor logs the raw JWT on first sign-in; the captured value is set as `CLERK_AUTHORIZED_PARTY`. If `azp` is absent from native JWTs, `AuthorizedPartyMatches` is a no-op and REQ-026 is still satisfied.
 
 2. **`org:caregiver` custom role existence in Clerk Dashboard**
    - What we know: Custom roles must be pre-created in Clerk Dashboard before invitations can use them
    - What's unclear: Whether this role was created during Phase 1 provisioning
    - Recommendation: Verify in Clerk Dashboard (dev + prod) before writing the invitation plan. Add a Wave 0 task: "Verify org:caregiver role exists in Clerk Dashboard."
+   - RESOLVED: Plan 03-04 Task 1 is a human-action blocking checkpoint — executor must verify/create `org:caregiver` in Clerk Dashboard before Wave 3 execution proceeds.
 
 3. **iOS project setup scope**
    - What we know: `iosApp/` is currently empty (just `.gitkeep`). A full Xcode project must be created from scratch.
    - What's unclear: Whether iOS signing certificates and provisioning profiles are in place on the developer's Mac
    - Recommendation: iOS setup requires Xcode on macOS. Plan iOS as its own plan within Phase 3 and flag that it requires manual Xcode project creation steps that cannot be executed in CI.
+   - RESOLVED: iOS is its own plan (03-05) with `autonomous: false` and a blocking human-action checkpoint for Xcode project setup; CI execution is not required for Phase 3 completion.
 
 4. **Org creation in Phase 3 vs Phase 5**
    - What we know: Phase 3 goal says "create a family organization"; Phase 5 (REQ-036) describes the full admin onboarding wizard including org creation as step 2
    - What's unclear: Does "create a family organization" in Phase 3's goal mean the org creation UI must be built now, or only that org-based auth must work (with org creation deferred to Phase 5's wizard)?
    - Recommendation: Since Phase 3 success criteria make no reference to an org creation screen, treat org creation as a Phase 5 concern. For Phase 3 testing, create the Clerk org manually via the Dashboard or CLI. The auth infrastructure (JWT, middleware, org enforcement) is testable without a mobile org-creation UI.
+   - RESOLVED: Org creation is deferred to Phase 5's onboarding wizard (REQ-036). Phase 3 tests use manually created Clerk orgs via Dashboard or CLI; the JWT/middleware/org-enforcement infrastructure is fully testable without a mobile org-creation UI.
 
 ---
 
