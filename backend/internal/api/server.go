@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	clerk "github.com/clerk/clerk-sdk-go/v2"
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 	openapi_types "github.com/oapi-codegen/runtime/types"
@@ -45,13 +46,24 @@ type createChildRequest struct {
 // Auth paths return before touching s.DB, so a nil DB is safe for unit tests
 // of the validation/auth code paths.
 func (s *Server) PostV1Children(w http.ResponseWriter, r *http.Request) {
-	// TODO Phase 3: replace with JWT claim extraction
-	clerkUserID := r.Header.Get("X-Clerk-User-Id")
-	clerkOrgID := r.Header.Get("X-Clerk-Org-Id")
-	if clerkUserID == "" || clerkOrgID == "" {
-		WriteProblem(w, http.StatusUnauthorized, "about:blank", "Unauthorized", "missing identity headers")
+	// Extract JWT claims populated by WithHeaderAuthorization middleware.
+	claims, ok := clerk.SessionClaimsFromContext(r.Context())
+	if !ok || claims == nil {
+		WriteProblem(w, http.StatusUnauthorized, "about:blank", "Unauthorized", "missing or invalid session token")
 		return
 	}
+	// Require an active organization in the session (REQ-027).
+	if claims.ActiveOrganizationID == "" {
+		WriteProblem(w, http.StatusForbidden, "about:blank", "Forbidden", "no active organization in session")
+		return
+	}
+	// Require admin role for write operations (REQ-016). CRITICAL: prefix must be "org:" not "admin".
+	if !claims.HasRole("org:admin") {
+		WriteProblem(w, http.StatusForbidden, "about:blank", "Forbidden", "admin role required")
+		return
+	}
+	clerkUserID := claims.Subject
+	clerkOrgID := claims.ActiveOrganizationID
 
 	// Decode JSON body — no body → EOF → 400.
 	var req createChildRequest
@@ -148,12 +160,23 @@ func (s *Server) PostV1Children(w http.ResponseWriter, r *http.Request) {
 //
 // Auth path returns before DB use — nil DB is safe for unit tests of the auth code path.
 func (s *Server) DeleteV1ChildrenId(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
-	// TODO Phase 3: replace with JWT claim extraction
-	clerkUserID := r.Header.Get("X-Clerk-User-Id")
-	if clerkUserID == "" {
-		WriteProblem(w, http.StatusUnauthorized, "about:blank", "Unauthorized", "missing identity header")
+	// Extract JWT claims populated by WithHeaderAuthorization middleware.
+	claims, ok := clerk.SessionClaimsFromContext(r.Context())
+	if !ok || claims == nil {
+		WriteProblem(w, http.StatusUnauthorized, "about:blank", "Unauthorized", "missing or invalid session token")
 		return
 	}
+	// Require an active organization in the session (REQ-027).
+	if claims.ActiveOrganizationID == "" {
+		WriteProblem(w, http.StatusForbidden, "about:blank", "Forbidden", "no active organization in session")
+		return
+	}
+	// Require admin role for write operations (REQ-016). CRITICAL: prefix must be "org:" not "admin".
+	if !claims.HasRole("org:admin") {
+		WriteProblem(w, http.StatusForbidden, "about:blank", "Forbidden", "admin role required")
+		return
+	}
+	clerkUserID := claims.Subject
 
 	ctx := r.Context()
 	childID := id.String()
@@ -168,14 +191,14 @@ func (s *Server) DeleteV1ChildrenId(w http.ResponseWriter, r *http.Request, id o
 	// D-12: purge erasure_audit rows older than 90 days (sweep-on-request, REQ-C-008).
 	_, _ = tx.ExecContext(ctx, `DELETE FROM erasure_audit WHERE deleted_at < NOW() - INTERVAL '90 days'`)
 
-	// Capture consent_event_id BEFORE deleting the children row.
+	// Capture consent_event_id and clerk_org_id BEFORE deleting the children row.
 	// CRITICAL (RESEARCH.md Pitfall 1): D-05 FK direction means children.consent_event_id REFERENCES consent_events(id).
 	// Deleting consent_events BEFORE children throws a FK violation — children must be deleted first.
-	// SELECT consent_event_id FROM children must come here, before any DELETE, so the value is preserved.
-	var consentEventID string
+	// SELECT must come here, before any DELETE, so the values are preserved.
+	var consentEventID, childClerkOrgID string
 	err = tx.QueryRowContext(ctx,
-		`SELECT consent_event_id FROM children WHERE id = $1`, childID,
-	).Scan(&consentEventID)
+		`SELECT consent_event_id, clerk_org_id FROM children WHERE id = $1`, childID,
+	).Scan(&consentEventID, &childClerkOrgID)
 	if err == sql.ErrNoRows {
 		WriteProblem(w, http.StatusNotFound, "about:blank", "Not Found", "child not found")
 		return
@@ -184,8 +207,11 @@ func (s *Server) DeleteV1ChildrenId(w http.ResponseWriter, r *http.Request, id o
 		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not look up child")
 		return
 	}
-
-	// TODO Phase 3: verify children.clerk_org_id matches the requester's active org before deleting (IDOR gap T-2-02).
+	// REQ-015 / T-2-02: child must belong to requester's active org (IDOR gap closure).
+	if claims.ActiveOrganizationID != childClerkOrgID {
+		WriteProblem(w, http.StatusForbidden, "about:blank", "Forbidden", "access denied")
+		return
+	}
 
 	// FK-safe deletion order (D-05 FK: children → consent_events).
 	// children must be deleted BEFORE consent_events to release the FK reference (Pitfall 1).
@@ -253,13 +279,24 @@ func (s *Server) DeleteV1ChildrenId(w http.ResponseWriter, r *http.Request, id o
 // Auth path returns before any external call — nil DB and nil Clerk are safe for auth tests.
 // Member fetch happens before BeginTx — a fetch failure returns 500 without opening a tx.
 func (s *Server) DeleteV1Account(w http.ResponseWriter, r *http.Request) {
-	// TODO Phase 3: replace with JWT claim extraction
-	clerkUserID := r.Header.Get("X-Clerk-User-Id")
-	clerkOrgID := r.Header.Get("X-Clerk-Org-Id")
-	if clerkUserID == "" || clerkOrgID == "" {
-		WriteProblem(w, http.StatusUnauthorized, "about:blank", "Unauthorized", "missing identity headers")
+	// Extract JWT claims populated by WithHeaderAuthorization middleware.
+	claims, ok := clerk.SessionClaimsFromContext(r.Context())
+	if !ok || claims == nil {
+		WriteProblem(w, http.StatusUnauthorized, "about:blank", "Unauthorized", "missing or invalid session token")
 		return
 	}
+	// Require an active organization in the session (REQ-027).
+	if claims.ActiveOrganizationID == "" {
+		WriteProblem(w, http.StatusForbidden, "about:blank", "Forbidden", "no active organization in session")
+		return
+	}
+	// Require admin role for write operations (REQ-016). CRITICAL: prefix must be "org:" not "admin".
+	if !claims.HasRole("org:admin") {
+		WriteProblem(w, http.StatusForbidden, "about:blank", "Forbidden", "admin role required")
+		return
+	}
+	clerkUserID := claims.Subject
+	clerkOrgID := claims.ActiveOrganizationID
 
 	ctx := r.Context()
 

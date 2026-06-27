@@ -30,7 +30,7 @@ func (s *stubClerk) DeleteOrganization(_ context.Context, _ string) error {
 }
 
 // TestDeleteV1ChildrenId_MissingAuthHeader verifies that DELETE /v1/children/{id}
-// without an X-Clerk-User-Id header returns 401 with Content-Type application/problem+json.
+// without session claims returns 401 with Content-Type application/problem+json.
 // The handler must return before touching the DB on this path (nil DB Server is safe for this test).
 func TestDeleteV1ChildrenId_MissingAuthHeader(t *testing.T) {
 	srv := &api.Server{} // nil DB is safe: handler returns 401 before DB use
@@ -39,7 +39,7 @@ func TestDeleteV1ChildrenId_MissingAuthHeader(t *testing.T) {
 
 	// Use a valid UUID-format path — the handler checks auth before parsing the id.
 	req := httptest.NewRequest(http.MethodDelete, "/v1/children/00000000-0000-0000-0000-000000000001", nil)
-	// Intentionally omit X-Clerk-User-Id to trigger 401.
+	// No claims injected — handler returns 401 (no Clerk JWT in context).
 	rec := httptest.NewRecorder()
 	mux.ServeHTTP(rec, req)
 
@@ -53,7 +53,7 @@ func TestDeleteV1ChildrenId_MissingAuthHeader(t *testing.T) {
 }
 
 // TestDeleteV1Account_MissingAuthHeader verifies that DELETE /v1/account
-// without identity headers returns 401 with Content-Type application/problem+json.
+// without session claims returns 401 with Content-Type application/problem+json.
 // The handler must return before touching the DB on this path (nil DB Server is safe for this test).
 func TestDeleteV1Account_MissingAuthHeader(t *testing.T) {
 	srv := &api.Server{} // nil DB is safe: handler returns 401 before DB use
@@ -61,7 +61,7 @@ func TestDeleteV1Account_MissingAuthHeader(t *testing.T) {
 	api.HandlerFromMux(srv, mux)
 
 	req := httptest.NewRequest(http.MethodDelete, "/v1/account", nil)
-	// Intentionally omit all auth headers to trigger 401.
+	// No claims injected — handler returns 401 (no Clerk JWT in context).
 	rec := httptest.NewRecorder()
 	mux.ServeHTTP(rec, req)
 
@@ -84,8 +84,8 @@ func TestDeleteV1Account_ClerkMemberFetchError(t *testing.T) {
 	api.HandlerFromMux(srv, mux)
 
 	req := httptest.NewRequest(http.MethodDelete, "/v1/account", nil)
-	req.Header.Set("X-Clerk-User-Id", "user_abc")
-	req.Header.Set("X-Clerk-Org-Id", "org_xyz")
+	// Inject admin claims so the request passes the auth gate and reaches the Clerk member-fetch path.
+	req = withFakeClaims(req, "user_abc", "org_xyz", "org:admin")
 	rec := httptest.NewRecorder()
 	mux.ServeHTTP(rec, req)
 

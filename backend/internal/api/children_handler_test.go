@@ -20,8 +20,7 @@ func TestPostV1Children_MissingBody(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/v1/children", nil)
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Clerk-User-Id", "user_test")
-	req.Header.Set("X-Clerk-Org-Id", "org_test")
+	req = withFakeClaims(req, "user_test", "org_test", "org:admin")
 	rec := httptest.NewRecorder()
 	mux.ServeHTTP(rec, req)
 
@@ -51,8 +50,7 @@ func TestPostV1Children_MalformedBody(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/v1/children", strings.NewReader("{not valid json"))
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Clerk-User-Id", "user_test")
-	req.Header.Set("X-Clerk-Org-Id", "org_test")
+	req = withFakeClaims(req, "user_test", "org_test", "org:admin")
 	rec := httptest.NewRecorder()
 	mux.ServeHTTP(rec, req)
 
@@ -66,7 +64,7 @@ func TestPostV1Children_MalformedBody(t *testing.T) {
 }
 
 // TestPostV1Children_MissingAuthHeaders verifies that POST /v1/children without
-// X-Clerk-User-Id or X-Clerk-Org-Id returns 401 (Phase 2 placeholder auth gate).
+// session claims returns 401 (no Clerk JWT in context → 401).
 func TestPostV1Children_MissingAuthHeaders(t *testing.T) {
 	srv := &api.Server{} // nil DB is safe: handler returns 401 before DB use
 	mux := http.NewServeMux()
@@ -85,7 +83,7 @@ func TestPostV1Children_MissingAuthHeaders(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/v1/children", bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	// No X-Clerk-User-Id or X-Clerk-Org-Id headers
+	// No claims injected — handler returns 401 (no Clerk JWT in context).
 	rec := httptest.NewRecorder()
 	mux.ServeHTTP(rec, req)
 
@@ -98,7 +96,8 @@ func TestPostV1Children_MissingAuthHeaders(t *testing.T) {
 	}
 }
 
-// TestPostV1Children_MissingClerkUserId verifies 401 when only X-Clerk-Org-Id is present.
+// TestPostV1Children_MissingClerkUserId verifies 401 when no session claims are present
+// (formerly tested partial header presence; now tests absence of JWT claims context).
 func TestPostV1Children_MissingClerkUserId(t *testing.T) {
 	srv := &api.Server{}
 	mux := http.NewServeMux()
@@ -117,7 +116,7 @@ func TestPostV1Children_MissingClerkUserId(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/v1/children", bytes.NewReader(bodyBytes))
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Clerk-Org-Id", "org_test") // Only org id, no user id
+	// No claims injected — handler returns 401.
 	rec := httptest.NewRecorder()
 	mux.ServeHTTP(rec, req)
 
@@ -204,8 +203,7 @@ func TestPostV1Children_InvalidInput(t *testing.T) {
 			bodyBytes, _ := json.Marshal(tc.body)
 			req := httptest.NewRequest(http.MethodPost, "/v1/children", bytes.NewReader(bodyBytes))
 			req.Header.Set("Content-Type", "application/json")
-			req.Header.Set("X-Clerk-User-Id", "user_test")
-			req.Header.Set("X-Clerk-Org-Id", "org_test")
+			req = withFakeClaims(req, "user_test", "org_test", "org:admin")
 			rec := httptest.NewRecorder()
 			mux.ServeHTTP(rec, req)
 
