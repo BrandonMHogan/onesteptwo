@@ -47,6 +47,12 @@ android {
         compose = true
         buildConfig = true
     }
+
+    packaging {
+        // okhttp3 logging-interceptor and jspecify both include this manifest;
+        // exclude it to avoid a mergeJavaResource conflict in the debug APK.
+        resources.excludes += "META-INF/versions/9/OSGI-INF/**"
+    }
 }
 
 kotlin {
