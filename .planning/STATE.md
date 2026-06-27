@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 3 UI-SPEC approved
-last_updated: "2026-06-27T21:02:45.228Z"
-last_activity: 2026-06-26 -- Phase 02 execution started
+stopped_at: Phase 03 Plan 01 complete
+last_updated: "2026-06-27T21:10:00Z"
+last_activity: 2026-06-27 -- Phase 03 Plan 01 (Go JWT auth) complete
 progress:
   total_phases: 9
   completed_phases: 2
-  total_plans: 10
-  completed_plans: 10
-  percent: 22
+  total_plans: 16
+  completed_plans: 11
+  percent: 24
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-25)
 
 **Core value:** Offline-first potty tracking for multi-caregiver families — log instantly, sync when connected, notify everyone
-**Current focus:** Phase 02 — compliance-privacy-architecture
+**Current focus:** Phase 03 — authentication-family-model
 
 ## Current Position
 
-Phase: 02 (compliance-privacy-architecture) — EXECUTING
-Plan: 3 of 6
-Status: Ready to execute
-Last activity: 2026-06-26 -- Phase 02 execution started
+Phase: 03 (authentication-family-model) — EXECUTING
+Plan: 2 of 6
+Status: Executing Phase 03
+Last activity: 2026-06-27 -- Phase 03 Plan 01 complete
 
-Progress: [█░░░░░░░░░] 11%
+Progress: [█░░░░░░░░░] 24%
 
 ## Phase Status
 
@@ -64,12 +64,20 @@ Progress: [█░░░░░░░░░] 11%
 | Phase 02 P04 | 6min | 2 tasks | 6 files |
 | Phase 02-compliance-privacy-architecture P02 | 6min | 2 tasks | 7 files |
 | Phase 02-compliance-privacy-architecture P05 | 8min | 2 tasks | 3 files |
+| Phase 03-authentication-family-model P01 | ~5min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
 ### Decisions
 
 All 27 locked decisions are recorded in PROJECT.md Decisions section.
+
+**Plan 03-01 decisions:**
+
+- WithHeaderAuthorization chosen over RequireHeaderAuthorization so /healthz passes through unauthenticated; each protected handler enforces its own 401/403
+- CLERK_AUTHORIZED_PARTY left empty until plan 03-03 empirically discovers the azp value from a native-app JWT (REQ-026 open); AuthorizedPartyMatches("") is a confirmed no-op
+- Assumption A2 resolved: clerk.ContextWithSessionClaims, SessionClaims.ActiveOrganizationID/.ActiveOrganizationRole/.HasRole all confirmed in v2.7.0 source — names match PATTERNS.md exactly
+- IDOR fix (T-2-02): SELECT extended to read clerk_org_id from children; ownership check rejects cross-org deletes with 403 before any cascade DELETE
 
 **Plan 01-02 decisions:**
 
@@ -128,6 +136,6 @@ None yet — see Open Questions below for pre-execution items to resolve.
 
 ## Session Continuity
 
-Last session: 2026-06-27T18:25:40.583Z
-Stopped at: Phase 3 UI-SPEC approved
-Resume file: .planning/phases/03-authentication-family-model/03-UI-SPEC.md
+Last session: 2026-06-27T21:10:00Z
+Stopped at: Phase 03 Plan 01 complete — Go JWT auth + IDOR fix + auth tests green
+Resume file: .planning/phases/03-authentication-family-model/03-02-PLAN.md
