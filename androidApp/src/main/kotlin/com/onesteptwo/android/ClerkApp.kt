@@ -14,10 +14,8 @@ import timber.log.Timber
 class ClerkApp : Application() {
     override fun onCreate() {
         super.onCreate()
-        Clerk.initialize(
-            this,
-            BuildConfig.CLERK_PUBLISHABLE_KEY
-        )
         Timber.plant(Timber.DebugTree())
+        Clerk.initialize(this, BuildConfig.CLERK_PUBLISHABLE_KEY)
+        Timber.d("ClerkApp: Clerk.initialize called (key prefix=${BuildConfig.CLERK_PUBLISHABLE_KEY.take(8)}), isInitialized=${Clerk.isInitialized.value}")
     }
 }

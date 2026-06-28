@@ -121,7 +121,13 @@ fun SignUpScreen(
                         val signUp = (result as ClerkResult.Success<SignUp>).value
                         Timber.d("SignUp result: status=${signUp.status}, missingFields=${signUp.missingFields}, createdUserId=${signUp.createdUserId}")
                         when (signUp.status) {
-                            SignUp.Status.COMPLETE -> onSignedIn()
+                            SignUp.Status.COMPLETE -> {
+                                Timber.d(
+                                    "SignUp complete: sessionId=${Clerk.session?.id}, " +
+                                        "userId=${Clerk.user?.id}, isSignedIn=${Clerk.isSignedIn}"
+                                )
+                                onSignedIn()
+                            }
                             SignUp.Status.MISSING_REQUIREMENTS -> {
                                 val missing = signUp.missingFields.joinToString(", ").ifEmpty { "unknown" }
                                 screenError = "Account creation needs more steps: $missing"

@@ -92,7 +92,10 @@ fun SignInScreen(
                     this.password = password
                 }) {
                     is ClerkResult.Success<*> -> {
-                        Timber.d("SignIn success")
+                        Timber.d(
+                            "SignIn success: sessionId=${Clerk.session?.id}, " +
+                                "userId=${Clerk.user?.id}, isSignedIn=${Clerk.isSignedIn}"
+                        )
                         onSignedIn()
                     }
                     else -> {
