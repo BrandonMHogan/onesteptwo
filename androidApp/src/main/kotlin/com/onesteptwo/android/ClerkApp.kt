@@ -2,6 +2,7 @@ package com.onesteptwo.android
 
 import android.app.Application
 import com.clerk.api.Clerk
+import timber.log.Timber
 
 /**
  * Application subclass that initialises the Clerk Android SDK before any Activity or Service
@@ -17,5 +18,6 @@ class ClerkApp : Application() {
             this,
             BuildConfig.CLERK_PUBLISHABLE_KEY
         )
+        Timber.plant(Timber.DebugTree())
     }
 }

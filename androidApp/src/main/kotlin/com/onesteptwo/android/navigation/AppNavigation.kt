@@ -20,6 +20,7 @@ import com.onesteptwo.android.ui.PostAuthStub
 import com.onesteptwo.android.ui.auth.SignInScreen
 import com.onesteptwo.android.ui.auth.SignUpScreen
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * Root navigation graph for the app. Auth-gates all routes:
@@ -104,8 +105,11 @@ fun AppNavigation() {
  */
 @Suppress("UNCHECKED_CAST")
 private suspend fun navigateAfterAuth(navController: NavHostController) {
-    val user = Clerk.user ?: run {
+    val user = Clerk.user
+    Timber.d("navigateAfterAuth: user=${user?.id ?: "null"}, isSignedIn=${Clerk.isSignedIn}")
+    if (user == null) {
         // Defensive: Clerk.user should be non-null immediately after sign-in.
+        Timber.w("navigateAfterAuth: Clerk.user is null — navigating to postauth defensively")
         navController.navigate("postauth") { popUpTo(0) { inclusive = true } }
         return
     }
@@ -120,6 +124,7 @@ private suspend fun navigateAfterAuth(navController: NavHostController) {
     } catch (e: Exception) {
         emptyList()
     }
+    Timber.d("navigateAfterAuth: ${memberships.size} org memberships")
 
     when (memberships.size) {
         0 -> {

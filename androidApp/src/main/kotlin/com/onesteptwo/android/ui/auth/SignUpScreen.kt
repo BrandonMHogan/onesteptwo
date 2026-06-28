@@ -46,7 +46,9 @@ import androidx.compose.ui.unit.dp
 import com.clerk.api.Clerk
 import com.clerk.api.network.model.error.ClerkErrorResponse
 import com.clerk.api.network.serialization.ClerkResult
+import com.clerk.api.signup.SignUp
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * Email/password sign-up screen per UI-SPEC Copywriting Contract and Interaction Contracts.
@@ -105,13 +107,32 @@ fun SignUpScreen(
         if (email.isEmpty() || password.isEmpty()) return
 
         isLoading = true
+        val atIdx = email.indexOf('@')
+        val maskedEmail = "${email.take(1)}***${if (atIdx >= 0) email.substring(atIdx) else ""}"
+        Timber.d("SignUp attempt for: $maskedEmail")
         coroutineScope.launch {
             try {
                 when (val result = Clerk.auth.signUp {
                     this.email = email
                     this.password = password
                 }) {
-                    is ClerkResult.Success<*> -> onSignedIn()
+                    is ClerkResult.Success<*> -> {
+                        @Suppress("UNCHECKED_CAST")
+                        val signUp = (result as ClerkResult.Success<SignUp>).value
+                        Timber.d("SignUp result: status=${signUp.status}, missingFields=${signUp.missingFields}, createdUserId=${signUp.createdUserId}")
+                        when (signUp.status) {
+                            SignUp.Status.COMPLETE -> onSignedIn()
+                            SignUp.Status.MISSING_REQUIREMENTS -> {
+                                val missing = signUp.missingFields.joinToString(", ").ifEmpty { "unknown" }
+                                screenError = "Account creation needs more steps: $missing"
+                                Timber.w("SignUp missing requirements: $missing")
+                            }
+                            else -> {
+                                screenError = "Couldn't create your account. Check your connection and try again."
+                                Timber.w("SignUp unexpected status: ${signUp.status}")
+                            }
+                        }
+                    }
                     else -> {
                         val failure = result as? ClerkResult.Failure<*>
                         screenError = mapSignUpError(failure)
@@ -119,6 +140,7 @@ fun SignUpScreen(
                 }
             } catch (e: Exception) {
                 screenError = "Couldn't create your account. Check your connection and try again."
+                Timber.e(e, "SignUp exception")
             } finally {
                 isLoading = false
             }
@@ -152,7 +174,7 @@ fun SignUpScreen(
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
                 capitalization = KeyboardCapitalization.None,
-                autoCorrect = false,
+                autoCorrectEnabled = false,
                 imeAction = ImeAction.Next
             ),
             keyboardActions = KeyboardActions(

@@ -47,6 +47,7 @@ import com.clerk.api.Clerk
 import com.clerk.api.network.model.error.ClerkErrorResponse
 import com.clerk.api.network.serialization.ClerkResult
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * Email/password sign-in screen per UI-SPEC Copywriting Contract and Interaction Contracts.
@@ -83,19 +84,26 @@ fun SignInScreen(
         if (isLoading || email.isEmpty() || password.isEmpty()) return
         isLoading = true
         errorMessage = null
+        Timber.d("SignIn attempt for: ${email.take(1)}***")
         coroutineScope.launch {
             try {
                 when (val result = Clerk.auth.signInWithPassword {
                     identifier = email
                     this.password = password
                 }) {
-                    is ClerkResult.Success<*> -> onSignedIn()
+                    is ClerkResult.Success<*> -> {
+                        Timber.d("SignIn success")
+                        onSignedIn()
+                    }
                     else -> {
                         val failure = result as? ClerkResult.Failure<*>
-                        errorMessage = mapSignInError(failure)
+                        val msg = mapSignInError(failure)
+                        Timber.w("SignIn failed: $msg")
+                        errorMessage = msg
                     }
                 }
             } catch (e: Exception) {
+                Timber.e(e, "SignIn exception")
                 errorMessage = "Couldn't connect. Check your internet connection and try again."
             } finally {
                 isLoading = false
@@ -130,7 +138,7 @@ fun SignInScreen(
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
                 capitalization = KeyboardCapitalization.None,
-                autoCorrect = false,
+                autoCorrectEnabled = false,
                 imeAction = ImeAction.Next
             ),
             keyboardActions = KeyboardActions(
