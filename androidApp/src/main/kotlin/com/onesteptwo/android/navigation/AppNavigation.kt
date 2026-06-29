@@ -25,8 +25,10 @@ import com.clerk.api.organizations.OrganizationMembership
 import com.clerk.api.session.Session
 import com.clerk.api.user.getOrganizationMemberships
 import com.onesteptwo.android.ui.PostAuthStub
+import com.onesteptwo.android.ui.auth.OrgPickerScreen
 import com.onesteptwo.android.ui.auth.SignInScreen
 import com.onesteptwo.android.ui.auth.SignUpScreen
+import com.onesteptwo.android.ui.settings.InviteCaregiverScreen
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -138,19 +140,37 @@ fun AppNavigation() {
             composable("postauth") {
                 PostAuthStub(
                     onInvite = {
-                        // Invite Caregiver screen is built in plan 03-04.
+                        // Role gate: only org:admin users see the Invite button in PostAuthStub,
+                        // but double-check here before navigation for defence in depth (T-3-05).
+                        if (Clerk.organizationMembership?.role == "org:admin") {
+                            navController.navigate("invite")
+                        }
                     }
                 )
             }
 
-            // Org picker: shown when user belongs to 2+ Clerk organisations.
-            // Full implementation in plan 03-04 (OrgPickerScreen).
+            // Org picker: shown when user belongs to 2+ Clerk organisations (REQ-018).
             composable("orgpicker") {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("Choose a family (coming soon)")
+                OrgPickerScreen(
+                    onOrgActivated = {
+                        navController.navigate("postauth") { popUpTo(0) { inclusive = true } }
+                    }
+                )
+            }
+
+            // Invite caregiver: admin-only screen to send a Clerk invitation (REQ-017).
+            // Double-gated: PostAuthStub only exposes the action to org:admin (via onInvite above),
+            // and this route independently verifies the role to enforce T-3-05.
+            composable("invite") {
+                val isAdmin = Clerk.organizationMembership?.role == "org:admin"
+                LaunchedEffect(isAdmin) {
+                    if (!isAdmin) {
+                        Timber.w("AppNavigation: non-admin reached invite route — popping back")
+                        navController.popBackStack()
+                    }
+                }
+                if (isAdmin) {
+                    InviteCaregiverScreen(onDone = { navController.popBackStack() })
                 }
             }
         }
