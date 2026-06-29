@@ -3,6 +3,7 @@ module github.com/BrandonMHogan/onesteptwo/backend
 go 1.25.7
 
 require (
+	github.com/clerk/clerk-sdk-go/v2 v2.7.0
 	github.com/google/uuid v1.6.0
 	github.com/lib/pq v1.12.3
 	github.com/oapi-codegen/runtime v1.4.2
@@ -11,7 +12,6 @@ require (
 
 require (
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
-	github.com/clerk/clerk-sdk-go/v2 v2.7.0 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.4 // indirect
 	github.com/mfridman/interpolate v0.0.2 // indirect
 	github.com/sethvargo/go-retry v0.3.0 // indirect
