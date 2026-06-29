@@ -10,8 +10,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,10 +31,11 @@ import com.clerk.api.Clerk
  */
 @Composable
 fun PostAuthStub(onInvite: () -> Unit) {
-    // Read the active org membership role from Clerk.
-    // Clerk.organizationMembership returns the membership for the currently active org session.
+    // Reactively derive the active org membership role from Clerk.
+    // derivedStateOf re-evaluates whenever Clerk.organizationMembership changes, avoiding
+    // stale state if the active org or role changes after initial composition (WR-02).
     val isAdmin by remember {
-        mutableStateOf(Clerk.organizationMembership?.role == "org:admin")
+        derivedStateOf { Clerk.organizationMembership?.role == "org:admin" }
     }
 
     Column(
