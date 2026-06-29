@@ -6,6 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		413B02C12AB54618A1E077B8 /* shared.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8995C5C1EE804EBB942A634C /* shared.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		995CF3127C084B02A34F8757 /* shared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8995C5C1EE804EBB942A634C /* shared.xcframework */; };
+		BA1C3FC11DD141A1BAF3D6B2 /* ClerkKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1FA72DD80625472194C41B3D /* ClerkKit */; };
+		AA6626DFB3D14E0DB5DDB610 /* ClerkKitUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5B9582A445EC4675ADB375CF /* ClerkKitUI */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		CA6D55742FF13EFF00C951EB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -23,7 +30,22 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		FEC8ABB1087545D9AD09ACAC /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				413B02C12AB54618A1E077B8 /* shared.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		8995C5C1EE804EBB942A634C /* shared.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = shared.xcframework; path = ../shared/build/XCFrameworks/debug/shared.xcframework; sourceTree = SOURCE_ROOT; };
 		CA6D55662FF13EFE00C951EB /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA6D55732FF13EFF00C951EB /* iosAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA6D557D2FF13EFF00C951EB /* iosAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -52,6 +74,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				995CF3127C084B02A34F8757 /* shared.xcframework in Frameworks */,
+				BA1C3FC11DD141A1BAF3D6B2 /* ClerkKit in Frameworks */,
+				AA6626DFB3D14E0DB5DDB610 /* ClerkKitUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -79,6 +104,7 @@
 				CA6D55762FF13EFF00C951EB /* iosAppTests */,
 				CA6D55802FF13EFF00C951EB /* iosAppUITests */,
 				CA6D55672FF13EFE00C951EB /* Products */,
+				8995C5C1EE804EBB942A634C /* shared.xcframework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -102,6 +128,7 @@
 				CA6D55622FF13EFE00C951EB /* Sources */,
 				CA6D55632FF13EFE00C951EB /* Frameworks */,
 				CA6D55642FF13EFE00C951EB /* Resources */,
+				FEC8ABB1087545D9AD09ACAC /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -112,6 +139,8 @@
 			);
 			name = iosApp;
 			packageProductDependencies = (
+				1FA72DD80625472194C41B3D /* ClerkKit */,
+				5B9582A445EC4675ADB375CF /* ClerkKitUI */,
 			);
 			productName = iosApp;
 			productReference = CA6D55662FF13EFE00C951EB /* iosApp.app */;
@@ -396,15 +425,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLERK_PUBLISHABLE_KEY = pk_test_dWx0aW1hdGUtZXNjYXJnb3QtNTguY2xlcmsuYWNjb3VudHMuZGV2JA;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -413,7 +439,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.onesteptwo.ios.iosApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -423,15 +449,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLERK_PUBLISHABLE_KEY = pk_test_dWx0aW1hdGUtZXNjYXJnb3QtNTguY2xlcmsuYWNjb3VudHMuZGV2JA;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -440,7 +463,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.onesteptwo.ios.iosApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -457,7 +480,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.onesteptwo.ios.iosAppTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/iosApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/iosApp";
 			};
@@ -475,7 +498,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.onesteptwo.ios.iosAppTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/iosApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/iosApp";
 			};
@@ -491,7 +514,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.onesteptwo.ios.iosAppUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = iosApp;
 			};
@@ -507,7 +530,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.onesteptwo.ios.iosAppUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = iosApp;
 			};
@@ -560,10 +583,23 @@
 			repositoryURL = "https://github.com/clerk/clerk-ios";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.2.6;
+				minimumVersion = 1.1.5;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		1FA72DD80625472194C41B3D /* ClerkKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CA6D559C2FF13F8700C951EB /* XCRemoteSwiftPackageReference "clerk-ios" */;
+			productName = ClerkKit;
+		};
+		5B9582A445EC4675ADB375CF /* ClerkKitUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CA6D559C2FF13F8700C951EB /* XCRemoteSwiftPackageReference "clerk-ios" */;
+			productName = ClerkKitUI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CA6D555E2FF13EFE00C951EB /* Project object */;
 }
