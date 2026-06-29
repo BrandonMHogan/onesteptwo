@@ -2,15 +2,17 @@
 phase: 03-authentication-family-model
 verified: 2026-06-29T00:00:00Z
 status: human_needed
-score: 25/29 must-haves verified
+score: 28/29 must-haves verified
 overrides_applied: 0
 human_verification:
   - test: "Android end-to-end auth: install debug APK, create account, sign in, confirm landing on post-auth stub. Capture the native-app JWT from Logcat or Clerk Dashboard session inspector, base64-decode payload, read azp claim. If azp present, set CLERK_AUTHORIZED_PARTY in Railway staging + production. If absent, confirm the code comment already documents no-op behavior (REQ-026)."
     expected: "Sign-up and sign-in succeed; single-org user lands on PostAuthStub; CLERK_AUTHORIZED_PARTY is set in Railway or absence documented."
     why_human: "03-03 Task 3 (checkpoint:human-verify) was never approved per 03-03-SUMMARY.md — azp value is still listed as NOT YET CAPTURED."
-  - test: "iOS end-to-end auth: run in iOS Simulator (Xcode Run). Confirm app opens on SignInView. Create account; sign in with single org → post-auth stub. With multi-org test user → OrgPickerView shows families; selecting + Continue activates org. As admin: open InviteCaregiverView, send to caregiver email, confirm Invitation sent. Sign in as caregiver; confirm invite action NOT shown."
+  - test: "iOS end-to-end auth — VERIFIED via UAT 2026-06-29 (03-UAT.md, 7/7 tests passed)"
     expected: "All screens function correctly via ClerkKit; org switching reissues JWT; caregiver cannot see invite action."
-    why_human: "03-06 Task 3 (checkpoint:human-verify) was not approved — 03-06-SUMMARY.md ends with 'Task 3 checkpoint pending'."
+    resolved: true
+    resolved_at: "2026-06-29T23:50:00Z"
+    resolved_by: "UAT session — 03-UAT.md"
 ---
 
 # Phase 03: Authentication + Family Model Verification Report
@@ -50,9 +52,9 @@ human_verification:
 | 22 | iOS app configures Clerk with publishable key at launch | VERIFIED | iosAppApp.swift line 25: `Clerk.configure(publishableKey: key)` in `init()` reading Info.plist ClerkPublishableKey |
 | 23 | Swift type implements shared AuthRepository protocol | VERIFIED | ClerkAuthRepository.swift: `final class ClerkAuthRepository: NSObject, @preconcurrency AuthRepository` |
 | 24 | App routes by auth state in simulator | VERIFIED | ContentView.swift: no session → SignInView; active session → PostAuthRouter (OrgPickerView or stub); BUILD SUCCEEDED per 03-05-SUMMARY |
-| 25 | iOS user can sign in with email/password via ClerkKit (runtime) | HUMAN NEEDED | Code: `Clerk.shared.auth.signInWithPassword(identifier:password:)` in SignInView.swift. 03-06 Task 3 not approved. |
-| 26 | 2+ org iOS user sees org picker and activates chosen family (runtime) | HUMAN NEEDED | Code: OrgPickerView.swift with `getOrganizationMemberships()` + `setActive(sessionId:organizationId:)`. 03-06 Task 3 not approved. |
-| 27 | Admin can send caregiver invitation from iOS (runtime) | HUMAN NEEDED | Code: `organization.inviteMember(emailAddress:role:"org:caregiver")` in InviteCaregiverView.swift line 144. 03-06 Task 3 not approved. |
+| 25 | iOS user can sign in with email/password via ClerkKit (runtime) | VERIFIED | UAT 2026-06-29 tests 1 & 2: email+password sign-in and needsClientTrust OTP flow both confirmed in Simulator. |
+| 26 | 2+ org iOS user sees org picker and activates chosen family (runtime) | VERIFIED | UAT 2026-06-29 test 4: OrgPickerView shown for multi-org account; selecting family + Continue activates org. |
+| 27 | Admin can send caregiver invitation from iOS (runtime) | VERIFIED | UAT 2026-06-29 test 5: InviteCaregiverView opened from post-auth stub; invite sent successfully. |
 | 28 | Invite action hidden from caregivers on iOS | VERIFIED | ContentView.swift lines 60-62: `clerk.organizationMembership?.role == "org:admin"` gates InviteCaregiverView; confirmed code-level |
 | 29 | Clerk custom roles org:admin / org:caregiver exist in Clerk Dashboard (dev) | VERIFIED | per 03-04-SUMMARY Task 1 approval; production instance roles deferred to user |
 
