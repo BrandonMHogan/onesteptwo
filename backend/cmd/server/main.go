@@ -34,11 +34,16 @@ func main() {
 
 	// WithHeaderAuthorization (not RequireHeaderAuthorization) so /healthz — which carries
 	// no Authorization header — passes through unauthenticated. Each protected handler
-	// enforces its own 401/403 rejection. (REQ-026: CLERK_AUTHORIZED_PARTY may be unset
-	// until plan 03-03 empirically discovers the azp value from a native-app JWT; when the
-	// env var is empty, AuthorizedPartyMatches("") is a no-op that does not reject.)
+	// enforces its own 401/403 rejection.
+	authorizedParty := os.Getenv("CLERK_AUTHORIZED_PARTY")
+	if authorizedParty == "" {
+		// WR-05: When unset, AuthorizedPartyMatches("") is a no-op and the azp claim in
+		// incoming JWTs is never verified. Any token signed by this Clerk instance passes.
+		// Set CLERK_AUTHORIZED_PARTY to the mobile app bundle ID before production launch.
+		log.Println("WARNING: CLERK_AUTHORIZED_PARTY is not set — azp claim unverified; set to mobile bundle ID for production")
+	}
 	authMiddleware := clerkhttp.WithHeaderAuthorization(
-		clerkhttp.AuthorizedPartyMatches(os.Getenv("CLERK_AUTHORIZED_PARTY")),
+		clerkhttp.AuthorizedPartyMatches(authorizedParty),
 		clerkhttp.Leeway(5*time.Second),
 	)
 
