@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 03 Plan 03 Tasks 1-2 complete — Android auth UI (ClerkApp, AppNavigation, SignInScreen, SignUpScreen, PostAuthStub); checkpoint at Task 3 (azp capture + end-to-end device verification)
-last_updated: "2026-06-28T11:29:20.396Z"
+last_updated: "2026-06-29T01:35:20.838Z"
 last_activity: 2026-06-28 -- Phase 03 execution started
 progress:
   total_phases: 9
   completed_phases: 2
   total_plans: 16
-  completed_plans: 13
+  completed_plans: 14
   percent: 22
 ---
 
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-25)
 ## Current Position
 
 Phase: 03 (authentication-family-model) — EXECUTING
-Plan: 1 of 6
-Status: Executing Phase 03
+Plan: 2 of 6
+Status: Ready to execute
 Last activity: 2026-06-28 -- Phase 03 execution started
 
 Progress: [██░░░░░░░░] 26%
@@ -67,6 +67,7 @@ Progress: [██░░░░░░░░] 26%
 | Phase 03-authentication-family-model P01 | ~5min | 3 tasks | 6 files |
 | Phase 03-authentication-family-model P02 | ~5min | 3 tasks | 5 files |
 | Phase 03-authentication-family-model P03 | ~10min | 2/3 tasks | 9 files | (Task 3 pending checkpoint) |
+| Phase 03 P05 | 8min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -120,6 +121,8 @@ All 27 locked decisions are recorded in PROJECT.md Decisions section.
 - [Phase ?]: v1.1.1 was missing BindStyledParameterOptions.Type/Format fields
 - [Phase ?]: closes REQ-NF-001 BLOCKER
 - [Phase ?]: enables ErrorHandlerFunc injection
+- [Phase ?]: @MainActor + @preconcurrency AuthRepository: Clerk.shared is @MainActor-isolated in ClerkKit 1.1.5; @preconcurrency on Obj-C conformance defers check to runtime (Obj-C ABI has no actor concept)
+- [Phase ?]: ClerkKit 1.1.5 token API: Session.getToken() = cached, Session.getToken(.init(skipCache:true)) = force refresh; matches Android skipCache pattern from 03-02
 
 ### Service URLs
 
@@ -152,6 +155,6 @@ None yet — see Open Questions below for pre-execution items to resolve.
 
 ## Session Continuity
 
-Last session: 2026-06-27T23:47:00Z
+Last session: 2026-06-29T01:35:20.834Z
 Stopped at: Phase 03 Plan 03 Tasks 1-2 complete — Android auth UI (ClerkApp, AppNavigation, SignInScreen, SignUpScreen, PostAuthStub); checkpoint at Task 3 (azp capture + end-to-end device verification)
 Resume file: .planning/phases/03-authentication-family-model/03-03-PLAN.md (Task 3 checkpoint)

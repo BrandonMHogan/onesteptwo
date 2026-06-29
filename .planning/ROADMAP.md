@@ -96,12 +96,12 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 **Wave 1**
 
   - [x] 03-01-PLAN.md — Go API JWT auth: clerk-sdk-go/v2 middleware (azp + Leeway), per-handler org + admin-role enforcement, IDOR fix (T-2-02), auth_test.go (REQ-015, REQ-016, REQ-026, REQ-027, REQ-NF-007, REQ-NF-010)
-  - [ ] 03-02-PLAN.md — KMP shared HTTP client: Ktor 3.5.1 bearer auth with nonCancellableRefresh, AuthRepository interface, Android ClerkAuthRepository (REQ-019, REQ-NF-006)
+  - [x] 03-02-PLAN.md — KMP shared HTTP client: Ktor 3.5.1 bearer auth with nonCancellableRefresh, AuthRepository interface, Android ClerkAuthRepository (REQ-019, REQ-NF-006)
 
 **Wave 2** *(blocked on Wave 1)*
 
-  - [ ] 03-03-PLAN.md — Android Clerk init + Sign In/Sign Up + auth-gated navigation; capture native azp → set CLERK_AUTHORIZED_PARTY (REQ-015, REQ-026)
-  - [ ] 03-05-PLAN.md — iOS project setup: Xcode project, ClerkKit SPM, shared framework, Swift AuthRepository, app shell (REQ-015)
+  - [x] 03-03-PLAN.md — Android Clerk init + Sign In/Sign Up + auth-gated navigation; capture native azp → set CLERK_AUTHORIZED_PARTY (REQ-015, REQ-026)
+  - [x] 03-05-PLAN.md — iOS project setup: Xcode project, ClerkKit SPM, shared framework, Swift AuthRepository, app shell (REQ-015)
 
 **Wave 3** *(blocked on Wave 2)*
 
@@ -210,7 +210,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 |-------|----------------|--------|-----------|
 | 1. Foundation & Infrastructure | 4/4 | Complete    | 2026-06-26 |
 | 2. Compliance & Privacy Architecture | 6/6 | Complete   | 2026-06-27 |
-| 3. Authentication & Family Model | 1/6 | In Progress | - |
+| 3. Authentication & Family Model | 4/6 | In Progress|  |
 | 4. UI/UX Design | 0/TBD | Not started | - |
 | 5. Core Event Logging | 0/TBD | Not started | - |
 | 6. Offline-First Sync | 0/TBD | Not started | - |
