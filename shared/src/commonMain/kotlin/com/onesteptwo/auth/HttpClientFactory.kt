@@ -22,8 +22,11 @@ import io.ktor.serialization.kotlinx.json.json
  * @param authRepository Platform-specific Clerk session token provider.
  * @param baseUrl        Informational parameter; not used for routing — the
  *                       [sendWithoutRequest] allowlist controls proactive auth.
+ * @param isDebug        When true, also allows bearer tokens to be sent to localhost
+ *                       and the Android emulator loopback (10.0.2.2) for local
+ *                       development. Must be false in production builds (WR-08).
  */
-fun buildHttpClient(authRepository: AuthRepository, baseUrl: String = ""): HttpClient {
+fun buildHttpClient(authRepository: AuthRepository, baseUrl: String = "", isDebug: Boolean = false): HttpClient {
     return HttpClient {
         install(Auth) {
             bearer {
@@ -47,12 +50,16 @@ fun buildHttpClient(authRepository: AuthRepository, baseUrl: String = ""): HttpC
                 // T-3-07: Send the Authorization header proactively ONLY to OneStepTwo API
                 // hosts. Requests to third-party URLs (analytics, CDN, etc.) never receive
                 // the bearer token. Never blanket-return true here.
+                // WR-08: Dev-only hosts (localhost, 10.0.2.2) are gated behind isDebug so
+                // release builds never proactively send tokens to loopback addresses.
                 sendWithoutRequest { request ->
                     val host = request.url.host
                     host.endsWith("onesteptwo.com") ||              // production + subdomains
                     host == "onesteptwo-staging.up.railway.app" ||  // Railway staging
-                    host == "localhost" ||                           // local dev
-                    host == "10.0.2.2"                              // Android emulator loopback
+                    (isDebug && (
+                        host == "localhost" ||                       // local dev
+                        host == "10.0.2.2"                          // Android emulator loopback
+                    ))
                 }
             }
         }
