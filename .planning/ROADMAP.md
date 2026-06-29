@@ -8,7 +8,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 
 - [x] **Phase 1: Foundation & Infrastructure** - Monorepo scaffold, CI/CD, Railway deploy, PostgreSQL + R2 backup, Clerk + Firebase provisioning, Go healthcheck, SQLDelight and goose migrations initialized
 - [x] **Phase 2: Compliance & Privacy Architecture** - Consent gate, erasure cascade, audit log, data minimisation constraints, and all COPPA/GDPR/PIPEDA/POPIA obligations enforced in schema and API before any child data flows (completed 2026-06-26)
-- [ ] **Phase 3: Authentication & Family Model** - Sign up/in on Android + iOS, Clerk org enforcement, role-gated access, invitation flow, multi-org picker, JWT validation with azp and org context checks
+- [x] **Phase 3: Authentication & Family Model** - Sign up/in on Android + iOS, Clerk org enforcement, role-gated access, invitation flow, multi-org picker, JWT validation with azp and org context checks (completed 2026-06-29)
 - [ ] **Phase 4: UI/UX Design** - Screen flows, lo-fi wireframes, design tokens (color, type, spacing), component specs, and navigation/animation patterns for all screens on both platforms — spec complete before implementation begins
 - [ ] **Phase 5: Core Event Logging** - Onboarding wizard (family setup + consent + child profile), 4-tab navigation, one-tap logging with details-later flow, event types, pending-details banner, heatmap history tab, child switcher, Settings screens
 - [ ] **Phase 6: Offline-First Sync** - Pending queue in SQLDelight, connectivity-triggered retry, pending count indicator, pull-to-refresh, last-write-wins conflict resolution
@@ -105,8 +105,8 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 
 **Wave 3** *(blocked on Wave 2)*
 
-  - [ ] 03-04-PLAN.md — Android org picker + admin invite caregiver; Clerk custom roles (REQ-016, REQ-017, REQ-018)
-  - [ ] 03-06-PLAN.md — iOS auth screens: SignIn/SignUp/OrgPicker/InviteCaregiver views (REQ-015, REQ-016, REQ-017, REQ-018)
+  - [x] 03-04-PLAN.md — Android org picker + admin invite caregiver; Clerk custom roles (REQ-016, REQ-017, REQ-018)
+  - [x] 03-06-PLAN.md — iOS auth screens: SignIn/SignUp/OrgPicker/InviteCaregiver views (REQ-015, REQ-016, REQ-017, REQ-018)
 
 ### Phase 4: UI/UX Design
 
@@ -210,7 +210,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 |-------|----------------|--------|-----------|
 | 1. Foundation & Infrastructure | 4/4 | Complete    | 2026-06-26 |
 | 2. Compliance & Privacy Architecture | 6/6 | Complete   | 2026-06-27 |
-| 3. Authentication & Family Model | 4/6 | In Progress|  |
+| 3. Authentication & Family Model | 6/6 | Complete   | 2026-06-29 |
 | 4. UI/UX Design | 0/TBD | Not started | - |
 | 5. Core Event Logging | 0/TBD | Not started | - |
 | 6. Offline-First Sync | 0/TBD | Not started | - |
