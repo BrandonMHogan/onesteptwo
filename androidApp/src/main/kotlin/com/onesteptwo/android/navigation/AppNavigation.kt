@@ -221,7 +221,12 @@ private suspend fun navigateAfterAuth(navController: NavHostController) {
             // (non-null after sign-in) and the org ID from the single membership.
             val orgId = memberships.first().organization.id
             val sessionId = Clerk.session?.id ?: ""
-            Clerk.auth.setActive(sessionId, orgId)
+            try {
+                Clerk.auth.setActive(sessionId, orgId)
+            } catch (e: Exception) {
+                Timber.e(e, "navigateAfterAuth: setActive failed for org=$orgId")
+                // Proceed to postauth; the JWT will lack org_id, but Phase 5 handles this.
+            }
             navController.navigate("postauth") { popUpTo(0) { inclusive = true } }
         }
         else -> {
