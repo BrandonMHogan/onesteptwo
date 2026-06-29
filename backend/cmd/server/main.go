@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"log"
 	"net/http"
@@ -28,6 +29,13 @@ func main() {
 	defer db.Close()
 	db.SetMaxOpenConns(25)
 	db.SetMaxIdleConns(5)
+
+	// WR-07: Verify the database is reachable at startup. sql.Open only validates the
+	// DSN syntax; without Ping the server can start successfully even when DATABASE_URL
+	// is wrong or the DB is unreachable, hiding deployment failures until the first request.
+	if err := db.PingContext(context.Background()); err != nil {
+		log.Fatalf("database unreachable: %v", err)
+	}
 
 	// Set the Clerk secret key for JWKS-backed JWT verification.
 	clerk.SetKey(os.Getenv("CLERK_SECRET_KEY"))
