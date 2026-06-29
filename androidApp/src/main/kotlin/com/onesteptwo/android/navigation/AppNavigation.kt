@@ -223,6 +223,12 @@ private suspend fun navigateAfterAuth(navController: NavHostController) {
             val sessionId = Clerk.session?.id ?: ""
             try {
                 Clerk.auth.setActive(sessionId, orgId)
+                // WR-09: Log post-setActive state so silent result failures surface in debug.
+                Timber.d(
+                    "navigateAfterAuth: post-setActive " +
+                        "activeOrg=${Clerk.organizationMembership?.organization?.id}, " +
+                        "membership=${Clerk.organizationMembership?.role}"
+                )
             } catch (e: Exception) {
                 Timber.e(e, "navigateAfterAuth: setActive failed for org=$orgId")
                 // Proceed to postauth; the JWT will lack org_id, but Phase 5 handles this.
