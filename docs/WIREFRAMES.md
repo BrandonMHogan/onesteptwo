@@ -249,6 +249,7 @@ Ref: UI-SPEC §Auth Screens, §Loading State (component 12), §Error State (comp
 · Elevation: CTA overlay (8dp)
 · a11y: email field role=text, type=emailAddress; CTA contentDescription "Send invite"
 · a11y: success state liveRegion=Polite; error liveRegion=Polite
+· Note: tab bar visible when accessed via Settings (Settings sub-screen rule, REQ-035)
 
 Ref: UI-SPEC §Auth Screens (Invite Caregiver), §Primary CTAs, §Copywriting Contract §Error State Copy
 
