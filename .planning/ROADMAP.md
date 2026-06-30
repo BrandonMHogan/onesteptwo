@@ -125,7 +125,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 
 **Wave 1**
 
-  - [ ] 04-01-PLAN.md — docs/DESIGN-TOKENS.md: six token categories (Color, Typography, Spacing, Corner Radius, Elevation, Motion) extracted verbatim from 04-UI-SPEC.md (REQ-035)
+  - [x] 04-01-PLAN.md — docs/DESIGN-TOKENS.md: six token categories (Color, Typography, Spacing, Corner Radius, Elevation, Motion) extracted verbatim from 04-UI-SPEC.md (REQ-035)
   - [ ] 04-02-PLAN.md — docs/SCREEN-FLOWS.md: auth/onboarding + main-app Mermaid navigation diagrams, log→toast→sheet interaction flow, platform navigation notes (REQ-035)
 
 **Wave 2** *(blocked on Wave 1 — token-name consistency)*
@@ -224,7 +224,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 | 1. Foundation & Infrastructure | 4/4 | Complete    | 2026-06-26 |
 | 2. Compliance & Privacy Architecture | 6/6 | Complete   | 2026-06-27 |
 | 3. Authentication & Family Model | 6/6 | Complete   | 2026-06-29 |
-| 4. UI/UX Design | 0/4 | Planned | - |
+| 4. UI/UX Design | 1/4 | In Progress|  |
 | 5. Core Event Logging | 0/TBD | Not started | - |
 | 6. Offline-First Sync | 0/TBD | Not started | - |
 | 7. Progress & Milestones | 0/TBD | Not started | - |
