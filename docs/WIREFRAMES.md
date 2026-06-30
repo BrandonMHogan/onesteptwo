@@ -80,7 +80,7 @@ Ref: UI-SPEC §Auth Screens, §Typography, §Color (component: no dedicated comp
 │  ────── OTP STEP (replaces above) ── │
 │  Check your email                    │
 │  ┌──────────────────────────────┐    │
-│  │  [  ] [  ] [  ] [  ] [  ]   │    │
+│  │ [  ] [  ] [  ] [  ] [  ] [  ]│    │
 │  └──────────────────────────────┘    │
 │  ⚠ Incorrect or expired code.        │
 │    Try again.                        │
@@ -92,8 +92,9 @@ Ref: UI-SPEC §Auth Screens, §Typography, §Color (component: no dedicated comp
 · Color: error icon color.error; OTP digit cells background color.surface-container, border color.outline
 · Color: OTP cell focus ring color.primary (radius.sm)
 · Elevation: same as default state
-· a11y: error message liveRegion=Polite; OTP inputs role=text, traversalIndex ordered 1–5
+· a11y: error message liveRegion=Polite; OTP inputs role=text, traversalIndex ordered 1–6
 · a11y: contentDescription "Enter verification code digit N" per OTP cell
+· Note: 6 cells shown — Clerk default email OTP is 6 digits; verify if project uses custom Clerk configuration
 
 Ref: UI-SPEC §Auth Screens, §Copywriting Contract §Error State Copy, §Accessibility Contract
 
