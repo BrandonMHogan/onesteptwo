@@ -9,7 +9,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 - [x] **Phase 1: Foundation & Infrastructure** - Monorepo scaffold, CI/CD, Railway deploy, PostgreSQL + R2 backup, Clerk + Firebase provisioning, Go healthcheck, SQLDelight and goose migrations initialized
 - [x] **Phase 2: Compliance & Privacy Architecture** - Consent gate, erasure cascade, audit log, data minimisation constraints, and all COPPA/GDPR/PIPEDA/POPIA obligations enforced in schema and API before any child data flows (completed 2026-06-26)
 - [x] **Phase 3: Authentication & Family Model** - Sign up/in on Android + iOS, Clerk org enforcement, role-gated access, invitation flow, multi-org picker, JWT validation with azp and org context checks (completed 2026-06-29)
-- [ ] **Phase 4: UI/UX Design** - Screen flows, lo-fi wireframes, design tokens (color, type, spacing), component specs, and navigation/animation patterns for all screens on both platforms — spec complete before implementation begins
+- [x] **Phase 4: UI/UX Design** - Screen flows, lo-fi wireframes, design tokens (color, type, spacing), component specs, and navigation/animation patterns for all screens on both platforms — spec complete before implementation begins (completed 2026-06-30)
 - [ ] **Phase 5: Core Event Logging** - Onboarding wizard (family setup + consent + child profile), 4-tab navigation, one-tap logging with details-later flow, event types, pending-details banner, heatmap history tab, child switcher, Settings screens
 - [ ] **Phase 6: Offline-First Sync** - Pending queue in SQLDelight, connectivity-triggered retry, pending count indicator, pull-to-refresh, last-write-wins conflict resolution
 - [ ] **Phase 7: Progress & Milestones** - Progress tab with streak (current + best), total event counts, and milestone badges; heatmap history reflects synced data
@@ -134,7 +134,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 
 **Wave 3** *(blocked on Waves 1–2)*
 
-  - [ ] 04-04-PLAN.md — Phase 4 success-criteria verification across all three docs + finalize 04-UI-SPEC.md checker sign-off (REQ-035)
+  - [x] 04-04-PLAN.md — Phase 4 success-criteria verification across all three docs + finalize 04-UI-SPEC.md checker sign-off (REQ-035)
 
 ### Phase 5: Core Event Logging
 
@@ -224,7 +224,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 | 1. Foundation & Infrastructure | 4/4 | Complete    | 2026-06-26 |
 | 2. Compliance & Privacy Architecture | 6/6 | Complete   | 2026-06-27 |
 | 3. Authentication & Family Model | 6/6 | Complete   | 2026-06-29 |
-| 4. UI/UX Design | 3/4 | In Progress|  |
+| 4. UI/UX Design | 4/4 | Complete    | 2026-06-30 |
 | 5. Core Event Logging | 0/TBD | Not started | - |
 | 6. Offline-First Sync | 0/TBD | Not started | - |
 | 7. Progress & Milestones | 0/TBD | Not started | - |
