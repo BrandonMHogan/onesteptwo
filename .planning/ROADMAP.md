@@ -130,7 +130,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 
 **Wave 2** *(blocked on Wave 1 — token-name consistency)*
 
-  - [ ] 04-03-PLAN.md — docs/WIREFRAMES.md: 24 ASCII lo-fi wireframes across Groups A–F (auth, onboarding, home, history, progress, settings, sheets, states) (REQ-035)
+  - [x] 04-03-PLAN.md — docs/WIREFRAMES.md: 24 ASCII lo-fi wireframes across Groups A–F (auth, onboarding, home, history, progress, settings, sheets, states) (REQ-035)
 
 **Wave 3** *(blocked on Waves 1–2)*
 
@@ -224,7 +224,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 | 1. Foundation & Infrastructure | 4/4 | Complete    | 2026-06-26 |
 | 2. Compliance & Privacy Architecture | 6/6 | Complete   | 2026-06-27 |
 | 3. Authentication & Family Model | 6/6 | Complete   | 2026-06-29 |
-| 4. UI/UX Design | 2/4 | In Progress|  |
+| 4. UI/UX Design | 3/4 | In Progress|  |
 | 5. Core Event Logging | 0/TBD | Not started | - |
 | 6. Offline-First Sync | 0/TBD | Not started | - |
 | 7. Progress & Milestones | 0/TBD | Not started | - |
