@@ -45,7 +45,7 @@
 · Typography: CTA "Sign in" Body 16sp semibold, color.on-primary
 · Color: CTA background color.primary (#7E22CE light / #D8B4FE dark)
 · Color: input field background color.surface-container, border color.outline, radius.sm (8dp)
-· Color: "Sign up" link color.primary
+· Color: "Sign up" link color.on-surface (70% opacity) or color.on-background — not color.primary
 · Elevation: CTA button overlay (8dp)
 · a11y: email field role=text, password field role=password with toggle, CTA role=button
 · a11y: min tap target 48dp for all interactive elements
@@ -132,6 +132,7 @@ Ref: UI-SPEC §Auth Screens, §Copywriting Contract §Error State Copy, §Access
 · Typography: error Label 14sp, color.error; field labels Label 14sp
 · Color: CTA background color.primary; error color.error
 · Color: input border color.outline; error state border color.error
+· Color: "Sign in" link color.on-surface (70% opacity) or color.on-background — not color.primary
 · Elevation: CTA overlay (8dp)
 · a11y: error announced via liveRegion=Polite; password toggle contentDescription "Show/hide password"
 
