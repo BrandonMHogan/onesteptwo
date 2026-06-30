@@ -232,12 +232,12 @@ Empty states use text only. No illustrations (D-01 calm/minimal; no illustration
 
 ### Destructive Action Confirmations (REQ-014)
 
-| Action | Alert Title | Alert Body | Confirm Button | Cancel |
-|--------|-------------|------------|----------------|--------|
-| Remove child (admin) | "Remove [name]?" | "This permanently erases all events and data for [name]. This cannot be undone." | "Remove [name]" (error color) | "Cancel" |
-| Close family account (admin) | "Delete family account?" | "This permanently erases all family members, children, and events. This cannot be undone." | "Delete everything" (error color) | "Cancel" |
-| Remove caregiver (admin) | "Remove [name]?" | "They will lose access to your family immediately." | "Remove" (error color) | "Cancel" |
-| Delete my data (any user) | "Delete your data?" | "Your account and all data will be permanently erased. This cannot be undone." | "Delete my data" (error color) | "Cancel" |
+| Action | Alert Title | Alert Body | Confirm Button | Dismiss |
+|--------|-------------|------------|----------------|---------|
+| Remove child (admin) | "Remove [name]?" | "This permanently erases all events and data for [name]. This cannot be undone." | "Remove [name]" (error color) | "Keep [child's name]" |
+| Close family account (admin) | "Delete family account?" | "This permanently erases all family members, children, and events. This cannot be undone." | "Delete everything" (error color) | "Keep account" |
+| Remove caregiver (admin) | "Remove [name]?" | "They will lose access to your family immediately." | "Remove" (error color) | "Keep [caregiver's name]" |
+| Delete my data (any user) | "Delete your data?" | "Your account and all data will be permanently erased. This cannot be undone." | "Delete my data" (error color) | "Keep my data" |
 
 All confirmations use native alert dialogs: `AlertDialog` (Android Compose) / `.alert` modifier (SwiftUI). "Delete my data" flow must be reachable within two taps from Settings (REQ-014).
 
