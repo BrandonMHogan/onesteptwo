@@ -582,3 +582,420 @@ Ref: UI-SPEC §Toast Post-Log (component 6), §Log Button → Toast → Bottom S
 Ref: UI-SPEC §Main App — Home Tab, §Empty State (component 10), §Copywriting Contract §Empty State Copy
 
 ---
+
+## Group D — History Tab
+
+### History — Heatmap with Data
+
+```
+┌──────────────────────────────────────┐
+│ STATUS BAR (system insets)           │
+├──────────────────────────────────────┤
+│                                      │
+│  Mo  Tu  We  Th  Fr  Sa  Su         │
+│  ·   ·   ░   ▒   █   ▒   ░   Apr   │
+│  █   █   ▒   ·   █   █   ░   May   │
+│  ·   ░   ▒   █   ▒   ·   ·   Jun   │
+│  ░   ▒   █   ▒   ░   ·   ·   Jul   │
+│                                      │
+│  less [·] [░] [▒] [█] more          │
+│       empty low  med  high           │
+│                                      │
+├──────────────────────────────────────┤
+│  Home  │ History │Progress│ Settings │
+│        │   ●     │        │          │
+└──────────────────────────────────────┘
+```
+
+· Typography: month labels Caption 12sp, color.outline; week labels (Mo–Su) Label 14sp, color.on-surface 70%
+· Typography: legend "less" / "more" Caption 12sp, color.outline; intensity swatch labels Caption 12sp
+· Color: empty cells color.surface-container; low intensity #F3E8FF (primary-100); medium #C084FC (primary-400); high #7E22CE (primary-700) — light mode values (D-27)
+· Color: cell size min 32dp square (tappable target per WCAG); radius.sm (8dp); gap 4dp between cells
+· Color: tab bar History active color.primary; inactive color.on-surface 60% (REQ-035)
+· Motion: tint transition 150ms ease-in-out on data load (motion.duration.short)
+· a11y: each cell role=button, contentDescription "[Weekday], [Month Day], [N] events, tap to see details"
+· a11y: empty cells contentDescription "[Weekday], [Month Day], no events"
+· Note: tapping non-empty cell pushes History Day-Detail screen (REQ-033)
+
+Ref: UI-SPEC §Main App — History Tab, §Heatmap Cell (component 3), §Color §Heatmap Intensity Colors
+
+---
+
+### History — Empty State
+
+```
+┌──────────────────────────────────────┐
+│ STATUS BAR (system insets)           │
+├──────────────────────────────────────┤
+│                                      │
+│                                      │
+│                                      │
+│          No events yet               │
+│                                      │
+│   Log your first potty trip to       │
+│      see it here.                    │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+├──────────────────────────────────────┤
+│  Home  │ History │Progress│ Settings │
+│        │   ●     │        │          │
+└──────────────────────────────────────┘
+```
+
+· Typography: "No events yet" Headline 24sp semibold, color.on-background
+· Typography: body copy Body 16sp regular, color.on-surface 70% opacity
+· Color: heatmap grid replaced entirely by empty-state component; no grid cells rendered
+· Color: tab bar History active color.primary; inactive color.on-surface 60% (REQ-035)
+· Elevation: flat — no raised elements on empty state
+· a11y: empty state container announced via liveRegion=Polite on screen load
+· Note: empty state shown when the child has zero logged events (no events ever)
+
+Ref: UI-SPEC §Main App — History Tab, §Empty State (component 10), §Copywriting Contract §Empty State Copy
+
+---
+
+### History Day-Detail — Full Screen
+
+```
+┌──────────────────────────────────────┐
+│ STATUS BAR (system insets)           │
+├──────────────────────────────────────┤
+│  ← Thursday, June 12                │
+│  (Headline 24sp — platform back)    │
+│                                      │
+│  ┌────────────────────────────────┐  │
+│  │ 08:14  Pee        ✓ synced    │  │
+│  └────────────────────────────────┘  │
+│  ┌────────────────────────────────┐  │
+│  │ 10:32  Poo        [add details]│  │
+│  └────────────────────────────────┘  │
+│  ┌────────────────────────────────┐  │
+│  │ 14:07  Both  "good effort"    │  │
+│  └────────────────────────────────┘  │
+│  ┌────────────────────────────────┐  │
+│  │ 16:55  Tried      ✓ synced    │  │
+│  └────────────────────────────────┘  │
+│                                      │
+│  [TAB BAR HIDDEN — full-screen       │
+│   push navigation detail view]       │
+└──────────────────────────────────────┘
+```
+
+· Typography: date header Headline 24sp semibold, color.on-background (e.g. "Thursday, June 12")
+· Typography: event time Label 14sp, color.on-surface 70%; event type Body 16sp semibold
+· Typography: note text Body 16sp italic; sync status Caption 12sp, color.success or color.outline
+· Color: event cards background color.surface, radius.md (12dp), elevation raised (2dp)
+· Color: "add details" pending-details link color.primary; pending card border color.outline
+· Elevation: event cards raised (2dp); screen background color.background
+· a11y: back button contentDescription "Go back to History"; platform back gesture enabled (D-10)
+· a11y: pending card role=button, contentDescription "[time] [type] event — tap to add details"
+· Note: tab bar hidden — full-screen push navigation detail view per REQ-035; back returns to heatmap
+
+Ref: UI-SPEC §Main App — History Day-Detail View, §Event Card (component 5), §Navigation Patterns §History Drill-Down
+
+---
+
+## Group E — Progress + Settings
+
+### Progress Tab — With Data
+
+```
+┌──────────────────────────────────────┐
+│ STATUS BAR (system insets)           │
+├──────────────────────────────────────┤
+│                                      │
+│  Alex  (Label 14sp, 70% opacity)    │
+│                                      │
+│           12                         │
+│        day streak                    │
+│   Best: 18 days  (Label 14sp)        │
+│                                      │
+│  This week        All time           │
+│      23              147             │
+│  events            events            │
+│                                      │
+│  ┌──────────┐  ┌──────────┐         │
+│  │ 🏅 First │  │ 🏅  5-day│         │
+│  │  trip ✓  │  │ streak ✓ │         │
+│  └──────────┘  └──────────┘         │
+│  ┌──────────┐  ┌──────────┐         │
+│  │ 🔒 30-day│  │ 🔒   100 │         │
+│  │ streak   │  │  events  │         │
+│  └──────────┘  └──────────┘         │
+├──────────────────────────────────────┤
+│  Home  │ History │Progress│ Settings │
+│        │         │   ●    │          │
+└──────────────────────────────────────┘
+```
+
+· Typography: active child name Label 14sp, color.on-surface 70% opacity
+· Typography: streak count Display 28sp semibold, color.primary (#7E22CE light); "day streak" Body 16sp
+· Typography: "Best: N days" Label 14sp, color.on-surface 70%; stat numbers Title 20sp semibold
+· Typography: milestone badge labels Label 14sp; 2×2 grid, badge circles 64×64dp
+· Color: unlocked badge 64×64 circle, color.primary border, color.surface-container bg, radius.md
+· Color: locked badge 64×64 circle, color.outline border at 38% opacity, color.surface-container bg
+· Color: tab bar Progress active color.primary; inactive color.on-surface 60% (REQ-035)
+· a11y: streak region contentDescription "12 day streak, current. Best: 18 days"
+· a11y: unlocked badge role=none, contentDescription "First trip milestone, unlocked"
+· a11y: locked badge role=none, contentDescription "30-day streak milestone, locked"
+
+Ref: UI-SPEC §Main App — Progress Tab, §Milestone Badge (component 4), §Streak Display
+
+---
+
+### Progress Tab — Empty State
+
+```
+┌──────────────────────────────────────┐
+│ STATUS BAR (system insets)           │
+├──────────────────────────────────────┤
+│                                      │
+│  Alex  (Label 14sp, 70% opacity)    │
+│                                      │
+│                                      │
+│   Alex is just getting started       │
+│                                      │
+│   Keep logging to see streaks        │
+│   and milestones.                    │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+├──────────────────────────────────────┤
+│  Home  │ History │Progress│ Settings │
+│        │         │   ●    │          │
+└──────────────────────────────────────┘
+```
+
+· Typography: "[Child name] is just getting started" Headline 24sp semibold, color.on-background
+· Typography: "Keep logging to see streaks and milestones." Body 16sp regular, color.on-surface 70%
+· Color: streak and stats sections replaced by empty-state component; milestone grid hidden
+· Color: tab bar Progress active color.primary; inactive color.on-surface 60% (REQ-035)
+· a11y: empty state liveRegion=Polite on screen load; child name label is non-interactive
+· Note: empty state fires when child has zero logged events (REQ-034)
+
+Ref: UI-SPEC §Main App — Progress Tab, §Empty State (component 10), §Copywriting Contract §Empty State Copy
+
+---
+
+### Settings Tab — Admin View
+
+```
+┌──────────────────────────────────────┐
+│ STATUS BAR (system insets)           │
+├──────────────────────────────────────┤
+│  Settings                            │
+│                                      │
+│  Family ──────────────────────────   │
+│  Brandon  · Admin                    │
+│  Jamie    · Caregiver         [✕]   │
+│  Invite caregiver             [›]   │
+│                                      │
+│  Children ─────────────────────────  │
+│  Alex  (Jun 2022)             [›]   │
+│  Add child                    [›]   │
+│                                      │
+│  Notifications ────────────────────  │
+│  Notify me for Alex           [⬜]  │
+│                                      │
+│  Account ──────────────────────────  │
+│  brandon@example.com                 │
+│  Sign out                     [›]   │
+│  Delete my data               [›]   │
+│  (color.error — 2 taps from Settings)│
+├──────────────────────────────────────┤
+│  Home  │ History │Progress│ Settings │
+│        │         │        │    ●     │
+└──────────────────────────────────────┘
+```
+
+· Typography: section labels Label 14sp semibold, color.on-surface 70%; row text Body 16sp
+· Typography: "Delete my data" Body 16sp semibold, color.error (#B91C1C light / #FCA5A5 dark)
+· Color: section dividers color.outline; list row background color.surface, radius.md (12dp)
+· Color: "Delete my data" label color.error — visually distinct destructive action (REQ-014, T-04-07)
+· Color: tab bar Settings active color.primary; inactive color.on-surface 60% (REQ-035)
+· Elevation: rows flat (0dp); confirmation modal elevated (8dp) when delete is triggered
+· a11y: "Delete my data" role=button, contentDescription "Delete my data, destructive action"
+· a11y: remove-caregiver [✕] role=button, contentDescription "Remove Jamie, destructive"
+· a11y: notification toggle role=switch, contentDescription "Notify me for Alex, [on/off]"
+· COMPLIANCE: REQ-014 — "Delete my data" reachable in two taps from Settings tab (tap Settings → tap Delete my data)
+· Note: Admin sees all 4 sections: Family, Children, Notifications, Account
+
+Ref: UI-SPEC §Main App — Settings Tab (Admin), §Copywriting Contract §Destructive Action Confirmations, REQUIREMENTS REQ-014
+
+---
+
+### Settings Tab — Caregiver View
+
+```
+┌──────────────────────────────────────┐
+│ STATUS BAR (system insets)           │
+├──────────────────────────────────────┤
+│  Settings                            │
+│                                      │
+│  [Family section — HIDDEN]           │
+│  [Children section — HIDDEN]         │
+│  (role gate: org:caregiver)          │
+│                                      │
+│  Notifications ────────────────────  │
+│  Notify me for Alex           [⬜]  │
+│                                      │
+│  Account ──────────────────────────  │
+│  jamie@example.com                   │
+│  Sign out                     [›]   │
+│  Delete my data               [›]   │
+│  (color.error — own account only)    │
+│                                      │
+│                                      │
+├──────────────────────────────────────┤
+│  Home  │ History │Progress│ Settings │
+│        │         │        │    ●     │
+└──────────────────────────────────────┘
+```
+
+· Typography: section labels Label 14sp semibold; row text Body 16sp, color.on-background
+· Color: Family and Children sections not rendered (removed from view tree — not visibility:hidden)
+· Color: tab bar Settings active color.primary; inactive color.on-surface 60% (REQ-035)
+· a11y: screen reader traverses 2 sections only (Notifications, Account); hidden sections inaccessible
+· SECURITY: role gate (org:caregiver) at view layer mirrors API-level enforcement (T-04-09 mitigated)
+· Note: Caregiver sees only 2 sections: Notifications and Account; Family and Children sections are hidden
+
+Ref: UI-SPEC §Main App — Settings Tab (Caregiver), §Access Control (V4), REQUIREMENTS REQ-014
+
+---
+
+## Group F — Sheets + States
+
+### Event Detail — Bottom Sheet
+
+```
+┌──────────────────────────────────────┐
+│ STATUS BAR (system insets)           │
+├──────────────────────────────────────┤
+│  (background screen — scrim overlay) │
+│                                      │
+│ ─── bottom sheet ── (radius.lg) ─── │
+│                                      │
+│  Add details                  [×]   │
+│                                      │
+│  Event type                          │
+│  [Pee] [Poo] [Both]                 │
+│  [Accident (pee)] [Accident (poo)]  │
+│  [Tried]                             │
+│                                      │
+│  Note                                │
+│  ┌──────────────────────────────┐    │
+│  │ Add a note (optional)        │    │
+│  └──────────────────────────────┘    │
+│                                      │
+│  ┌──────────────────────────────┐    │
+│  │ Logged at [HH:mm]        [›]│    │
+│  └──────────────────────────────┘    │
+│                                      │
+│  ╔══════════════════════════════╗    │
+│  ║         Save details         ║    │
+│  ╚══════════════════════════════╝    │
+└──────────────────────────────────────┘
+```
+
+· Typography: "Add details" Title 20sp semibold, color.on-background; dismiss [×] icon 24dp
+· Typography: section label "Event type" / "Note" Label 14sp; event type chips Label 14sp
+· Typography: note placeholder "Add a note (optional)" Body 16sp, color.outline; time row Body 16sp
+· Typography: "Save details" CTA Body 16sp semibold, color.on-primary
+· Color: sheet background color.surface; top corners radius.lg (16dp); scrim #00000066
+· Color: CTA background color.primary; event type chips color.secondary bg, color.on-secondary text, radius.pill
+· Color: note field background color.surface-container, border color.outline, radius.sm
+· Elevation: sheet overlay (8dp); platform default open/close animation (D-35, ~300ms)
+· a11y: sheet role=bottomSheet; dismiss button contentDescription "Close, dismiss sheet"
+· a11y: event type chips role=radio within a radioGroup; "Save details" role=button
+· Note: fields in order — event type → note → time adjustment → save CTA (per UI-SPEC §Log Button flow)
+
+Ref: UI-SPEC §Event Detail Bottom Sheet (component 7), §Log Button → Toast → Bottom Sheet Flow, §Copywriting Contract
+
+---
+
+### Child Switcher — Bottom Sheet
+
+```
+┌──────────────────────────────────────┐
+│ STATUS BAR (system insets)           │
+├──────────────────────────────────────┤
+│  (background screen — scrim overlay) │
+│                                      │
+│ ─── bottom sheet ── (radius.lg) ─── │
+│                                      │
+│  Switch child                        │
+│                                      │
+│  ┌──────────────────────────────┐    │
+│  │ Alex                    [✓] │    │
+│  └──────────────────────────────┘    │
+│  ┌──────────────────────────────┐    │
+│  │ Sam                         │    │
+│  └──────────────────────────────┘    │
+│  ┌──────────────────────────────┐    │
+│  │ Jordan                      │    │
+│  └──────────────────────────────┘    │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘
+```
+
+· Typography: "Switch child" Title 20sp semibold, color.on-background
+· Typography: child name rows Body 16sp, color.on-background; active checkmark color.primary
+· Color: sheet background color.surface; top corners radius.lg (16dp); row height 48dp
+· Color: active row checkmark color.primary; inactive rows no indicator
+· Color: scrim #00000066 behind sheet; sheet elevation overlay (8dp)
+· a11y: sheet role=bottomSheet; rows role=radio within radioGroup "Switch child" (REQ-031)
+· a11y: active row contentDescription "[child name], selected"; inactive "[child name]"
+· a11y: selecting a child dismisses sheet and updates active child context
+· Note: sheet triggered by tapping child name header (chevron "›") in Home tab multi-child view
+
+Ref: UI-SPEC §Child Switcher (component 9), §Main App — Home Tab, REQUIREMENTS REQ-031
+
+---
+
+### Loading State and Error State
+
+```
+┌──────────────────────────────────────┐
+│ STATUS BAR (system insets)           │
+├──────────────────────────────────────┤
+│                                      │
+│                                      │
+│  [LOADING STATE]                     │
+│                                      │
+│              ◌                       │
+│     (CircularProgressIndicator /     │
+│      ProgressView — centered)        │
+│                                      │
+│  [ERROR STATE]                       │
+│                                      │
+│   Couldn't load data.                │
+│   Pull down to refresh.              │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+└──────────────────────────────────────┘
+```
+
+· Typography: loading spinner — no label (spinner is self-explanatory); error text Body 16sp, color.error
+· Typography: error copy "Couldn't load data. Pull down to refresh." Body 16sp, color.error
+· Color: spinner (◌) color.primary (#7E22CE light / #D8B4FE dark); centered on screen
+· Color: error text color.error (#B91C1C light / #FCA5A5 dark); background color.background
+· Color: no tab bar shown — generic pattern applies to any screen or content zone
+· Elevation: flat — loading and error states use no elevation
+· a11y: spinner contentDescription "Loading"; liveRegion=Polite to announce loading start
+· a11y: error message liveRegion=Polite; pull-to-refresh accessible via accessibility action
+· Note: generic pattern — used for initial page loads and data-fetch failures across all tabs
+
+Ref: UI-SPEC §Loading State (component 12), §Error State (component 11), §Copywriting Contract §Error State Copy
+
+---
