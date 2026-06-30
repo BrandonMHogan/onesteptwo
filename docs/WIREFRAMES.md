@@ -523,6 +523,8 @@ Ref: UI-SPEC §Main App — Home Tab, §Status Chips (component 8), §Child Swit
 │  │ [Pee] [Poo] [Both]          │    │
 │  │ [Accident (pee)]             │    │
 │  │ [Accident (poo)] [Tried]     │    │
+│  │                              │    │
+│  │      add details             │    │
 │  └──────────────────────────────┘    │
 │  (toast above tab bar, 8dp gap)      │
 ├──────────────────────────────────────┤
@@ -540,6 +542,7 @@ Ref: UI-SPEC §Main App — Home Tab, §Status Chips (component 8), §Child Swit
 · a11y: toast liveRegion=Polite; chip labels "Pee, button", "Poo, button", etc.
 · a11y: auto-dismiss after 12 seconds (D-17)
 · Note: six chip labels verbatim: Pee, Poo, Both, Accident (pee), Accident (poo), Tried
+· Note: "add details" text link — Label 14sp, color.on-surface; tap opens Event Detail bottom sheet without requiring chip selection first (SCREEN-FLOWS.md step 6)
 
 Ref: UI-SPEC §Toast Post-Log (component 6), §Log Button → Toast → Bottom Sheet Flow, §Copywriting Contract
 
