@@ -9,7 +9,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 - [x] **Phase 1: Foundation & Infrastructure** - Monorepo scaffold, CI/CD, Railway deploy, PostgreSQL + R2 backup, Clerk + Firebase provisioning, Go healthcheck, SQLDelight and goose migrations initialized
 - [x] **Phase 2: Compliance & Privacy Architecture** - Consent gate, erasure cascade, audit log, data minimisation constraints, and all COPPA/GDPR/PIPEDA/POPIA obligations enforced in schema and API before any child data flows (completed 2026-06-26)
 - [x] **Phase 3: Authentication & Family Model** - Sign up/in on Android + iOS, Clerk org enforcement, role-gated access, invitation flow, multi-org picker, JWT validation with azp and org context checks (completed 2026-06-29)
-- [x] **Phase 4: UI/UX Design** - Screen flows, lo-fi wireframes, design tokens (color, type, spacing), component specs, and navigation/animation patterns for all screens on both platforms — spec complete before implementation begins (completed 2026-06-30)
+- [ ] **Phase 4: UI/UX Design** - Screen flows, lo-fi wireframes, design tokens (color, type, spacing), component specs, and navigation/animation patterns for all screens on both platforms — 5 accuracy errors found in verification; gap closure required before Phase 5 (verified 2026-06-30, score 3/5)
 - [ ] **Phase 5: Core Event Logging** - Onboarding wizard (family setup + consent + child profile), 4-tab navigation, one-tap logging with details-later flow, event types, pending-details banner, heatmap history tab, child switcher, Settings screens
 - [ ] **Phase 6: Offline-First Sync** - Pending queue in SQLDelight, connectivity-triggered retry, pending count indicator, pull-to-refresh, last-write-wins conflict resolution
 - [ ] **Phase 7: Progress & Milestones** - Progress tab with streak (current + best), total event counts, and milestone badges; heatmap history reflects synced data
@@ -113,6 +113,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 **Goal**: The complete UI/UX specification for OneStepTwo is documented before any production UI code is written — covering all screen flows, lo-fi wireframes, design tokens, component specs, and navigation/animation patterns for both Jetpack Compose and SwiftUI. Engineers implement from this spec; design decisions do not happen during Phase 5+.
 **Depends on**: Phase 3
 **Requirements**: REQ-035
+**Verification**: gaps_found (3/5 truths verified, 2026-06-30) — 5 accuracy errors require correction before Phase 5
 **Success Criteria** (what must be TRUE):
 
   1. A screen flow diagram covers every user path: admin onboarding wizard, caregiver first login, main app (4-tab navigation), child switcher, one-tap log → "add details later" toast, history heatmap drill-down, progress tab, settings screens (admin vs caregiver role differences), invite caregiver flow, empty states, error states, and offline state indicators
@@ -135,6 +136,14 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 **Wave 3** *(blocked on Waves 1–2)*
 
   - [x] 04-04-PLAN.md — Phase 4 success-criteria verification across all three docs + finalize 04-UI-SPEC.md checker sign-off (REQ-035)
+
+**Gaps to close (from 04-VERIFICATION.md):**
+
+  - CR-01: docs/DESIGN-TOKENS.md line 38 — correct primary-300 usage annotation: "heatmap medium (dark)" → "heatmap high (dark)"; same correction needed in 04-UI-SPEC.md line 126
+  - CR-02: docs/WIREFRAMES.md lines 720-727 — correct Progress Tab milestone badge labels: replace "5-day streak" with "Accident-free day" and "100 events" with "7-day streak"
+  - CR-03: docs/WIREFRAMES.md lines 264, 304, 345, 390 — correct all four wizard step dot patterns: Step 2 = ○ ● ○ ○ ○, Step 3 = ○ ○ ● ○ ○, Step 4 = ○ ○ ○ ● ○, Step 5 = ○ ○ ○ ○ ●
+  - CR-04: docs/WIREFRAMES.md line 951 — correct Child Switcher typography annotation: "Body 16sp" → "Title 20sp semibold"
+  - CR-05: docs/WIREFRAMES.md line 47 — correct Sign In link color annotation: "color.primary" → "color.on-surface (70% opacity) or color.on-background"
 
 ### Phase 5: Core Event Logging
 
@@ -224,7 +233,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 | 1. Foundation & Infrastructure | 4/4 | Complete    | 2026-06-26 |
 | 2. Compliance & Privacy Architecture | 6/6 | Complete   | 2026-06-27 |
 | 3. Authentication & Family Model | 6/6 | Complete   | 2026-06-29 |
-| 4. UI/UX Design | 4/4 | Complete    | 2026-06-30 |
+| 4. UI/UX Design | 4/4 | Gaps found (3/5) — pending correction | 2026-06-30 |
 | 5. Core Event Logging | 0/TBD | Not started | - |
 | 6. Offline-First Sync | 0/TBD | Not started | - |
 | 7. Progress & Milestones | 0/TBD | Not started | - |

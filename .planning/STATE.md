@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-04-PLAN.md — Phase 4 UI/UX Design complete
-last_updated: "2026-06-30T13:01:42Z"
-last_activity: 2026-06-30 -- Phase 04 complete (plan 4 of 4)
+stopped_at: Phase 4 verification complete — gaps_found (5 accuracy errors need correction before Phase 5)
+last_updated: "2026-06-30T14:00:00Z"
+last_activity: 2026-06-30 -- Phase 04 verification complete (gaps_found)
 progress:
   total_phases: 9
-  completed_phases: 4
+  completed_phases: 3
   total_plans: 20
   completed_plans: 20
   percent: 44
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-25)
 
 **Core value:** Offline-first potty tracking for multi-caregiver families — log instantly, sync when connected, notify everyone
-**Current focus:** Phase 04 — ui-ux-design
+**Current focus:** Phase 04 — ui-ux-design (verification gaps pending)
 
 ## Current Position
 
-Phase: 04 (ui-ux-design) — COMPLETE
-Plan: 4 of 4 — all plans complete
-Next: Phase 05 (core-event-logging)
-Status: Phase 4 complete; ready for Phase 5
-Last activity: 2026-06-30 -- Phase 04 complete
+Phase: 04 (ui-ux-design) — VERIFICATION GAPS FOUND
+Plan: 4 of 4 — all plans complete; verification found 5 accuracy errors
+Next: Close Phase 4 gaps, then Phase 05 (core-event-logging)
+Status: Phase 4 gap closure required before Phase 5 can begin
+Last activity: 2026-06-30 -- Phase 04 verification: gaps_found (score 3/5)
 
 Progress: [████████████░] 44%
 
@@ -40,7 +40,7 @@ Progress: [████████████░] 44%
 | 1 | Foundation & Infrastructure | COMPLETE |
 | 2 | Compliance & Privacy Architecture | COMPLETE |
 | 3 | Authentication & Family Model | COMPLETE |
-| 4 | UI/UX Design | COMPLETE |
+| 4 | UI/UX Design | GAPS FOUND — verification failed (3/5 truths) |
 | 5 | Core Event Logging | NOT STARTED |
 | 6 | Offline-First Sync | NOT STARTED |
 | 7 | Progress & Milestones | NOT STARTED |
@@ -170,7 +170,12 @@ None yet.
 
 ### Blockers/Concerns
 
-None yet — see Open Questions below for pre-execution items to resolve.
+**Phase 4 verification gaps (must resolve before Phase 5):**
+- CR-01: DESIGN-TOKENS.md line 38 — primary-300 usage says "heatmap medium (dark)" but should be "heatmap high (dark)"; same error in 04-UI-SPEC.md line 126
+- CR-02: WIREFRAMES.md lines 720-727 — milestone badges show "5-day streak" and "100 events" (not in spec); correct: "Accident-free day" and "7-day streak"
+- CR-03: WIREFRAMES.md lines 264, 304, 345, 390 — all four wizard step dot indicators off by one position
+- CR-04: WIREFRAMES.md line 951 — child switcher annotation "Body 16sp" must be "Title 20sp semibold"
+- CR-05: WIREFRAMES.md line 47 — sign-in "Sign up" link annotated as color.primary; must use color.on-surface or color.on-background
 
 ## Open Questions
 
@@ -178,6 +183,7 @@ None yet — see Open Questions below for pre-execution items to resolve.
 - Should EU data residency (Railway EU region) be evaluated before launch or deferred until EU adoption grows? Phase 7 success criteria leave this open per REQ-C-007.
 - Do either the App Store (Apple) or Google Play require platform-specific parental consent mechanisms (e.g. Apple's parental gate API) in addition to the in-app self-attestation screen?
 - Has the OpenAPI spec at /api/openapi.yaml been seeded with initial endpoint shapes, or will it be defined from scratch in Phase 1? Check /api/openapi.yaml before starting Phase 1 plan.
+- Clerk OTP digit count: the Sign In wireframe shows 5 OTP cells; verify whether Clerk is configured for 5 or 6 digits (default is 6) — update wireframe if needed.
 
 ## Blocked
 
@@ -186,6 +192,6 @@ None yet — see Open Questions below for pre-execution items to resolve.
 
 ## Session Continuity
 
-Last session: 2026-06-30T13:01:42Z
-Stopped at: Completed 04-04-PLAN.md — Phase 4 UI/UX Design complete
+Last session: 2026-06-30T14:00:00Z
+Stopped at: Phase 4 verification complete — gaps_found, gap closure plan needed
 Resume file: None
