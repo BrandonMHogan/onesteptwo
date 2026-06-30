@@ -617,8 +617,8 @@ Ref: UI-SPEC §Main App — Home Tab, §Empty State (component 10), §Copywritin
 · Color: cell size min 32dp square (tappable target per WCAG); radius.sm (8dp); gap 4dp between cells
 · Color: tab bar History active color.primary; inactive color.on-surface 60% (REQ-035)
 · Motion: tint transition 150ms ease-in-out on data load (motion.duration.short)
-· a11y: each cell role=button, contentDescription "[Weekday], [Month Day], [N] events, tap to see details"
-· a11y: empty cells contentDescription "[Weekday], [Month Day], no events"
+· a11y: non-empty cell role=button, contentDescription "[N] events on [Mon, Jan 1]" (e.g. "6 events on Thu, Jun 12, button")
+· a11y: empty cell role=none (non-interactive), contentDescription "[Mon, Jan 1], no events"
 · Note: tapping non-empty cell pushes History Day-Detail screen (REQ-033)
 
 Ref: UI-SPEC §Main App — History Tab, §Heatmap Cell (component 3), §Color §Heatmap Intensity Colors
