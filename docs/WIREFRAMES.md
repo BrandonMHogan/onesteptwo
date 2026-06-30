@@ -261,7 +261,7 @@ Ref: UI-SPEC §Auth Screens (Invite Caregiver), §Primary CTAs, §Copywriting Co
 ┌──────────────────────────────────────┐
 │ STATUS BAR (system insets)           │
 ├──────────────────────────────────────┤
-│  ● ○ ○ ○ ○  (step dots 1–5, dot 2   │
+│  ○ ● ○ ○ ○  (step dots 1–5, dot 2   │
 │              active = color.primary) │
 │                                      │
 │  Your family name                    │
@@ -301,7 +301,7 @@ Ref: UI-SPEC §Admin Onboarding Wizard (Step 2), §Primary CTAs
 ┌──────────────────────────────────────┐
 │ STATUS BAR (system insets)           │
 ├──────────────────────────────────────┤
-│  ○ ● ○ ○ ○  (step 3 active)         │
+│  ○ ○ ● ○ ○  (step 3 active)         │
 │                                      │
 │  Your child                          │
 │                                      │
@@ -342,7 +342,7 @@ Ref: UI-SPEC §Admin Onboarding Wizard (Step 3), §Spacing Scale §Child data mi
 ┌──────────────────────────────────────┐
 │ STATUS BAR (system insets)           │
 ├──────────────────────────────────────┤
-│  ○ ○ ● ○ ○  (step 4 active)         │
+│  ○ ○ ○ ● ○  (step 4 active)         │
 │                                      │
 │  About your data                     │
 │                                      │
@@ -387,7 +387,7 @@ Ref: UI-SPEC §Admin Onboarding Wizard (Step 4), §Copywriting Contract §Consen
 ┌──────────────────────────────────────┐
 │ STATUS BAR (system insets)           │
 ├──────────────────────────────────────┤
-│  ○ ○ ○ ● ○  (step 5 active)         │
+│  ○ ○ ○ ○ ●  (step 5 active)         │
 │                                      │
 │                                      │
 │  You're all set!                     │
