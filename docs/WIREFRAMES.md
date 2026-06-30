@@ -948,7 +948,7 @@ Ref: UI-SPEC §Event Detail Bottom Sheet (component 7), §Log Button → Toast �
 ```
 
 · Typography: "Switch child" Title 20sp semibold, color.on-background
-· Typography: child name rows Body 16sp, color.on-background; active checkmark color.primary
+· Typography: child name rows Title 20sp semibold, color.on-background; active checkmark color.primary
 · Color: sheet background color.surface; top corners radius.lg (16dp); row height 48dp
 · Color: active row checkmark color.primary; inactive rows no indicator
 · Color: scrim #00000066 behind sheet; sheet elevation overlay (8dp)
