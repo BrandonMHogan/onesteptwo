@@ -106,7 +106,7 @@ Six levels per D-25. Weights are limited to two: regular (400) and semibold (600
 **Accent (#7E22CE / #D8B4FE) is reserved exclusively for:**
 1. Log button background
 2. Bottom tab bar active icon + label
-3. Primary CTA buttons (onboarding wizard "Continue" / "Start tracking", "Send invite", "Save" in bottom sheet)
+3. Primary CTA buttons (onboarding wizard "Continue setup" / "Start tracking", "Send invite", "Save details" in bottom sheet)
 4. Progress tab streak number callout
 5. Heatmap high-intensity cells (primary-700 / primary-300 in dark mode)
 6. Milestone badge unlocked background
@@ -174,10 +174,10 @@ Dark mode follows system preference on first launch; no manual toggle (D-06).
 | Screen / Context | CTA Label | Notes |
 |------------------|-----------|-------|
 | Home tab — log button | "Log" | Large pill button; context makes action self-evident |
-| Onboarding — family name step | "Continue" | Steps 2 and 3 of wizard |
+| Onboarding — family name step | "Continue setup" | Steps 2 and 3 of wizard |
 | Onboarding — consent step | "I agree — continue" | Button stays disabled until checkbox checked |
 | Onboarding — completion | "Start tracking" | Warm but calm; no exclamation mark |
-| Event detail bottom sheet | "Save" | Primary action; saves event_type + note |
+| Event detail bottom sheet | "Save details" | Primary action; saves event_type + note |
 | Invite caregiver | "Send invite" | Submits Clerk invitation |
 | Settings — add child | "Add child" | Opens child creation flow |
 
@@ -435,7 +435,7 @@ Note: accident_pee and accident_poo share the same warning icon; they are differ
   1. Event type selector — segmented/chip row; see chip spec above; pre-selected if set
   2. Text note field — multi-line, Body (16sp), placeholder "Add a note (optional)"
   3. Time adjustment — Label text "Logged at [HH:mm]" with edit icon; opens time picker on tap (optional — available but not required to fill)
-  4. Save button — full-width, `color.primary`, Body (16sp) semibold label "Save"
+  4. Save details button — full-width, `color.primary`, Body (16sp) semibold label "Save details"
 - Sheet title: "Add details" — Title (20sp) semibold
 - Dismissal: swipe down or tap outside (platform default); shows confirmation alert if unsaved changes exist
 
@@ -518,8 +518,8 @@ Linear wizard, 5 steps after Clerk sign-up. Tab bar hidden throughout.
 | Step | Content | CTA |
 |------|---------|-----|
 | 1 | Clerk sign-up (managed by Clerk SDK) | — |
-| 2 | Family display name input | "Continue" |
-| 3 | First child: nickname + birth month/year selectors | "Continue" |
+| 2 | Family display name input | "Continue setup" |
+| 3 | First child: nickname + birth month/year selectors | "Continue setup" |
 | 4 | Plain-language data explanation + self-attestation checkbox | "I agree — continue" (disabled until checked) |
 | 5 | Success state: child name displayed, confirmation copy | "Start tracking" |
 
@@ -536,6 +536,8 @@ Progress indicator: step dots (active/inactive) at top of wizard screens, 1–5.
 ### Main App — Home Tab
 
 Non-scrollable layout (D-19), top to bottom:
+
+Primary focal point: Log button. All other home screen elements are subordinate in visual weight.
 
 1. **Child name header** — "[Child name] ›" (Title 20sp semibold); tap opens child switcher sheet; hidden chevron for single-child families
 2. **Today's event count** — Display (28sp) semibold integer + Label "events today" below; `color.on-background`
@@ -618,7 +620,7 @@ Caregiver sees only two sections: Notifications (same as admin) and Account. Fam
 4. Toast slides up from above tab bar (200ms enter)
 5. User taps event type chip in toast → event_type written to SQLDelight → toast exits (150ms)
 6. User taps "add details" in toast (or taps pending-details card later) → bottom sheet opens (platform default timing)
-7. User fills fields and taps Save → sheet dismisses, event updated in SQLDelight
+7. User fills fields and taps Save details → sheet dismisses, event updated in SQLDelight
 
 ### History Drill-Down
 
