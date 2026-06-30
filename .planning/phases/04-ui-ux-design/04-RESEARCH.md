@@ -567,22 +567,25 @@ Ref: UI-SPEC §Progress Tab, §Milestone Badge (component 5)
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Mermaid rendering support**
    - What we know: Mermaid is the standard for markdown-embedded diagrams; GitHub renders it natively
    - What's unclear: Whether the project team's specific markdown toolchain (local previewer, internal wiki, etc.) renders Mermaid
    - Recommendation: Plan first task (SCREEN-FLOWS.md) with a note that if Mermaid renders correctly in the repo, keep diagrams; otherwise add plain-text flow description fallback
+   - RESOLVED: Plan 04-02 Task 1 mandates a plain-text numbered fallback description beneath every Mermaid diagram, making the output rendering-agnostic.
 
 2. **UI-SPEC.md checker sign-off status**
    - What we know: STATE.md records `stopped_at: Phase 04 UI-SPEC approved`; the UI-SPEC.md file itself has `**Approval:** pending`
    - What's unclear: Is this a stale marker to update, or does the approval need a formal re-check?
    - Recommendation: Include a final verification task in Phase 4 that updates the approval marker and cross-checks all six checker dimensions are still PASS after the three output docs are produced
+   - RESOLVED: Plan 04-04 Task 2 explicitly updates the `**Approval:** pending` marker to `approved` with the completion date.
 
 3. **Should SCREEN-FLOWS.md also document the within-screen interaction sequences?**
    - What we know: Success Criterion 1 requires "one-tap log → add details later toast" flow to be in the screen flow diagram
    - What's unclear: Whether this belongs in SCREEN-FLOWS.md as a sub-diagram or as a narrative description in WIREFRAMES.md
    - Recommendation: Put it in SCREEN-FLOWS.md as a second Mermaid diagram titled "Home Tab Interaction Flow" — keeps navigation and interactions in the same reference doc
+   - RESOLVED: Placed in SCREEN-FLOWS.md as `## Home Tab Interaction Flow (Log → Toast → Sheet)` per Plan 04-02 Task 2.
 
 ---
 
