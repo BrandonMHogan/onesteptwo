@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Phase 03 complete — iOS UAT 7/7 passed (sign in, OTP, routing, org picker, invite, role gate, sign out)
-last_updated: "2026-06-29T23:50:00Z"
-last_activity: 2026-06-29 -- Phase 03 UAT complete
+status: planning
+stopped_at: Phase 04 UI-SPEC approved
+last_updated: "2026-06-30T00:11:12.661Z"
+last_activity: 2026-06-29 -- Phase 03 UAT complete (7/7 passed)
 progress:
   total_phases: 9
   completed_phases: 3
@@ -168,6 +168,6 @@ None yet — see Open Questions below for pre-execution items to resolve.
 
 ## Session Continuity
 
-Last session: 2026-06-29T18:46:42.796Z
-Stopped at: Completed Phase 03 Plan 04 — OrgPickerScreen, InviteCaregiverScreen, Clerk roles verified
-Resume file: None
+Last session: 2026-06-30T00:11:12.652Z
+Stopped at: Phase 04 UI-SPEC approved
+Resume file: .planning/phases/04-ui-ux-design/04-UI-SPEC.md
