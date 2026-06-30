@@ -35,7 +35,7 @@ Tab bar active state: `color.primary` (REQ-035). Inactive icon + label: `color.o
 | `primary-50` | `#FAF5FF` | Surface (secondary 30% light mode) |
 | `primary-100` | `#F3E8FF` | Secondary surface container, input field backgrounds (light) |
 | `primary-200` | `#E9D5FF` | On-secondary in dark mode |
-| `primary-300` | `#D8B4FE` | Primary accent in dark mode; heatmap medium (dark) |
+| `primary-300` | `#D8B4FE` | Primary accent in dark mode; heatmap high (dark) |
 | `primary-400` | `#C084FC` | Heatmap medium intensity (light) |
 | `primary-500` | `#A855F7` | Anchor reference (not used directly in semantic tokens) |
 | `primary-600` | `#9333EA` | Heatmap low-to-medium boundary reference |
