@@ -87,7 +87,7 @@ Ref: UI-SPEC §Auth Screens, §Typography, §Color (component: no dedicated comp
 └──────────────────────────────────────┘
 ```
 
-· Typography: error text Body 16sp, color.error (#B91C1C light / #FCA5A5 dark)
+· Typography: error text Label 14sp, color.error (#B91C1C light / #FCA5A5 dark)
 · Typography: OTP heading Display 28sp semibold
 · Color: error icon color.error; OTP digit cells background color.surface-container, border color.outline
 · Color: OTP cell focus ring color.primary (radius.sm)
