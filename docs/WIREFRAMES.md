@@ -593,11 +593,11 @@ Ref: UI-SPEC §Main App — Home Tab, §Empty State (component 10), §Copywritin
 │ STATUS BAR (system insets)           │
 ├──────────────────────────────────────┤
 │                                      │
-│  Mo  Tu  We  Th  Fr  Sa  Su         │
-│  ·   ·   ░   ▒   █   ▒   ░   Apr   │
-│  █   █   ▒   ·   █   █   ░   May   │
-│  ·   ░   ▒   █   ▒   ·   ·   Jun   │
-│  ░   ▒   █   ▒   ░   ·   ·   Jul   │
+│       Mo  Tu  We  Th  Fr  Sa  Su    │
+│  Apr  ·   ·   ░   ▒   █   ▒   ░    │
+│  May  █   █   ▒   ·   █   █   ░    │
+│  Jun  ·   ░   ▒   █   ▒   ·   ·    │
+│  Jul  ░   ▒   █   ▒   ░   ·   ·    │
 │                                      │
 │  less [·] [░] [▒] [█] more          │
 │       empty low  med  high           │
