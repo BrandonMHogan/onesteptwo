@@ -9,8 +9,8 @@
 /* Begin PBXBuildFile section */
 		413B02C12AB54618A1E077B8 /* shared.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8995C5C1EE804EBB942A634C /* shared.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		995CF3127C084B02A34F8757 /* shared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8995C5C1EE804EBB942A634C /* shared.xcframework */; };
-		BA1C3FC11DD141A1BAF3D6B2 /* ClerkKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1FA72DD80625472194C41B3D /* ClerkKit */; };
 		AA6626DFB3D14E0DB5DDB610 /* ClerkKitUI in Frameworks */ = {isa = PBXBuildFile; productRef = 5B9582A445EC4675ADB375CF /* ClerkKitUI */; };
+		BA1C3FC11DD141A1BAF3D6B2 /* ClerkKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1FA72DD80625472194C41B3D /* ClerkKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
