@@ -743,7 +743,7 @@ Ref: UI-SPEC §Main App — History Day-Detail View, §Event Card (component 5),
 · Color: locked badge 64×64 circle, color.outline border at 38% opacity, color.surface-container bg
 · Color: tab bar Progress active color.primary; inactive color.on-surface 60% (REQ-035)
 · a11y: streak region contentDescription "12 day streak, current. Best: 18 days"
-· a11y: unlocked badge role=none, contentDescription "First trip milestone, unlocked"
+· a11y: unlocked badge role=none, contentDescription "[Badge name], unlocked on [date]" (e.g. "First trip milestone, unlocked on June 3")
 · a11y: locked badge role=none, contentDescription "30-day streak milestone, locked"
 
 Ref: UI-SPEC §Main App — Progress Tab, §Milestone Badge (component 4), §Streak Display
