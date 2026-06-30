@@ -687,7 +687,7 @@ Ref: UI-SPEC §Main App — History Tab, §Empty State (component 10), §Copywri
 
 · Typography: date header Headline 24sp semibold, color.on-background (e.g. "Thursday, June 12")
 · Typography: event time Label 14sp, color.on-surface 70%; event type Body 16sp semibold
-· Typography: note text Body 16sp italic; sync status Caption 12sp, color.success or color.outline
+· Typography: note text Body 16sp regular, color.on-surface; sync status Caption 12sp, color.success or color.outline
 · Color: event cards background color.surface, radius.md (12dp), elevation raised (2dp)
 · Color: "add details" pending-details link color.primary; pending card border color.outline
 · Elevation: event cards raised (2dp); screen background color.background
