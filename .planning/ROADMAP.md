@@ -121,7 +121,20 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
   4. Component specs cover: bottom tab bar (4 tabs, active/inactive states), bottom-anchored log button (placement, size, tap area, haptic feedback spec), event card (complete variant and pending-details variant), heatmap calendar cell (empty/low/medium/high intensity), milestone badge (locked and unlocked states), toast/snackbar, "add details" bottom sheet, pending details banner, child switcher, empty state, error state, and loading state
   5. Navigation and animation patterns are documented: tab switch transitions, push/pop navigation for drill-down screens, log button tap feedback (haptic + visual confirmation), toast appear/dismiss timing, bottom sheet open/close, and any platform-specific motion guidance for Compose vs SwiftUI
 
-**Plans**: TBD
+**Plans**: 4 plans (2 waves of doc creation + 1 verification wave)
+
+**Wave 1**
+
+  - [ ] 04-01-PLAN.md — docs/DESIGN-TOKENS.md: six token categories (Color, Typography, Spacing, Corner Radius, Elevation, Motion) extracted verbatim from 04-UI-SPEC.md (REQ-035)
+  - [ ] 04-02-PLAN.md — docs/SCREEN-FLOWS.md: auth/onboarding + main-app Mermaid navigation diagrams, log→toast→sheet interaction flow, platform navigation notes (REQ-035)
+
+**Wave 2** *(blocked on Wave 1 — token-name consistency)*
+
+  - [ ] 04-03-PLAN.md — docs/WIREFRAMES.md: 24 ASCII lo-fi wireframes across Groups A–F (auth, onboarding, home, history, progress, settings, sheets, states) (REQ-035)
+
+**Wave 3** *(blocked on Waves 1–2)*
+
+  - [ ] 04-04-PLAN.md — Phase 4 success-criteria verification across all three docs + finalize 04-UI-SPEC.md checker sign-off (REQ-035)
 
 ### Phase 5: Core Event Logging
 
@@ -211,7 +224,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 | 1. Foundation & Infrastructure | 4/4 | Complete    | 2026-06-26 |
 | 2. Compliance & Privacy Architecture | 6/6 | Complete   | 2026-06-27 |
 | 3. Authentication & Family Model | 6/6 | Complete   | 2026-06-29 |
-| 4. UI/UX Design | 0/TBD | Not started | - |
+| 4. UI/UX Design | 0/4 | Planned | - |
 | 5. Core Event Logging | 0/TBD | Not started | - |
 | 6. Offline-First Sync | 0/TBD | Not started | - |
 | 7. Progress & Milestones | 0/TBD | Not started | - |
