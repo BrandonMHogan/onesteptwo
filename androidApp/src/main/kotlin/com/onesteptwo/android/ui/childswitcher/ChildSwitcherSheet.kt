@@ -1,4 +1,4 @@
-package com.onesteptwo.android.ui.home
+package com.onesteptwo.android.ui.childswitcher
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
