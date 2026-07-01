@@ -1,6 +1,7 @@
 package com.onesteptwo.android.ui.settings
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
@@ -137,9 +138,8 @@ fun AddChildScreen(container: AppContainer, onDone: () -> Unit) {
     )
     val state by viewModel.state.collectAsState()
 
-    if (state.done) {
-        onDone()
-        return
+    LaunchedEffect(state.done) {
+        if (state.done) onDone()
     }
 
     when (state.step) {

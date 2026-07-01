@@ -1,0 +1,9 @@
+-- shared/src/commonMain/sqldelight/migrations/3.sqm
+-- Phase 5 Stage 2: creates the local notification-preferences cache table (REQ-025).
+-- Applies on top of 2.sqm. No gaps in numbering (REQ-025).
+-- No transaction wrappers — see 1.sqm comment for rationale.
+
+CREATE TABLE notification_preferences (
+    child_id TEXT NOT NULL PRIMARY KEY,
+    enabled INTEGER NOT NULL DEFAULT 1
+);
