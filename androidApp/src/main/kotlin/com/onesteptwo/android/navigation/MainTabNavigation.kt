@@ -32,6 +32,7 @@ import com.onesteptwo.android.ui.settings.SettingsScreen
 import com.onesteptwo.android.viewmodel.ChildSelectionViewModel
 import com.onesteptwo.android.viewmodel.ChildSelectionViewModelFactory
 import timber.log.Timber
+import java.time.LocalDate
 
 private data class TabItem(val route: String, val label: String, val icon: androidx.compose.ui.graphics.vector.ImageVector)
 
@@ -84,7 +85,13 @@ fun MainTabNavigation(container: AppContainer, onSignOut: () -> Unit) {
             modifier = Modifier.padding(scaffoldPadding)
         ) {
             composable("home") { HomeScreen(container, childSelectionViewModel) }
-            composable("history") { HistoryScreen() }
+            composable("history") {
+                HistoryScreen(
+                    container = container,
+                    childSelectionViewModel = childSelectionViewModel,
+                    onDayClick = { date -> navController.navigate("history/day/$date") }
+                )
+            }
             composable("progress") { ProgressScreen(childSelectionViewModel) }
             composable("settings") {
                 SettingsScreen(
