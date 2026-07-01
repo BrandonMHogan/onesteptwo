@@ -52,6 +52,41 @@ paths:
         "401":
           description: Unauthorized
   /v1/children/{id}:
+    patch:
+      operationId: patchV1ChildrenId
+      summary: Partially update a child's nickname or birth month/year (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchChildRequest'
+      responses:
+        "200":
+          description: Child profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChildResponse'
+        "400":
+          description: Invalid request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Child not found
     delete:
       operationId: deleteV1ChildrenId
       summary: Delete a child profile and all associated data (GDPR/COPPA erasure)
@@ -165,6 +200,15 @@ components:
           format: uuid
         clerk_org_id:
           type: string
+        nickname:
+          type: string
+        birth_month:
+          type: integer
+        birth_year:
+          type: integer
+    PatchChildRequest:
+      type: object
+      properties:
         nickname:
           type: string
         birth_month:

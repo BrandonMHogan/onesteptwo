@@ -50,6 +50,13 @@ type NotificationPreferenceResponse struct {
 	Enabled *bool               `json:"enabled,omitempty"`
 }
 
+// PatchChildRequest defines model for PatchChildRequest.
+type PatchChildRequest struct {
+	BirthMonth *int    `json:"birth_month,omitempty"`
+	BirthYear  *int    `json:"birth_year,omitempty"`
+	Nickname   *string `json:"nickname,omitempty"`
+}
+
 // ProblemDetail defines model for ProblemDetail.
 type ProblemDetail struct {
 	Detail *string `json:"detail,omitempty"`
@@ -66,6 +73,9 @@ type PutNotificationPreferenceRequest struct {
 
 // PostV1ChildrenJSONRequestBody defines body for PostV1Children for application/json ContentType.
 type PostV1ChildrenJSONRequestBody = CreateChildRequest
+
+// PatchV1ChildrenIdJSONRequestBody defines body for PatchV1ChildrenId for application/json ContentType.
+type PatchV1ChildrenIdJSONRequestBody = PatchChildRequest
 
 // PutV1NotificationPreferencesJSONRequestBody defines body for PutV1NotificationPreferences for application/json ContentType.
 type PutV1NotificationPreferencesJSONRequestBody = PutNotificationPreferenceRequest
@@ -87,6 +97,9 @@ type ServerInterface interface {
 	// Delete a child profile and all associated data (GDPR/COPPA erasure)
 	// (DELETE /v1/children/{id})
 	DeleteV1ChildrenId(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// Partially update a child's nickname or birth month/year (admin only)
+	// (PATCH /v1/children/{id})
+	PatchV1ChildrenId(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
 	// List the caller's per-child notification preferences for the active org (REQ-022)
 	// (GET /v1/notification-preferences)
 	GetV1NotificationPreferences(w http.ResponseWriter, r *http.Request)
@@ -177,6 +190,32 @@ func (siw *ServerInterfaceWrapper) DeleteV1ChildrenId(w http.ResponseWriter, r *
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.DeleteV1ChildrenId(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PatchV1ChildrenId operation middleware
+func (siw *ServerInterfaceWrapper) PatchV1ChildrenId(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PatchV1ChildrenId(w, r, id)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -339,6 +378,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/v1/children", wrapper.GetV1Children)
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/v1/children", wrapper.PostV1Children)
 	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/v1/children/{id}", wrapper.DeleteV1ChildrenId)
+	m.HandleFunc(http.MethodPatch+" "+options.BaseURL+"/v1/children/{id}", wrapper.PatchV1ChildrenId)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/v1/notification-preferences", wrapper.GetV1NotificationPreferences)
 	m.HandleFunc(http.MethodPut+" "+options.BaseURL+"/v1/notification-preferences", wrapper.PutV1NotificationPreferences)
 

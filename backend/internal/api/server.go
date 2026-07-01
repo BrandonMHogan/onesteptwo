@@ -213,6 +213,100 @@ func (s *Server) GetV1Children(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(children)
 }
 
+// patchChildRequest carries the partial-update payload. Unlike createChildRequest's non-pointer
+// fields (all required on create), pointer fields distinguish "not provided" (nil, leave column
+// unchanged) from an explicit value to validate and write.
+type patchChildRequest struct {
+	Nickname   *string `json:"nickname"`
+	BirthMonth *int    `json:"birth_month"`
+	BirthYear  *int    `json:"birth_year"`
+}
+
+// PatchV1ChildrenId implements PATCH /v1/children/{id} — partial update of nickname and/or
+// birth month/year (Settings "Edit child"). Admin-only, same auth shape as DeleteV1ChildrenId
+// (REQ-016, REQ-027, REQ-015 IDOR check).
+//
+// Auth paths return before touching s.DB, so a nil DB is safe for unit tests of the
+// validation/auth code paths.
+func (s *Server) PatchV1ChildrenId(w http.ResponseWriter, r *http.Request, id openapi_types.UUID) {
+	claims, ok := clerk.SessionClaimsFromContext(r.Context())
+	if !ok || claims == nil {
+		WriteProblem(w, http.StatusUnauthorized, "about:blank", "Unauthorized", "missing or invalid session token")
+		return
+	}
+	if claims.ActiveOrganizationID == "" {
+		WriteProblem(w, http.StatusForbidden, "about:blank", "Forbidden", "no active organization in session")
+		return
+	}
+	if !claims.HasRole("org:admin") {
+		WriteProblem(w, http.StatusForbidden, "about:blank", "Forbidden", "admin role required")
+		return
+	}
+
+	var req patchChildRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		WriteProblem(w, http.StatusBadRequest, "about:blank", "Bad Request", "invalid or missing JSON body")
+		return
+	}
+
+	if req.Nickname != nil {
+		switch {
+		case *req.Nickname == "":
+			WriteProblem(w, http.StatusBadRequest, "about:blank", "Bad Request", "nickname must not be empty")
+			return
+		case len(*req.Nickname) > 100:
+			WriteProblem(w, http.StatusBadRequest, "about:blank", "Bad Request", "nickname must not exceed 100 characters")
+			return
+		}
+	}
+	if req.BirthMonth != nil && (*req.BirthMonth < 1 || *req.BirthMonth > 12) {
+		WriteProblem(w, http.StatusBadRequest, "about:blank", "Bad Request", "birth_month must be between 1 and 12")
+		return
+	}
+	if req.BirthYear != nil && (*req.BirthYear < 2000 || *req.BirthYear > time.Now().Year()+1) {
+		WriteProblem(w, http.StatusBadRequest, "about:blank", "Bad Request", "birth_year is out of valid range")
+		return
+	}
+
+	childID := id.String()
+
+	// IDOR check (REQ-015): child must belong to the caller's active org.
+	var childOrgID string
+	err := s.DB.QueryRowContext(r.Context(), `SELECT clerk_org_id FROM children WHERE id = $1`, childID).Scan(&childOrgID)
+	if err == sql.ErrNoRows {
+		WriteProblem(w, http.StatusNotFound, "about:blank", "Not Found", "child not found")
+		return
+	}
+	if err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not look up child")
+		return
+	}
+	if claims.ActiveOrganizationID != childOrgID {
+		WriteProblem(w, http.StatusForbidden, "about:blank", "Forbidden", "access denied")
+		return
+	}
+
+	var resp childListResponse
+	err = s.DB.QueryRowContext(r.Context(),
+		`UPDATE children
+		 SET nickname = COALESCE($1, nickname),
+		     birth_month = COALESCE($2, birth_month),
+		     birth_year = COALESCE($3, birth_year),
+		     updated_at = NOW()
+		 WHERE id = $4
+		 RETURNING id, clerk_org_id, nickname, birth_month, birth_year`,
+		req.Nickname, req.BirthMonth, req.BirthYear, childID,
+	).Scan(&resp.ID, &resp.ClerkOrgID, &resp.Nickname, &resp.BirthMonth, &resp.BirthYear)
+	if err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not update child profile")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(resp)
+}
+
 // DeleteV1ChildrenId implements DELETE /v1/children/{id} — child erasure cascade.
 // Hard-deletes a child's data in FK-safe order (REQ-011, REQ-013, REQ-014, REQ-C-002, REQ-C-003, REQ-C-004).
 // Each call first purges erasure_audit rows older than 90 days (D-12, REQ-C-008).
