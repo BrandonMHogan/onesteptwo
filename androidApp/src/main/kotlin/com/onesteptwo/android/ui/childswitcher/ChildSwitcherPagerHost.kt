@@ -1,5 +1,6 @@
 package com.onesteptwo.android.ui.childswitcher
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,7 +15,10 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.unit.dp
 import com.onesteptwo.db.Children
+import kotlin.math.absoluteValue
 
 /**
  * Shared cross-tab child switcher (04-UI-SPEC.md §Component 9, revised D-12): a persistent
@@ -103,7 +107,28 @@ fun ChildSwitcherPagerHost(
             state = pagerState,
             modifier = Modifier.fillMaxWidth()
         ) { page ->
-            content(children[realIndex(page, children.size)])
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer {
+                        // Depth transform (D-13): pages scale down and lose elevation as they
+                        // move away from center, both driven by the same 0f (centered) .. 1f
+                        // (fully off to one side) fraction — the underlying scroll/fling/snap
+                        // is still 100% HorizontalPager default (D-12), this is a pure visual
+                        // transform layered on top, read directly off live scroll position.
+                        val pageOffset = (
+                            (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
+                        ).absoluteValue.coerceIn(0f, 1f)
+                        val scale = 1f - 0.05f * pageOffset
+                        scaleX = scale
+                        scaleY = scale
+                        // elevation.raised (2dp, docs/DESIGN-TOKENS.md §Elevation Tokens) at
+                        // center -> elevation.flat (0dp) at the edges.
+                        shadowElevation = (2.dp * (1f - pageOffset)).toPx()
+                    }
+            ) {
+                content(children[realIndex(page, children.size)])
+            }
         }
     }
 
