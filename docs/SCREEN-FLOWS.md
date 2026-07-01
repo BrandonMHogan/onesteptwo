@@ -1,7 +1,7 @@
 # Screen Flows — OneStepTwo
 
 > Source: `.planning/phases/04-ui-ux-design/04-UI-SPEC.md` §Screen Inventory, §Navigation Patterns
-> Last updated: 2026-06-29
+> Last updated: 2026-07-01 (D-12: persistent cross-tab Child Switcher Banner + swipe gesture)
 
 ## Auth + Onboarding Flow
 
@@ -47,15 +47,21 @@ flowchart TD
 flowchart TD
     Shell[Tab Bar Shell\nHome · History · Progress · Settings\nREQ-035]
 
-    Shell -->|Home tab| HM[Home Tab\nLog button · event count · status chips]
-    Shell -->|History tab| HI[History Tab\nheatmap calendar grid]
-    Shell -->|Progress tab| PR[Progress Tab\nstreak · milestones]
+    Shell -->|Home tab| HM[Home Tab\nChild Switcher Banner · Log button\nevent count · status chips]
+    Shell -->|History tab| HI[History Tab\nChild Switcher Banner · heatmap calendar grid]
+    Shell -->|Progress tab| PR[Progress Tab\nChild Switcher Banner · streak · milestones]
     Shell -->|Settings tab| ST{User role?}
 
-    HM -->|child name header tap| CS[Child Switcher sheet\nhidden when family has 1 child]
+    HM -->|banner tap| CS[Child Switcher sheet\nhidden when family has 1 child]
+    HI -->|banner tap| CS
+    PR -->|banner tap| CS
     CS -->|dismiss| HM
 
-    HI -->|non-empty cell tap| DD[History Day-Detail\npush navigation\ntab bar hidden — REQ-035]
+    HM -->|swipe left/right, D-12| HM
+    HI -->|swipe left/right, D-12| HI
+    PR -->|swipe left/right, D-12| PR
+
+    HI -->|non-empty cell tap| DD[History Day-Detail\npush navigation\ntab bar hidden — REQ-035\nno Child Switcher Banner]
     DD -->|back gesture| HI
 
     ST -->|org:admin| SA[Settings — Admin\n4 sections: Family · Children\nNotifications · Account]
@@ -63,6 +69,8 @@ flowchart TD
 ```
 
 > **Tab bar visibility (REQ-035):** The bottom tab bar is hidden during the onboarding wizard (all 5 steps) and during the History Day-Detail full-screen push view. It is visible on all four main tabs (Home, History, Progress, Settings) and on the Settings sub-screens.
+
+> **Child Switcher Banner scope (D-12):** the banner (and its swipe gesture) appears only on the three tab roots — Home, History, Progress. It does not appear on History Day-Detail or any Settings sub-screen (Add/Edit child, Invite caregiver).
 
 ## Home Tab Interaction Flow (Log → Toast → Sheet)
 
@@ -75,6 +83,25 @@ flowchart TD
 7. User fills event-type selector, note field, and optionally adjusts logged time, then taps **"Save details"** → sheet dismisses, event row updated in SQLDelight
 
 > **Offline note:** Steps 2, 5, and 7 all write to SQLDelight only. Network sync occurs separately when connectivity is available. The interaction chain completes fully offline.
+
+## Child Switcher: Tap vs. Swipe Flow (D-12)
+
+Two independent, always-coexisting paths to change the active child, available identically on Home, History, and Progress (multi-child families only — see 04-UI-SPEC.md §Component 9):
+
+**Tap path (accessible, unchanged from original design):**
+1. User taps the Child Switcher Banner (name + age, centered) on any of the 3 tab roots
+2. Bottom sheet opens ("Switch child") listing all children in creation order, checkmark on the active row
+3. User taps a row → sheet dismisses → active child context updates across Home/History/Progress simultaneously (`ChildSelectionViewModel`, shared above the tab `NavHost`)
+4. This is the only path exposed to TalkBack/VoiceOver users — the banner's `contentDescription` and the sheet's `role = radio` rows fully cover it
+
+**Swipe path (new, D-12 — sighted/motor-only, not a replacement for the tap path):**
+1. User drags left or right anywhere on the current tab's screen (whole-screen `HorizontalPager` — banner and all tab content page together as one unit, tracking the finger 1:1)
+2. Page-indicator dots on the banner update live to reflect drag progress toward the next/previous child
+3. Releasing past the fling/position threshold completes the transition using `HorizontalPager`'s built-in default snap animation; releasing before the threshold snaps back to the current child
+4. Order follows the same creation-order list as the tap-path sheet; swiping past the last child wraps to the first, and vice versa (loop)
+5. Active child context updates across Home/History/Progress simultaneously, same as the tap path — both paths converge on the same `ChildSelectionViewModel.selectChild(...)` call
+
+> **Scope limit:** neither path is available on History Day-Detail or Settings sub-screens — the banner does not render there at all (D-12).
 
 ## Platform-Specific Navigation Notes
 

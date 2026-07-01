@@ -1,8 +1,8 @@
 # Wireframes — OneStepTwo
 
 > Source: `.planning/phases/04-ui-ux-design/04-UI-SPEC.md` §Screen Inventory, §Component Inventory
-> Last updated: 2026-06-29
-> 24 distinct screen/state wireframes across Groups A–F. Each wireframe includes layout annotations
+> Last updated: 2026-07-01 (D-12: persistent cross-tab Child Switcher Banner + swipe gesture)
+> 25 distinct screen/state wireframes across Groups A–F. Each wireframe includes layout annotations
 > and component cross-references. Phase 5 engineers implement each screen from its wireframe and
 > the referenced component spec.
 
@@ -424,6 +424,8 @@ Ref: UI-SPEC §Admin Onboarding Wizard (Step 5), §Auth → Main App Transition,
 
 ## Group C — Home Tab + Overlays
 
+> **Superseded 2026-07-01 (D-12):** the two Home wireframes below originally showed a left-aligned "[Name] ›" header with chevron, tap-only. That header is replaced by the persistent, centered Child Switcher Banner (shared across Home/History/Progress) shown here — see `.planning/phases/05-core-event-logging/05-CONTEXT.md` D-12 and 04-UI-SPEC.md §Component 9.
+
 ### Home — Single Child, No Status Chips
 
 ```
@@ -431,8 +433,11 @@ Ref: UI-SPEC §Admin Onboarding Wizard (Step 5), §Auth → Main App Transition,
 │ STATUS BAR (system insets)           │
 ├──────────────────────────────────────┤
 │                                      │
-│             Alex                     │
-│      (Title 20sp — no chevron)       │
+│              Alex                    │
+│           (Title 20sp)               │
+│             2y 3m                    │
+│         (Caption 12sp)               │
+│      (no dots — single child)        │
 │                                      │
 │               4                     │
 │          events today                │
@@ -443,14 +448,13 @@ Ref: UI-SPEC §Admin Onboarding Wizard (Step 5), §Auth → Main App Transition,
 │  ╚══════════════════════════════╝    │
 │  (wide pill ~75% screen width, 52dp) │
 │                                      │
-│                                      │
 ├──────────────────────────────────────┤
 │  Home  │ History │Progress│ Settings │
 │   ●    │         │        │          │
 └──────────────────────────────────────┘
 ```
 
-· Typography: child name Title 20sp semibold, color.on-background (no chevron — single child)
+· Typography: child name Title 20sp semibold centered, color.on-background; age "2y 3m" Caption 12sp centered below, color.on-surface 70%
 · Typography: event count Display 28sp semibold, color.on-background; "events today" Label 14sp
 · Typography: "Log" Body 16sp semibold, color.on-primary
 · Color: Log button background color.primary (#7E22CE), radius.pill (100dp), elevation overlay (8dp)
@@ -458,10 +462,11 @@ Ref: UI-SPEC §Admin Onboarding Wizard (Step 5), §Auth → Main App Transition,
 · Color: inactive tabs color.on-surface 60% opacity (REQ-035)
 · Elevation: Log button 8dp shadow; tab bar flat (0dp)
 · a11y: Log button contentDescription "Log potty trip", role=button, 52dp height
+· a11y: banner contentDescription "Alex, active child" (no swipe/tap hint — non-interactive for single child)
 · a11y: active tab "Home, selected, tab"; inactive tabs "[Tab], tab"
-· Note: tab bar always visible on main app screens (REQ-035); chevron hidden for single child
+· Note: tab bar always visible on main app screens (REQ-035); banner renders but is non-interactive (no dots, no tap, no swipe) for single-child families (D-12)
 
-Ref: UI-SPEC §Main App — Home Tab, §Bottom Tab Bar (component 1), §Log Button (component 2)
+Ref: UI-SPEC §Main App — Home Tab, §Bottom Tab Bar (component 1), §Log Button (component 2), §Child Switcher (component 9, revised D-12)
 
 ---
 
@@ -472,8 +477,12 @@ Ref: UI-SPEC §Main App — Home Tab, §Bottom Tab Bar (component 1), §Log Butt
 │ STATUS BAR (system insets)           │
 ├──────────────────────────────────────┤
 │                                      │
-│           Alex ›                     │
-│   (Title 20sp — chevron visible)     │
+│              Alex                    │
+│           (Title 20sp)               │
+│             2y 3m                    │
+│         (Caption 12sp)               │
+│            ● ○ ○                     │
+│     (page dots — 3 children)         │
 │                                      │
 │               6                     │
 │          events today                │
@@ -491,16 +500,52 @@ Ref: UI-SPEC §Main App — Home Tab, §Bottom Tab Bar (component 1), §Log Butt
 └──────────────────────────────────────┘
 ```
 
-· Typography: child name + chevron "Alex ›" Title 20sp semibold; chevron Caption size, color.outline
+· Typography: child name Title 20sp semibold centered; age Caption 12sp centered below, color.on-surface 70%
+· Color: page dots — active dot filled color.primary, inactive dots outlined color.outline 38% opacity; one dot per child, centered below age
 · Typography: status chip labels Caption 12sp, color.on-secondary; chip background color.secondary
 · Color: chips radius.pill (100dp), height 28dp, elevation raised (2dp); gap between chips 8dp
 · Color: tab bar as above — Home active color.primary; inactive color.on-surface 60% (REQ-035)
-· a11y: child header contentDescription "Alex, switch child, button", role=button, 48dp tap target
+· a11y: banner contentDescription "Alex, active child. Double tap to open child list, swipe left or right to switch.", role=button, 48dp tap target
 · a11y: "2 need details" chip contentDescription "2 events need details, button"
 · a11y: "1 syncing" chip contentDescription "1 event pending sync, button"
-· Note: chips hidden entirely when both counts are zero; chevron visible only for multi-child families
+· Note: chips hidden entirely when both counts are zero; page dots + tap/swipe affordances visible only for multi-child families (D-12); tapping banner opens Child Switcher sheet, swiping left/right anywhere on screen pages to next/previous child (whole-screen `HorizontalPager`, see "Home — Swipe-to-Switch Child" below)
 
-Ref: UI-SPEC §Main App — Home Tab, §Status Chips (component 8), §Child Switcher (component 9)
+Ref: UI-SPEC §Main App — Home Tab, §Status Chips (component 8), §Child Switcher (component 9, revised D-12)
+
+---
+
+### Home — Swipe-to-Switch Child (Mid-Drag) — new, D-12
+
+```
+┌──────────────────────────────────────┐
+│ STATUS BAR (system insets)           │
+├──────────────────────────────────────┤
+│                                      │
+│    Alex   ⇠ drag ⇢   Sam             │
+│  (partially   (incoming page,        │
+│   off-screen   partially on-screen,  │
+│   to the left)  same content layout) │
+│         ○ ● ○                        │
+│  (whole screen content underneath    │
+│   the banner pages together — Log    │
+│   button, chips, event count too)    │
+│                                      │
+├──────────────────────────────────────┤
+│  Home  │ History │Progress│ Settings │
+│   ●    │         │        │          │
+└──────────────────────────────────────┘
+```
+
+· Behavior: the entire tab screen is a `HorizontalPager` — banner, event count, status chips, and Log button all belong to one "page" per child and page together as a single unit, following the finger 1:1 during the drag
+· Behavior: releasing mid-drag past the fling/position threshold completes the page transition using `HorizontalPager`'s built-in default snap animation (no hand-picked duration — see 04-UI-SPEC.md §Motion Tokens "Child switcher swipe/page (D-12)")
+· Behavior: releasing before the threshold snaps back to the current child
+· Behavior: swiping past the last child wraps to the first, and vice versa (loop, D-12) — no dead end at either side of the child list
+· Behavior: swipe gesture works anywhere on the screen, not just the banner strip — this is a whole-screen "one-handed carousel," and does not conflict with History's/Progress's independent vertical scrolling since the pager only claims the horizontal axis
+· Order: pages follow the same order as the Child Switcher bottom sheet — children sorted by creation order (oldest first)
+· a11y: this gesture has no screen-reader equivalent; TalkBack/VoiceOver users must use the tap-to-open-sheet path instead (unchanged, always available)
+· Note: this same behavior applies identically on History and Progress — one shared `ChildSwitcherBanner` + pager wrapper, not three separate implementations
+
+Ref: UI-SPEC §Child Switcher (component 9, revised D-12), §Motion Tokens
 
 ---
 
@@ -511,7 +556,9 @@ Ref: UI-SPEC §Main App — Home Tab, §Status Chips (component 8), §Child Swit
 │ STATUS BAR (system insets)           │
 ├──────────────────────────────────────┤
 │                                      │
-│           Alex ›                     │
+│              Alex                    │
+│             2y 3m                    │
+│            ● ○ ○                     │
 │               6                     │
 │          events today                │
 │                                      │
@@ -556,10 +603,9 @@ Ref: UI-SPEC §Toast Post-Log (component 6), §Log Button → Toast → Bottom S
 │ STATUS BAR (system insets)           │
 ├──────────────────────────────────────┤
 │                                      │
-│           Alex                       │
-│      (Title 20sp — no chevron        │
-│       if single child)               │
-│                                      │
+│              Alex                    │
+│             2y 3m                    │
+│    (no dots — single child, D-12)    │
 │                                      │
 │          No events yet               │
 │   Log your first potty trip to       │
@@ -590,12 +636,19 @@ Ref: UI-SPEC §Main App — Home Tab, §Empty State (component 10), §Copywritin
 
 ## Group D — History Tab
 
+> **Updated 2026-07-01 (D-12):** both History wireframes below now show the persistent Child Switcher Banner at the top — History had no header at all before this revision. See `.planning/phases/05-core-event-logging/05-CONTEXT.md` D-12 and 04-UI-SPEC.md §Component 9. Screen content already grew vertically (weeks stack downward) before this change, so the new whole-screen swipe pager requires no change to the heatmap's own layout direction — only the banner is new here.
+
 ### History — Heatmap with Data
 
 ```
 ┌──────────────────────────────────────┐
 │ STATUS BAR (system insets)           │
 ├──────────────────────────────────────┤
+│              Alex                    │
+│             2y 3m                    │
+│            ● ○ ○                     │
+│  (Child Switcher Banner, D-12 —      │
+│   same shared component as Home)     │
 │                                      │
 │       Mo  Tu  We  Th  Fr  Sa  Su    │
 │  Apr  ·   ·   ░   ▒   █   ▒   ░    │
@@ -618,11 +671,14 @@ Ref: UI-SPEC §Main App — Home Tab, §Empty State (component 10), §Copywritin
 · Color: cell size min 32dp square (tappable target per WCAG); radius.sm (8dp); gap 4dp between cells
 · Color: tab bar History active color.primary; inactive color.on-surface 60% (REQ-035)
 · Motion: tint transition 150ms ease-in-out on data load (motion.duration.short)
+· Motion: banner + heatmap page together as one `HorizontalPager` unit when swiping between children (D-12) — heatmap's own vertical scroll is unaffected since the pager only claims the horizontal axis
 · a11y: non-empty cell role=button, contentDescription "[N] events on [Mon, Jan 1]" (e.g. "6 events on Thu, Jun 12, button")
 · a11y: empty cell role=none (non-interactive), contentDescription "[Mon, Jan 1], no events"
-· Note: tapping non-empty cell pushes History Day-Detail screen (REQ-033)
+· a11y: banner contentDescription as specified in §Component 9 (multi-child: swipe + tap hint; single-child: name only)
+· Note: tapping non-empty cell pushes History Day-Detail screen (REQ-033) — the banner does NOT appear on that pushed screen (D-12 scope limit, tab bar hidden there too)
+· Note: banner renders name-only, non-interactive (no dots) for single-child families (D-12)
 
-Ref: UI-SPEC §Main App — History Tab, §Heatmap Cell (component 3), §Color §Heatmap Intensity Colors
+Ref: UI-SPEC §Main App — History Tab, §Heatmap Cell (component 3), §Color §Heatmap Intensity Colors, §Child Switcher (component 9, revised D-12)
 
 ---
 
@@ -632,15 +688,15 @@ Ref: UI-SPEC §Main App — History Tab, §Heatmap Cell (component 3), §Color �
 ┌──────────────────────────────────────┐
 │ STATUS BAR (system insets)           │
 ├──────────────────────────────────────┤
-│                                      │
-│                                      │
+│              Alex                    │
+│             2y 3m                    │
+│  (Child Switcher Banner, D-12 —      │
+│   present even on empty state)       │
 │                                      │
 │          No events yet               │
 │                                      │
 │   Log your first potty trip to       │
 │      see it here.                    │
-│                                      │
-│                                      │
 │                                      │
 │                                      │
 │                                      │
@@ -657,6 +713,7 @@ Ref: UI-SPEC §Main App — History Tab, §Heatmap Cell (component 3), §Color �
 · Elevation: flat — no raised elements on empty state
 · a11y: empty state container announced via liveRegion=Polite on screen load
 · Note: empty state shown when the child has zero logged events (no events ever)
+· Note: Child Switcher Banner (D-12) remains present and functional in the empty state — switching to a different child still works, and pages the empty-state content along with the rest of the screen
 
 Ref: UI-SPEC §Main App — History Tab, §Empty State (component 10), §Copywriting Contract §Empty State Copy
 
@@ -705,14 +762,19 @@ Ref: UI-SPEC §Main App — History Day-Detail View, §Event Card (component 5),
 
 ## Group E — Progress + Settings
 
+> **Updated 2026-07-01 (D-12):** both Progress wireframes below now show the persistent Child Switcher Banner in place of the original plain-text "Alex (Label 14sp)" line. The full Progress data build remains Phase 7 scope (REQ-034); the banner itself ships as part of the D-12 follow-up. See `.planning/phases/05-core-event-logging/05-CONTEXT.md` D-12 and 04-UI-SPEC.md §Component 9.
+
 ### Progress Tab — With Data
 
 ```
 ┌──────────────────────────────────────┐
 │ STATUS BAR (system insets)           │
 ├──────────────────────────────────────┤
-│                                      │
-│  Alex  (Label 14sp, 70% opacity)    │
+│              Alex                    │
+│             2y 3m                    │
+│            ● ○ ○                     │
+│  (Child Switcher Banner, D-12 —      │
+│   replaces old plain-text label)     │
 │                                      │
 │           12                         │
 │        day streak                    │
@@ -736,18 +798,20 @@ Ref: UI-SPEC §Main App — History Day-Detail View, §Event Card (component 5),
 └──────────────────────────────────────┘
 ```
 
-· Typography: active child name Label 14sp, color.on-surface 70% opacity
+· Typography: Child Switcher Banner (D-12) — same shared component as Home/History; name Title 20sp semibold centered, age Caption 12sp centered below, page dots for 2+ children
 · Typography: streak count Display 28sp semibold, color.primary (#7E22CE light); "day streak" Body 16sp
 · Typography: "Best: N days" Label 14sp, color.on-surface 70%; stat numbers Title 20sp semibold
 · Typography: milestone badge labels Label 14sp; 2×2 grid, badge circles 64×64dp
 · Color: unlocked badge 64×64 circle, color.primary border, color.surface-container bg, radius.md
 · Color: locked badge 64×64 circle, color.outline border at 38% opacity, color.surface-container bg
 · Color: tab bar Progress active color.primary; inactive color.on-surface 60% (REQ-035)
+· Motion: banner + streaks/stats/badges page together as one `HorizontalPager` unit when swiping between children (D-12)
 · a11y: streak region contentDescription "12 day streak, current. Best: 18 days"
 · a11y: unlocked badge role=none, contentDescription "[Badge name], unlocked on [date]" (e.g. "First trip milestone, unlocked on June 3")
 · a11y: locked badge role=none, contentDescription "30-day streak milestone, locked"
+· Note: banner renders name-only, non-interactive (no dots) for single-child families (D-12)
 
-Ref: UI-SPEC §Main App — Progress Tab, §Milestone Badge (component 4), §Streak Display
+Ref: UI-SPEC §Main App — Progress Tab, §Milestone Badge (component 4), §Streak Display, §Child Switcher (component 9, revised D-12)
 
 ---
 
@@ -757,9 +821,9 @@ Ref: UI-SPEC §Main App — Progress Tab, §Milestone Badge (component 4), §Str
 ┌──────────────────────────────────────┐
 │ STATUS BAR (system insets)           │
 ├──────────────────────────────────────┤
-│                                      │
-│  Alex  (Label 14sp, 70% opacity)    │
-│                                      │
+│              Alex                    │
+│             2y 3m                    │
+│  (Child Switcher Banner, D-12)       │
 │                                      │
 │   Alex is just getting started       │
 │                                      │
@@ -781,8 +845,9 @@ Ref: UI-SPEC §Main App — Progress Tab, §Milestone Badge (component 4), §Str
 · Typography: "Keep logging to see streaks and milestones." Body 16sp regular, color.on-surface 70%
 · Color: streak and stats sections replaced by empty-state component; milestone grid hidden
 · Color: tab bar Progress active color.primary; inactive color.on-surface 60% (REQ-035)
-· a11y: empty state liveRegion=Polite on screen load; child name label is non-interactive
+· a11y: empty state liveRegion=Polite on screen load; Child Switcher Banner (D-12) remains interactive for multi-child families even in the empty state
 · Note: empty state fires when child has zero logged events (REQ-034)
+· Note: Child Switcher Banner (D-12) present regardless of empty state; switching/swiping to a different child still works
 
 Ref: UI-SPEC §Main App — Progress Tab, §Empty State (component 10), §Copywriting Contract §Empty State Copy
 
@@ -959,9 +1024,9 @@ Ref: UI-SPEC §Event Detail Bottom Sheet (component 7), §Log Button → Toast �
 · a11y: sheet role=bottomSheet; rows role=radio within radioGroup "Switch child" (REQ-031)
 · a11y: active row contentDescription "[child name], selected"; inactive "[child name]"
 · a11y: selecting a child dismisses sheet and updates active child context
-· Note: sheet triggered by tapping child name header (chevron "›") in Home tab multi-child view
+· Note: sheet triggered by tapping the Child Switcher Banner (D-12) on any of Home, History, or Progress in a multi-child family — no longer Home-only, no chevron icon (superseded by the centered banner + page dots design, see §Component 9)
 
-Ref: UI-SPEC §Child Switcher (component 9), §Main App — Home Tab, REQUIREMENTS REQ-031
+Ref: UI-SPEC §Child Switcher (component 9, revised D-12), §Main App — Home Tab / History Tab / Progress Tab, REQUIREMENTS REQ-031
 
 ---
 
