@@ -14,17 +14,31 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.onesteptwo.android.ui.childswitcher.ChildSwitcherPagerHost
 import com.onesteptwo.android.viewmodel.ChildSelectionViewModel
+import com.onesteptwo.db.Children
 
 /**
- * Phase 5 only needs the child switcher to update active-child context here (REQ-031) — full
- * streak/milestone UI is Phase 7 (REQ-034). Participates in [ChildSelectionViewModel] so the
- * active-child label stays in sync with Home/History even though there's nothing else to show yet.
+ * Phase 5 only needs the persistent Child Switcher Banner + swipe pager here (REQ-031, revised
+ * D-12) — full streak/milestone UI is Phase 7 (REQ-034). Each page is bound to one specific child
+ * ([ProgressContent]) rather than reading a shared "active child," consistent with Home/History.
  */
 @Composable
 fun ProgressScreen(childSelectionViewModel: ChildSelectionViewModel) {
+    val children by childSelectionViewModel.children.collectAsState()
     val activeChild by childSelectionViewModel.activeChild.collectAsState()
 
+    ChildSwitcherPagerHost(
+        children = children,
+        activeChild = activeChild,
+        onSelectChild = childSelectionViewModel::selectChild
+    ) { child ->
+        ProgressContent(child = child)
+    }
+}
+
+@Composable
+private fun ProgressContent(child: Children) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -32,10 +46,8 @@ fun ProgressScreen(childSelectionViewModel: ChildSelectionViewModel) {
     ) {
         Text(text = "Progress", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(8.dp))
-        val childName = activeChild?.nickname
         Text(
-            text = if (childName != null) "Streaks and milestones for $childName are coming soon."
-            else "Streaks and milestones are coming soon.",
+            text = "Streaks and milestones for ${child.nickname} are coming soon.",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
         )
