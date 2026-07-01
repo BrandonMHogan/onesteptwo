@@ -31,6 +31,8 @@ import com.onesteptwo.android.ui.history.DayDetailScreen
 import com.onesteptwo.android.ui.history.HistoryScreen
 import com.onesteptwo.android.ui.home.HomeScreen
 import com.onesteptwo.android.ui.progress.ProgressScreen
+import com.onesteptwo.android.ui.settings.AddChildScreen
+import com.onesteptwo.android.ui.settings.EditChildScreen
 import com.onesteptwo.android.ui.settings.InviteCaregiverScreen
 import com.onesteptwo.android.ui.settings.SettingsScreen
 import com.onesteptwo.android.viewmodel.ChildSelectionViewModel
@@ -114,9 +116,24 @@ fun MainTabNavigation(container: AppContainer, onSignOut: () -> Unit) {
             composable("progress") { ProgressScreen(childSelectionViewModel) }
             composable("settings") {
                 SettingsScreen(
+                    container = container,
                     onNavigateToInvite = { navController.navigate("settings/invite") },
+                    onNavigateToAddChild = { navController.navigate("settings/children/add") },
+                    onNavigateToEditChild = { childId -> navController.navigate("settings/children/$childId/edit") },
                     onSignOut = onSignOut
                 )
+            }
+            composable("settings/children/add") {
+                AddChildScreen(container = container, onDone = { navController.popBackStack() })
+            }
+            composable(
+                route = "settings/children/{childId}/edit",
+                arguments = listOf(navArgument("childId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val childId = backStackEntry.arguments?.getString("childId") ?: return@composable
+                val children by childSelectionViewModel.children.collectAsState()
+                val child = children.firstOrNull { it.id == childId } ?: return@composable
+                EditChildScreen(container = container, child = child, onDone = { navController.popBackStack() })
             }
             // Double-gated: SettingsScreen only exposes the action to org:admin (button
             // visibility), and this route independently re-verifies the role (T-3-05).

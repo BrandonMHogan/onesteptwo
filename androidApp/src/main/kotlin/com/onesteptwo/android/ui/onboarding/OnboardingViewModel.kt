@@ -26,7 +26,7 @@ const val CONSENT_CHECKBOX_TEXT =
     "I confirm I am the parent or legal guardian of this child and am 18 years of age or older."
 
 /** Identifies which version of the consent copy the parent saw (D-06, 02-CONTEXT.md). */
-private const val CONSENT_TEXT_VERSION = "consent_v1"
+const val CONSENT_TEXT_VERSION = "consent_v1"
 
 enum class OnboardingStep { FAMILY_NAME, CHILD_DETAILS, CONSENT, SUCCESS }
 

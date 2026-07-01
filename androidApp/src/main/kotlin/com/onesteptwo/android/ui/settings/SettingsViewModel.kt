@@ -10,9 +10,13 @@ import com.clerk.api.organizations.OrganizationMembership
 import com.clerk.api.organizations.delete
 import com.clerk.api.organizations.getOrganizationMemberships
 import com.clerk.api.organizations.removeMember
+import com.onesteptwo.data.ChildrenRepository
+import com.onesteptwo.db.Children
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -31,7 +35,7 @@ data class SettingsUiState(
  * notification preferences (Task 9) are added to this same view model in later tasks rather than
  * split into per-section view models, since every section shares one Settings screen lifecycle.
  */
-class SettingsViewModel : ViewModel() {
+class SettingsViewModel(private val childrenRepository: ChildrenRepository) : ViewModel() {
 
     private val _state = MutableStateFlow(
         SettingsUiState(
@@ -40,6 +44,9 @@ class SettingsViewModel : ViewModel() {
         )
     )
     val state: StateFlow<SettingsUiState> = _state.asStateFlow()
+
+    val children: StateFlow<List<Children>> =
+        childrenRepository.observeAll().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     init {
         loadFamily()
@@ -90,9 +97,9 @@ class SettingsViewModel : ViewModel() {
     }
 }
 
-class SettingsViewModelFactory : ViewModelProvider.Factory {
+class SettingsViewModelFactory(private val childrenRepository: ChildrenRepository) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return SettingsViewModel() as T
+        return SettingsViewModel(childrenRepository) as T
     }
 }

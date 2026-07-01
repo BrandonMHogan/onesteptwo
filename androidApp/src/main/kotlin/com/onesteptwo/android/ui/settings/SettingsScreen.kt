@@ -31,7 +31,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.clerk.api.organizations.OrganizationMembership
+import com.onesteptwo.android.AppContainer
 import com.onesteptwo.android.ui.common.DestructiveConfirmDialog
+import com.onesteptwo.db.Children
 
 /**
  * Settings tab shell (04-UI-SPEC.md §Main App — Settings Tab). Sections build up across
@@ -40,9 +42,16 @@ import com.onesteptwo.android.ui.common.DestructiveConfirmDialog
  * at all (WIREFRAMES.md: "removed from view tree, not visibility:hidden").
  */
 @Composable
-fun SettingsScreen(onNavigateToInvite: () -> Unit, onSignOut: () -> Unit) {
-    val viewModel: SettingsViewModel = viewModel(factory = SettingsViewModelFactory())
+fun SettingsScreen(
+    container: AppContainer,
+    onNavigateToInvite: () -> Unit,
+    onNavigateToAddChild: () -> Unit,
+    onNavigateToEditChild: (String) -> Unit,
+    onSignOut: () -> Unit
+) {
+    val viewModel: SettingsViewModel = viewModel(factory = SettingsViewModelFactory(container.childrenRepository))
     val state by viewModel.state.collectAsState()
+    val children by viewModel.children.collectAsState()
     var pendingRemoveCaregiver by remember { mutableStateOf<OrganizationMembership?>(null) }
 
     Column(
@@ -79,11 +88,13 @@ fun SettingsScreen(onNavigateToInvite: () -> Unit, onSignOut: () -> Unit) {
             Spacer(modifier = Modifier.height(24.dp))
 
             SectionLabel("Children")
-            Text(
-                text = "Coming soon.",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
+            children.forEach { child ->
+                SettingsRow(
+                    text = "${child.nickname}  (${childBirthLabel(child)})",
+                    onClick = { onNavigateToEditChild(child.id) }
+                )
+            }
+            SettingsRow(text = "Add child", onClick = onNavigateToAddChild)
             Spacer(modifier = Modifier.height(24.dp))
         }
 
@@ -162,4 +173,10 @@ private fun FamilyMemberRow(member: OrganizationMembership, onRemove: () -> Unit
 private fun memberDisplayName(member: OrganizationMembership): String {
     val u = member.publicUserData ?: return "Member"
     return "${u.firstName.orEmpty()} ${u.lastName.orEmpty()}".trim().ifBlank { u.identifier }
+}
+
+private fun childBirthLabel(child: Children): String {
+    val monthName = java.time.Month.of(child.birth_month.toInt())
+        .getDisplayName(java.time.format.TextStyle.SHORT, java.util.Locale.getDefault())
+    return "$monthName ${child.birth_year}"
 }

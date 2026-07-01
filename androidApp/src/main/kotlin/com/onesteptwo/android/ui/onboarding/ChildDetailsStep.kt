@@ -46,7 +46,8 @@ fun ChildDetailsStep(
     onNicknameChange: (String) -> Unit,
     onBirthMonthChange: (Int) -> Unit,
     onBirthYearChange: (Int) -> Unit,
-    onContinue: () -> Unit
+    onContinue: () -> Unit,
+    showStepDots: Boolean = true
 ) {
     var monthExpanded by remember { mutableStateOf(false) }
     var yearExpanded by remember { mutableStateOf(false) }
@@ -60,8 +61,10 @@ fun ChildDetailsStep(
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        StepDots(activeIndex = 3)
-        Spacer(modifier = Modifier.height(24.dp))
+        if (showStepDots) {
+            StepDots(activeIndex = 3)
+            Spacer(modifier = Modifier.height(24.dp))
+        }
 
         Text(text = "Your child", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(32.dp))
@@ -157,7 +160,7 @@ fun ChildDetailsStep(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ExposedDropdownMenuBoxScope.MonthYearDropdownContent(value: String, label: String, expanded: Boolean) {
+internal fun ExposedDropdownMenuBoxScope.MonthYearDropdownContent(value: String, label: String, expanded: Boolean) {
     OutlinedTextField(
         value = value,
         onValueChange = {},

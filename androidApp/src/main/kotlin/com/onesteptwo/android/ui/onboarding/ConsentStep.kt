@@ -31,7 +31,8 @@ fun ConsentStep(
     isSubmitting: Boolean,
     errorMessage: String?,
     onConsentCheckedChange: (Boolean) -> Unit,
-    onContinue: () -> Unit
+    onContinue: () -> Unit,
+    showStepDots: Boolean = true
 ) {
     Column(
         modifier = Modifier
@@ -39,8 +40,10 @@ fun ConsentStep(
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        StepDots(activeIndex = 4)
-        Spacer(modifier = Modifier.height(24.dp))
+        if (showStepDots) {
+            StepDots(activeIndex = 4)
+            Spacer(modifier = Modifier.height(24.dp))
+        }
 
         Text(text = "About your data", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(16.dp))
