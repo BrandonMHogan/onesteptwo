@@ -3,7 +3,6 @@ package com.onesteptwo.android.navigation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -13,6 +12,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,11 +24,11 @@ import com.clerk.api.network.serialization.ClerkResult
 import com.clerk.api.organizations.OrganizationMembership
 import com.clerk.api.session.Session
 import com.clerk.api.user.getOrganizationMemberships
-import com.onesteptwo.android.ui.PostAuthStub
+import com.onesteptwo.android.ClerkApp
 import com.onesteptwo.android.ui.auth.OrgPickerScreen
 import com.onesteptwo.android.ui.auth.SignInScreen
 import com.onesteptwo.android.ui.auth.SignUpScreen
-import com.onesteptwo.android.ui.settings.InviteCaregiverScreen
+import com.onesteptwo.android.ui.onboarding.OnboardingScreen
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -37,9 +37,9 @@ import timber.log.Timber
  *
  *   No active session   → "signin" (start)
  *   After sign-in/up:
- *     0 orgs            → "postauth" (stub — user not yet in a family)
- *     1 org             → activate org → "postauth"
- *     2+ orgs           → "orgpicker" (built in 03-04; placeholder here)
+ *     0 orgs            → "postauth" → no active org → onboarding wizard
+ *     1 org             → activate org → "postauth" → has-children? main shell : onboarding
+ *     2+ orgs           → "orgpicker" → activates one → "postauth" (same decision as above)
  *
  * Auth screens are popped from the back stack once the user is signed in and an
  * organisation is active, preventing navigation back to Sign In after authentication
@@ -56,6 +56,7 @@ fun AppNavigation() {
 
     val navController = rememberNavController()
     val coroutineScope = rememberCoroutineScope()
+    val container = (LocalContext.current.applicationContext as ClerkApp).container
 
     // Keep isInitialized in sync with the SDK's async init signal.
     LaunchedEffect(Unit) {
@@ -137,13 +138,37 @@ fun AppNavigation() {
                 )
             }
 
+            // Decides onboarding-wizard vs main-tab-shell once an org is (or isn't yet) active.
             composable("postauth") {
-                PostAuthStub(
-                    onInvite = {
-                        // Role gate: only org:admin users see the Invite button in PostAuthStub,
-                        // but double-check here before navigation for defence in depth (T-3-05).
-                        if (Clerk.organizationMembership?.role == "org:admin") {
-                            navController.navigate("invite")
+                PostAuthRouter(
+                    container = container,
+                    onNeedsOnboarding = {
+                        navController.navigate("onboarding") { popUpTo(0) { inclusive = true } }
+                    },
+                    onHasChildren = {
+                        navController.navigate("main") { popUpTo(0) { inclusive = true } }
+                    }
+                )
+            }
+
+            // Onboarding wizard (REQ-036) — steps 2-5; step 1 (Clerk sign-up) already happened.
+            composable("onboarding") {
+                OnboardingScreen(
+                    container = container,
+                    onComplete = {
+                        navController.navigate("main") { popUpTo(0) { inclusive = true } }
+                    }
+                )
+            }
+
+            // Main 4-tab shell (REQ-035).
+            composable("main") {
+                MainTabNavigation(
+                    container = container,
+                    onSignOut = {
+                        coroutineScope.launch {
+                            Clerk.auth.signOut()
+                            navController.navigate("signin") { popUpTo(0) { inclusive = true } }
                         }
                     }
                 )
@@ -157,22 +182,6 @@ fun AppNavigation() {
                     }
                 )
             }
-
-            // Invite caregiver: admin-only screen to send a Clerk invitation (REQ-017).
-            // Double-gated: PostAuthStub only exposes the action to org:admin (via onInvite above),
-            // and this route independently verifies the role to enforce T-3-05.
-            composable("invite") {
-                val isAdmin = Clerk.organizationMembership?.role == "org:admin"
-                LaunchedEffect(isAdmin) {
-                    if (!isAdmin) {
-                        Timber.w("AppNavigation: non-admin reached invite route — popping back")
-                        navController.popBackStack()
-                    }
-                }
-                if (isAdmin) {
-                    InviteCaregiverScreen(onDone = { navController.popBackStack() })
-                }
-            }
         }
     }
 }
@@ -181,8 +190,8 @@ fun AppNavigation() {
  * Suspend helper: inspects the signed-in user's Clerk organisation memberships and
  * navigates to the appropriate post-auth screen.
  *
- *  - 0 orgs  → postauth stub (user not yet added to a family; org creation is Phase 5)
- *  - 1 org   → activate it via Clerk.auth.setActive, then navigate to postauth
+ *  - 0 orgs  → postauth router (no active org → routes straight to onboarding)
+ *  - 1 org   → activate it via Clerk.auth.setActive, then navigate to postauth router
  *  - 2+ orgs → navigate to orgpicker
  *
  * Clears the back stack on navigation so the user cannot press Back to reach Sign In.
@@ -212,7 +221,7 @@ private suspend fun navigateAfterAuth(navController: NavHostController) {
 
     when (memberships.size) {
         0 -> {
-            // User has no org yet (invited in 03-04 / Phase 5 onboarding).
+            // User has no org yet — postauth router sends them straight to onboarding.
             navController.navigate("postauth") { popUpTo(0) { inclusive = true } }
         }
         1 -> {
@@ -231,7 +240,7 @@ private suspend fun navigateAfterAuth(navController: NavHostController) {
                 )
             } catch (e: Exception) {
                 Timber.e(e, "navigateAfterAuth: setActive failed for org=$orgId")
-                // Proceed to postauth; the JWT will lack org_id, but Phase 5 handles this.
+                // Proceed to postauth; the JWT will lack org_id, but the router below handles it.
             }
             navController.navigate("postauth") { popUpTo(0) { inclusive = true } }
         }

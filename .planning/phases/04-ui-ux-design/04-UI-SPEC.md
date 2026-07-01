@@ -187,7 +187,7 @@ Dark mode follows system preference on first launch; no manual toggle (D-06).
 
 ### Log Button Toast — Event Type Chip Labels (D-17)
 
-"Pee" | "Poo" | "Both" | "Accident (pee)" | "Accident (poo)" | "Tried"
+"Pee" | "Poo" | "Both" | "Accident" | "Tried"
 
 Toast body text: "Logged. Add a type?" — 12-second auto-dismiss.
 
@@ -361,11 +361,8 @@ Two variants:
 | pee | `Icons.Outlined.WaterDrop` | `drop` |
 | poo | `Icons.Outlined.Circle` (2dp border) | `circle` |
 | both | `Icons.Outlined.WaterDrop` (two stacked) | `drop.circle` |
-| accident_pee | `Icons.Outlined.Warning` | `exclamationmark.triangle` |
-| accident_poo | `Icons.Outlined.Warning` | `exclamationmark.triangle` |
+| accident | `Icons.Outlined.Warning` | `exclamationmark.triangle` |
 | tried | `Icons.Outlined.RadioButtonUnchecked` | `target` |
-
-Note: accident_pee and accident_poo share the same warning icon; they are differentiated by the label text.
 
 ### 4. Heatmap Calendar Cell
 

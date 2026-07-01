@@ -12,6 +12,8 @@ import timber.log.Timber
  * Registered via android:name=".ClerkApp" in AndroidManifest.xml.
  */
 class ClerkApp : Application() {
+    val container: AppContainer by lazy { AppContainer(this) }
+
     override fun onCreate() {
         super.onCreate()
         if (BuildConfig.DEBUG) {

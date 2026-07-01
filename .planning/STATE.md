@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 4 verification complete — gaps_found (5 accuracy errors need correction before Phase 5)
-last_updated: "2026-06-30T14:00:00Z"
-last_activity: 2026-06-30 -- Phase 04 verification complete (gaps_found)
+stopped_at: Phase 5 Stage 1 (Android) complete — Stage 2 (History/Settings/iOS) not started
+last_updated: "2026-06-30T18:00:00Z"
+last_activity: 2026-06-30 -- Phase 5 Stage 1 implemented (design import kickoff): theme, SQLDelight data layer, onboarding wizard, 4-tab shell, full Home tab loop, restyled Sign In, GET /v1/children
 progress:
   total_phases: 9
-  completed_phases: 3
-  total_plans: 20
-  completed_plans: 20
-  percent: 44
+  completed_phases: 4
+  total_plans: 22
+  completed_plans: 21
+  percent: 50
 ---
 
 # Project State
@@ -21,17 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-25)
 
 **Core value:** Offline-first potty tracking for multi-caregiver families — log instantly, sync when connected, notify everyone
-**Current focus:** Phase 04 — ui-ux-design (verification gaps pending)
+**Current focus:** Phase 05 — core-event-logging (Stage 1 Android complete, Stage 2 + iOS pending)
 
 ## Current Position
 
-Phase: 04 (ui-ux-design) — VERIFICATION GAPS FOUND
-Plan: 4 of 4 — all plans complete; verification found 5 accuracy errors
-Next: Close Phase 4 gaps, then Phase 05 (core-event-logging)
-Status: Phase 4 gap closure required before Phase 5 can begin
-Last activity: 2026-06-30 -- Phase 04 verification: gaps_found (score 3/5)
+Phase: 05 (core-event-logging) — STAGE 1 COMPLETE (Android only)
+Plan: 05-01-PLAN.md complete (theme, data layer, onboarding wizard, 4-tab shell, Home tab loop, Sign In restyle, GET /v1/children); 05-02-PLAN.md (History heatmap, Settings child/notification mgmt, PATCH /v1/children/{id}) not started
+Next: Execute 05-02-PLAN.md (Stage 2), then port Phase 5 to iOS/SwiftUI
+Status: Phase 4 gap closure confirmed complete (04-REVIEW-FIX.md: 13/13 findings fixed); Phase 5 Stage 1 Android build verified clean (`./gradlew :androidApp:assembleDebug`), no on-device/emulator run performed (no AVD configured in this environment)
+Last activity: 2026-06-30 -- Phase 5 Stage 1 (Android) implemented and build-verified
 
-Progress: [████████████░] 44%
+Progress: [██████████████░] 50%
 
 ## Phase Status
 
@@ -40,8 +40,8 @@ Progress: [████████████░] 44%
 | 1 | Foundation & Infrastructure | COMPLETE |
 | 2 | Compliance & Privacy Architecture | COMPLETE |
 | 3 | Authentication & Family Model | COMPLETE |
-| 4 | UI/UX Design | GAPS FOUND — verification failed (3/5 truths) |
-| 5 | Core Event Logging | NOT STARTED |
+| 4 | UI/UX Design | COMPLETE — gap closure applied 2026-06-30 (04-REVIEW-FIX.md, 13/13 findings fixed) |
+| 5 | Core Event Logging | IN PROGRESS — Stage 1 (Android) complete; Stage 2 (History/Settings) + iOS not started |
 | 6 | Offline-First Sync | NOT STARTED |
 | 7 | Progress & Milestones | NOT STARTED |
 | 8 | Push Notifications | NOT STARTED |
@@ -170,12 +170,12 @@ None yet.
 
 ### Blockers/Concerns
 
-**Phase 4 verification gaps (must resolve before Phase 5):**
-- CR-01: DESIGN-TOKENS.md line 38 — primary-300 usage says "heatmap medium (dark)" but should be "heatmap high (dark)"; same error in 04-UI-SPEC.md line 126
-- CR-02: WIREFRAMES.md lines 720-727 — milestone badges show "5-day streak" and "100 events" (not in spec); correct: "Accident-free day" and "7-day streak"
-- CR-03: WIREFRAMES.md lines 264, 304, 345, 390 — all four wizard step dot indicators off by one position
-- CR-04: WIREFRAMES.md line 951 — child switcher annotation "Body 16sp" must be "Title 20sp semibold"
-- CR-05: WIREFRAMES.md line 47 — sign-in "Sign up" link annotated as color.primary; must use color.on-surface or color.on-background
+**Phase 4 verification gaps:** RESOLVED 2026-06-30 — all 5 (CR-01..CR-05) plus 8 additional review warnings (WR-01..WR-08) fixed; see 04-REVIEW-FIX.md.
+
+**Phase 5 Stage 1 known gaps (tracked, not blocking):**
+- `DatabaseDriverFactory` has no `iosMain actual` yet — breaks a full KMP/XCFramework build, but not `:androidApp:assembleDebug`. Must be added before iOS work resumes.
+- No Android emulator/device was available to exercise the app at runtime in this session; verification was build-level only (`./gradlew :androidApp:assembleDebug` clean build succeeded, `go test ./...` passed). A manual on-device walkthrough of sign-up → wizard → Home logging loop is still needed.
+- Local `consent_events` rows created when hydrating children from `GET /v1/children` (returning-caregiver path) use placeholder `app_version`/`consent_text_version` ("unknown") since that endpoint doesn't echo the real server-side consent record — acceptable because the legal record of truth is the server-side row; nothing in the UI reads the local placeholder values.
 
 ## Open Questions
 
@@ -192,6 +192,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-30T14:00:00Z
-Stopped at: Phase 4 verification complete — gaps_found, gap closure plan needed
-Resume file: None
+Last session: 2026-06-30T18:00:00Z
+Stopped at: Phase 5 Stage 1 (Android) implemented and build-verified; Stage 2 (05-02-PLAN.md) not started
+Resume file: .planning/phases/05-core-event-logging/05-02-PLAN.md

@@ -8,6 +8,12 @@ val clerkPublishableKey: String =
     localProps.getProperty("CLERK_PUBLISHABLE_KEY")
         ?: System.getenv("CLERK_PUBLISHABLE_KEY")
         ?: ""
+// Defaults to the Railway staging API (.planning/STATE.md §Service URLs) — override via
+// local.properties/env for pointing at production or a local backend during development.
+val apiBaseUrl: String =
+    localProps.getProperty("API_BASE_URL")
+        ?: System.getenv("API_BASE_URL")
+        ?: "https://onesteptwo-staging.up.railway.app"
 
 plugins {
     alias(libs.plugins.android.application)
@@ -27,6 +33,7 @@ android {
         versionName = "0.1.0"
 
         buildConfigField("String", "CLERK_PUBLISHABLE_KEY", "\"$clerkPublishableKey\"")
+        buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
     }
 
     buildTypes {
@@ -80,4 +87,6 @@ dependencies {
     implementation(libs.clerk.android.api)
     implementation(libs.navigation.compose)
     implementation(libs.timber)
+    implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.lifecycle.runtime.compose)
 }

@@ -3,10 +3,10 @@ package com.onesteptwo.android
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.core.view.WindowCompat
 import com.onesteptwo.android.navigation.AppNavigation
+import com.onesteptwo.android.ui.theme.OneStepTwoTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,7 +16,7 @@ class MainActivity : ComponentActivity() {
         // (UI-SPEC Keyboard Behaviour — "Forms scroll above the keyboard").
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
-            MaterialTheme {
+            OneStepTwoTheme {
                 Surface {
                     AppNavigation()
                 }

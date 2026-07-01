@@ -523,8 +523,7 @@ Ref: UI-SPEC §Main App — Home Tab, §Status Chips (component 8), §Child Swit
 │  │ Logged. Add a type?          │    │
 │  │                              │    │
 │  │ [Pee] [Poo] [Both]          │    │
-│  │ [Accident (pee)]             │    │
-│  │ [Accident (poo)] [Tried]     │    │
+│  │ [Accident] [Tried]           │    │
 │  │                              │    │
 │  │      add details             │    │
 │  └──────────────────────────────┘    │
@@ -543,7 +542,7 @@ Ref: UI-SPEC §Main App — Home Tab, §Status Chips (component 8), §Child Swit
 · Motion: toast enters slide-up + fade-in 200ms; exits slide-down + fade-out 150ms (D-36)
 · a11y: toast liveRegion=Polite; chip labels "Pee, button", "Poo, button", etc.
 · a11y: auto-dismiss after 12 seconds (D-17)
-· Note: six chip labels verbatim: Pee, Poo, Both, Accident (pee), Accident (poo), Tried
+· Note: five chip labels verbatim: Pee, Poo, Both, Accident, Tried (matches the 5-value event_type ENUM in backend/db/migrations/00002_schema.sql — no accident_pee/accident_poo split)
 · Note: "add details" text link — Label 14sp, color.on-surface; tap opens Event Detail bottom sheet without requiring chip selection first (SCREEN-FLOWS.md step 6)
 
 Ref: UI-SPEC §Toast Post-Log (component 6), §Log Button → Toast → Bottom Sheet Flow, §Copywriting Contract
@@ -891,8 +890,7 @@ Ref: UI-SPEC §Main App — Settings Tab (Caregiver), §Access Control (V4), REQ
 │                                      │
 │  Event type                          │
 │  [Pee] [Poo] [Both]                 │
-│  [Accident (pee)] [Accident (poo)]  │
-│  [Tried]                             │
+│  [Accident] [Tried]                  │
 │                                      │
 │  Note                                │
 │  ┌──────────────────────────────┐    │

@@ -66,7 +66,7 @@ docs/06-auth.md, docs/07-sync-and-notifications.md.
 
 - [REQ-029] Data portability (GDPR Article 20): GET /v1/account/export endpoint returns a JSON bundle of all children, events, preferences, and consent records for the requesting user's org. **Deferred to v2 — must not be forgotten.** (source: docs/05-privacy.md)
 
-- [REQ-030] Event type field: the potty_events table must include a nullable event_type column. Valid values: pee, poo, both, accident_pee, accident_poo, tried. NULL is valid and represents a "count only" quick-tap where the caregiver chose not to specify a type. event_type may be set at creation or updated after the fact via a PATCH request.
+- [REQ-030] Event type field: the potty_events table must include a nullable event_type column. Valid values: pee, poo, both, accident, tried (matches the 5-value ENUM in backend/db/migrations/00002_schema.sql — accident is a single category, not split by pee/poo). NULL is valid and represents a "count only" quick-tap where the caregiver chose not to specify a type. event_type may be set at creation or updated after the fact via a PATCH request.
 
 - [REQ-031] Child switcher: the home screen must display the active child's name and a visible switcher control when the family's Clerk org has more than one child profile. Selecting a different child updates the active child context across all tabs (Home, History, Progress). A family with one child shows no switcher.
 

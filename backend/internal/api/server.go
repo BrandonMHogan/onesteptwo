@@ -146,12 +146,71 @@ func (s *Server) PostV1Children(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	_ = json.NewEncoder(w).Encode(map[string]any{
-		"id":          childID,
+		"id":           childID,
 		"clerk_org_id": clerkOrgID,
-		"nickname":    req.Nickname,
-		"birth_month": req.BirthMonth,
-		"birth_year":  req.BirthYear,
+		"nickname":     req.Nickname,
+		"birth_month":  req.BirthMonth,
+		"birth_year":   req.BirthYear,
 	})
+}
+
+// childListResponse mirrors the generated ChildResponse schema for JSON encoding.
+type childListResponse struct {
+	ID         string `json:"id"`
+	ClerkOrgID string `json:"clerk_org_id"`
+	Nickname   string `json:"nickname"`
+	BirthMonth int    `json:"birth_month"`
+	BirthYear  int    `json:"birth_year"`
+}
+
+// GetV1Children implements GET /v1/children — lists the caller's active-org children.
+// Any signed-in member of the active org may list children (no admin gate, unlike
+// POST/DELETE) — both org:admin and org:caregiver need this to drive the app's
+// onboarding-vs-main-shell routing decision (REQ-036's "returning caregiver skips the wizard").
+//
+// Auth paths return before touching s.DB, so a nil DB is safe for unit tests
+// of the validation/auth code paths.
+func (s *Server) GetV1Children(w http.ResponseWriter, r *http.Request) {
+	claims, ok := clerk.SessionClaimsFromContext(r.Context())
+	if !ok || claims == nil {
+		WriteProblem(w, http.StatusUnauthorized, "about:blank", "Unauthorized", "missing or invalid session token")
+		return
+	}
+	if claims.ActiveOrganizationID == "" {
+		WriteProblem(w, http.StatusForbidden, "about:blank", "Forbidden", "no active organization in session")
+		return
+	}
+
+	rows, err := s.DB.QueryContext(r.Context(),
+		`SELECT id, clerk_org_id, nickname, birth_month, birth_year
+		 FROM children
+		 WHERE clerk_org_id = $1
+		 ORDER BY created_at ASC`,
+		claims.ActiveOrganizationID,
+	)
+	if err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not list children")
+		return
+	}
+	defer rows.Close() //nolint:errcheck // safe no-op
+
+	children := make([]childListResponse, 0)
+	for rows.Next() {
+		var c childListResponse
+		if err := rows.Scan(&c.ID, &c.ClerkOrgID, &c.Nickname, &c.BirthMonth, &c.BirthYear); err != nil {
+			WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not read children")
+			return
+		}
+		children = append(children, c)
+	}
+	if err := rows.Err(); err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not list children")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(children)
 }
 
 // DeleteV1ChildrenId implements DELETE /v1/children/{id} — child erasure cascade.

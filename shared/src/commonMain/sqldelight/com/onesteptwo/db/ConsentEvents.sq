@@ -8,3 +8,12 @@ CREATE TABLE consent_events (
     app_version          TEXT NOT NULL,
     consent_text_version TEXT NOT NULL
 );
+
+-- Phase 5: query statements (M2)
+
+insert:
+INSERT OR REPLACE INTO consent_events (id, clerk_user_id, consented_at, app_version, consent_text_version)
+VALUES (?, ?, ?, ?, ?);
+
+selectById:
+SELECT * FROM consent_events WHERE id = ?;

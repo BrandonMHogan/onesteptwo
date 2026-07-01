@@ -11,6 +11,22 @@ paths:
         "200":
           description: Service is healthy
   /v1/children:
+    get:
+      operationId: getV1Children
+      summary: List the caller's active-org children
+      responses:
+        "200":
+          description: Children for the caller's active organization
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChildResponse'
+        "401":
+          description: Unauthorized
+        "403":
+          description: No active organization in session
     post:
       operationId: postV1Children
       summary: Create a child profile with parental consent (atomic consent gate)

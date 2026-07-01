@@ -63,6 +63,9 @@ type ServerInterface interface {
 	// Delete the entire account and all associated data (GDPR/COPPA erasure)
 	// (DELETE /v1/account)
 	DeleteV1Account(w http.ResponseWriter, r *http.Request)
+	// List the caller's active-org children
+	// (GET /v1/children)
+	GetV1Children(w http.ResponseWriter, r *http.Request)
 	// Create a child profile with parental consent (atomic consent gate)
 	// (POST /v1/children)
 	PostV1Children(w http.ResponseWriter, r *http.Request)
@@ -99,6 +102,20 @@ func (siw *ServerInterfaceWrapper) DeleteV1Account(w http.ResponseWriter, r *htt
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.DeleteV1Account(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetV1Children operation middleware
+func (siw *ServerInterfaceWrapper) GetV1Children(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetV1Children(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -270,6 +287,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/healthz", wrapper.GetHealthz)
 	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/v1/account", wrapper.DeleteV1Account)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/v1/children", wrapper.GetV1Children)
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/v1/children", wrapper.PostV1Children)
 	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/v1/children/{id}", wrapper.DeleteV1ChildrenId)
 

@@ -45,8 +45,9 @@ import timber.log.Timber
 /**
  * Admin caregiver invitation screen per UI-SPEC Invite Caregiver Screen specification (REQ-017).
  *
- * Only reachable from the admin [onInvite] action — role gate is enforced at both the
- * [PostAuthStub] (button visibility) and the AppNavigation `invite` route (REQ-016 / T-3-05).
+ * Only reachable from the admin-only Settings entry point — role gate is enforced both in
+ * [com.onesteptwo.android.ui.settings.SettingsScreen] (button visibility) and the
+ * `settings/invite` route in [com.onesteptwo.android.navigation.MainTabNavigation] (REQ-016 / T-3-05).
  *
  * - Title: "Invite a caregiver" (Display 28sp / headlineMedium)
  * - Primary CTA: "Send invitation" — disabled while email is empty or request is in-flight

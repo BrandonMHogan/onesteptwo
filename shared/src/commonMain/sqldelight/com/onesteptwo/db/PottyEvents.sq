@@ -17,3 +17,53 @@ CREATE TABLE potty_events (
     deleted_by TEXT,
     sync_status TEXT NOT NULL DEFAULT 'pending'
 );
+
+-- Phase 5: query statements (M2)
+-- Day-range queries take explicit ISO8601 [startInclusive, endExclusive) bounds computed in
+-- Kotlin (local timezone aware) rather than relying on SQLite's UTC date()/now() functions.
+
+insertPending:
+INSERT INTO potty_events (id, child_id, logged_by, occurred_at, created_at, updated_at, event_type, notes, sync_status)
+VALUES (?, ?, ?, ?, ?, ?, NULL, NULL, 'pending');
+
+setEventType:
+UPDATE potty_events
+SET event_type = ?, updated_at = ?, updated_by = ?
+WHERE id = ?;
+
+updateDetails:
+UPDATE potty_events
+SET event_type = ?, notes = ?, occurred_at = ?, updated_at = ?, updated_by = ?
+WHERE id = ?;
+
+deleteEvent:
+UPDATE potty_events
+SET deleted_at = ?, deleted_by = ?
+WHERE id = ?;
+
+selectByChildAndDayRange:
+SELECT * FROM potty_events
+WHERE child_id = ? AND occurred_at >= ? AND occurred_at < ? AND deleted_at IS NULL
+ORDER BY occurred_at DESC;
+
+selectPendingDetailsCountForChildDayRange:
+SELECT COUNT(*) FROM potty_events
+WHERE child_id = ? AND occurred_at >= ? AND occurred_at < ? AND deleted_at IS NULL AND event_type IS NULL;
+
+selectPendingSyncCountForChild:
+SELECT COUNT(*) FROM potty_events
+WHERE child_id = ? AND deleted_at IS NULL AND sync_status = 'pending';
+
+selectFirstPendingDetailsEventForChildDayRange:
+SELECT * FROM potty_events
+WHERE child_id = ? AND occurred_at >= ? AND occurred_at < ? AND deleted_at IS NULL AND event_type IS NULL
+ORDER BY occurred_at ASC
+LIMIT 1;
+
+selectById:
+SELECT * FROM potty_events WHERE id = ?;
+
+selectDailyCounts:
+SELECT date(occurred_at) AS day, COUNT(*) AS eventCount FROM potty_events
+WHERE child_id = ? AND occurred_at >= ? AND deleted_at IS NULL
+GROUP BY date(occurred_at);

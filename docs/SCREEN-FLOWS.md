@@ -70,7 +70,7 @@ flowchart TD
 2. **SQLDelight write fires immediately** — event row inserted locally with no network dependency; `sync_status = 'pending'`
 3. **Haptic fires on release** + button scales 0.95 → 1.0 (spring animation, 200ms release)
 4. **Toast slides up** from above tab bar — 200ms enter animation; body text: "Logged. Add a type?"
-5. User taps an **event-type chip** in the toast (Pee / Poo / Both / Accident (pee) / Accident (poo) / Tried) → `event_type` written to SQLDelight → toast exits (150ms exit animation)
+5. User taps an **event-type chip** in the toast (Pee / Poo / Both / Accident / Tried) → `event_type` written to SQLDelight → toast exits (150ms exit animation)
 6. User taps **"add details"** in the toast (or taps a pending-details event card later) → **bottom sheet opens** (platform default timing: Android `ModalBottomSheet` ~300ms; iOS `.sheet` natural spring)
 7. User fills event-type selector, note field, and optionally adjusts logged time, then taps **"Save details"** → sheet dismisses, event row updated in SQLDelight
 

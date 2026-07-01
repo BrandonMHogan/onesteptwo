@@ -12,3 +12,18 @@ CREATE TABLE children (
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
 );
+
+-- Phase 5: query statements (M2)
+
+insert:
+INSERT OR REPLACE INTO children (id, clerk_org_id, nickname, birth_month, birth_year, consent_event_id, created_at, updated_at)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+selectAll:
+SELECT * FROM children ORDER BY created_at ASC;
+
+selectById:
+SELECT * FROM children WHERE id = ?;
+
+deleteById:
+DELETE FROM children WHERE id = ?;

@@ -1,6 +1,7 @@
 # Gradle build outputs and caches
 .gradle/
 build/
+.kotlin/
 
 # Local configuration — contains local SDK path, never commit
 local.properties
