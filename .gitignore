@@ -3,6 +3,9 @@
 build/
 .kotlin/
 
+# Subagent-driven-development scratch (progress ledger, task briefs/reports)
+.superpowers/
+
 # Local configuration — contains local SDK path, never commit
 local.properties
 
