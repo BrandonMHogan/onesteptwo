@@ -15,6 +15,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,6 +36,7 @@ import com.onesteptwo.db.Potty_events
 fun EventDetailSheet(
     event: Potty_events,
     onSave: (eventType: String?, notes: String?) -> Unit,
+    onDelete: (() -> Unit)? = null,
     onDismiss: () -> Unit
 ) {
     var selectedType by remember(event.id) { mutableStateOf(event.event_type) }
@@ -84,6 +86,12 @@ fun EventDetailSheet(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Save details")
+            }
+            if (onDelete != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                TextButton(onClick = onDelete, modifier = Modifier.fillMaxWidth()) {
+                    Text("Delete event", color = MaterialTheme.colorScheme.error)
+                }
             }
             Spacer(modifier = Modifier.height(16.dp))
         }

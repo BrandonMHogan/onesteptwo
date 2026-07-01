@@ -13,17 +13,21 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.clerk.api.Clerk
 import com.onesteptwo.android.AppContainer
+import com.onesteptwo.android.ui.history.DayDetailScreen
 import com.onesteptwo.android.ui.history.HistoryScreen
 import com.onesteptwo.android.ui.home.HomeScreen
 import com.onesteptwo.android.ui.progress.ProgressScreen
@@ -57,10 +61,11 @@ fun MainTabNavigation(container: AppContainer, onSignOut: () -> Unit) {
 
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
+    val hideTabBar = currentDestination?.route?.startsWith("history/day/") == true
 
     Scaffold(
         bottomBar = {
-            NavigationBar {
+            if (!hideTabBar) NavigationBar {
                 tabs.forEach { tab ->
                     val selected = currentDestination?.hierarchy?.any { it.route == tab.route } == true
                     NavigationBarItem(
@@ -90,6 +95,20 @@ fun MainTabNavigation(container: AppContainer, onSignOut: () -> Unit) {
                     container = container,
                     childSelectionViewModel = childSelectionViewModel,
                     onDayClick = { date -> navController.navigate("history/day/$date") }
+                )
+            }
+            composable(
+                route = "history/day/{date}",
+                arguments = listOf(navArgument("date") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val dateArg = backStackEntry.arguments?.getString("date") ?: return@composable
+                val activeChild by childSelectionViewModel.activeChild.collectAsState()
+                val childId = activeChild?.id ?: return@composable
+                DayDetailScreen(
+                    date = java.time.LocalDate.parse(dateArg),
+                    childId = childId,
+                    container = container,
+                    onBack = { navController.popBackStack() }
                 )
             }
             composable("progress") { ProgressScreen(childSelectionViewModel) }
