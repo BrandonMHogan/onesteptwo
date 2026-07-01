@@ -13,24 +13,44 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.onesteptwo.android.AppContainer
+import com.onesteptwo.android.ui.childswitcher.ChildSwitcherPagerHost
 import com.onesteptwo.android.viewmodel.ChildSelectionViewModel
+import com.onesteptwo.db.Children
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
 
-/** History tab (04-UI-SPEC.md §Main App — History Tab): rolling heatmap, or empty state if the
- * active child has never logged an event. */
+/** History tab (04-UI-SPEC.md §Main App — History Tab): persistent Child Switcher Banner (D-12)
+ * above the rolling heatmap, or empty state if that page's child has never logged an event. */
 @Composable
 fun HistoryScreen(
     container: AppContainer,
     childSelectionViewModel: ChildSelectionViewModel,
     onDayClick: (LocalDate) -> Unit
 ) {
+    val children by childSelectionViewModel.children.collectAsState()
+    val activeChild by childSelectionViewModel.activeChild.collectAsState()
+
+    ChildSwitcherPagerHost(
+        children = children,
+        activeChild = activeChild,
+        onSelectChild = childSelectionViewModel::selectChild
+    ) { child ->
+        HistoryContent(container = container, child = child, onDayClick = onDayClick)
+    }
+}
+
+@Composable
+private fun HistoryContent(container: AppContainer, child: Children, onDayClick: (LocalDate) -> Unit) {
+    val activeChildFlow = remember(child.id) { MutableStateFlow<Children?>(child) }
     val historyViewModel: HistoryViewModel = viewModel(
-        factory = HistoryViewModelFactory(container.pottyEventsRepository, childSelectionViewModel.activeChild)
+        key = child.id,
+        factory = HistoryViewModelFactory(container.pottyEventsRepository, activeChildFlow)
     )
     val state by historyViewModel.state.collectAsState()
 
