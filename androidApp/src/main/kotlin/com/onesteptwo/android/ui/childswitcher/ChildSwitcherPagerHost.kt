@@ -62,7 +62,7 @@ fun ChildSwitcherPagerHost(
     ) { Int.MAX_VALUE }
 
     // Local swipe settles on a new page -> propagate to the shared active-child context.
-    LaunchedEffect(pagerState, children) {
+    LaunchedEffect(pagerState, children, activeChild?.id) {
         snapshotFlow { pagerState.settledPage }.collect { page ->
             val settledChild = children.getOrNull(realIndex(page, children.size)) ?: return@collect
             if (settledChild.id != activeChild?.id) onSelectChild(settledChild)
