@@ -18,10 +18,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +36,7 @@ import com.clerk.api.organizations.OrganizationMembership
 import com.onesteptwo.android.AppContainer
 import com.onesteptwo.android.ui.common.DestructiveConfirmDialog
 import com.onesteptwo.db.Children
+import kotlinx.coroutines.launch
 
 /**
  * Settings tab shell (04-UI-SPEC.md §Main App — Settings Tab). Sections build up across
@@ -49,10 +52,21 @@ fun SettingsScreen(
     onNavigateToEditChild: (String) -> Unit,
     onSignOut: () -> Unit
 ) {
-    val viewModel: SettingsViewModel = viewModel(factory = SettingsViewModelFactory(container.childrenRepository))
+    val viewModel: SettingsViewModel = viewModel(
+        factory = SettingsViewModelFactory(
+            container.childrenRepository,
+            container.childrenApiClient,
+            container.notificationPreferencesRepository,
+            container.notificationPreferencesApiClient
+        )
+    )
     val state by viewModel.state.collectAsState()
     val children by viewModel.children.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+    var showDeleteMyDataConfirm by remember { mutableStateOf(false) }
     var pendingRemoveCaregiver by remember { mutableStateOf<OrganizationMembership?>(null) }
+
+    LaunchedEffect(Unit) { viewModel.refreshNotificationPreferences() }
 
     Column(
         modifier = Modifier
@@ -99,16 +113,42 @@ fun SettingsScreen(
         }
 
         SectionLabel("Notifications")
-        Text(
-            text = "Coming soon.",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-        )
+        children.forEach { child ->
+            NotificationPreferenceRow(
+                childId = child.id,
+                childNickname = child.nickname,
+                repository = container.notificationPreferencesRepository,
+                apiClient = container.notificationPreferencesApiClient
+            )
+        }
         Spacer(modifier = Modifier.height(24.dp))
 
         SectionLabel("Account")
         Text(text = state.userEmail, style = MaterialTheme.typography.bodyLarge)
         SettingsRow(text = "Sign out", onClick = onSignOut)
+        SettingsRow(
+            text = "Delete my data",
+            onClick = {
+                viewModel.clearAccountError()
+                showDeleteMyDataConfirm = true
+            },
+            isDestructive = true
+        )
+
+        // Inline error — same treatment as the Family section's familyError: bodyMedium,
+        // colorScheme.error, Polite live region — so a failed delete/leave doesn't leave the
+        // user staring at an unchanged screen with no signal of what happened.
+        state.accountError?.let { msg ->
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = msg,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .semantics { liveRegion = LiveRegionMode.Polite }
+            )
+        }
         Spacer(modifier = Modifier.height(24.dp))
     }
 
@@ -125,6 +165,38 @@ fun SettingsScreen(
             },
             onDismiss = { pendingRemoveCaregiver = null }
         )
+    }
+
+    if (showDeleteMyDataConfirm) {
+        if (state.isAdmin) {
+            DestructiveConfirmDialog(
+                title = "Delete family account?",
+                body = "This permanently erases all family members, children, and events. This cannot be undone.",
+                confirmLabel = "Delete everything",
+                dismissLabel = "Keep account",
+                onConfirm = {
+                    showDeleteMyDataConfirm = false
+                    coroutineScope.launch {
+                        if (viewModel.deleteAccount()) onSignOut()
+                    }
+                },
+                onDismiss = { showDeleteMyDataConfirm = false }
+            )
+        } else {
+            DestructiveConfirmDialog(
+                title = "Delete your data?",
+                body = "Your account and all data will be permanently erased. This cannot be undone.",
+                confirmLabel = "Delete my data",
+                dismissLabel = "Keep my data",
+                onConfirm = {
+                    showDeleteMyDataConfirm = false
+                    coroutineScope.launch {
+                        if (viewModel.leaveFamily()) onSignOut()
+                    }
+                },
+                onDismiss = { showDeleteMyDataConfirm = false }
+            )
+        }
     }
 }
 

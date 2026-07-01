@@ -10,7 +10,11 @@ import com.clerk.api.organizations.OrganizationMembership
 import com.clerk.api.organizations.delete
 import com.clerk.api.organizations.getOrganizationMemberships
 import com.clerk.api.organizations.removeMember
+import com.onesteptwo.api.ApiResult
+import com.onesteptwo.api.ChildrenApiClient
+import com.onesteptwo.api.NotificationPreferencesApiClient
 import com.onesteptwo.data.ChildrenRepository
+import com.onesteptwo.data.NotificationPreferencesRepository
 import com.onesteptwo.db.Children
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,7 +30,8 @@ data class SettingsUiState(
     val userEmail: String = "",
     val familyMembers: List<OrganizationMembership> = emptyList(),
     val isLoadingFamily: Boolean = false,
-    val familyError: String? = null
+    val familyError: String? = null,
+    val accountError: String? = null
 )
 
 /**
@@ -35,7 +40,12 @@ data class SettingsUiState(
  * notification preferences (Task 9) are added to this same view model in later tasks rather than
  * split into per-section view models, since every section shares one Settings screen lifecycle.
  */
-class SettingsViewModel(private val childrenRepository: ChildrenRepository) : ViewModel() {
+class SettingsViewModel(
+    private val childrenRepository: ChildrenRepository,
+    private val childrenApiClient: ChildrenApiClient,
+    private val notificationPreferencesRepository: NotificationPreferencesRepository,
+    private val notificationPreferencesApiClient: NotificationPreferencesApiClient
+) : ViewModel() {
 
     private val _state = MutableStateFlow(
         SettingsUiState(
@@ -92,14 +102,54 @@ class SettingsViewModel(private val childrenRepository: ChildrenRepository) : Vi
         val membership = Clerk.organizationMembership ?: return false
         return when (membership.delete()) {
             is ClerkResult.Success -> true
-            else -> false
+            else -> {
+                _state.update { it.copy(accountError = "Couldn't leave the family. Try again.") }
+                false
+            }
         }
+    }
+
+    /** Refreshes the local notification-preference cache from the server (Settings screen load). */
+    fun refreshNotificationPreferences() {
+        viewModelScope.launch {
+            when (val result = notificationPreferencesApiClient.getPreferences()) {
+                is ApiResult.Success -> result.value.forEach { pref ->
+                    notificationPreferencesRepository.setLocal(pref.child_id, pref.enabled)
+                }
+                is ApiResult.Failure -> Unit // local cache already shows last-known/default state
+            }
+        }
+    }
+
+    /** Admin "Delete my data" — REQ-012 full family erasure via DELETE /v1/account. */
+    suspend fun deleteAccount(): Boolean =
+        when (childrenApiClient.deleteAccount()) {
+            is ApiResult.Success -> true
+            is ApiResult.Failure -> {
+                _state.update { it.copy(accountError = "Couldn't delete your data. Try again.") }
+                false
+            }
+        }
+
+    /** Clears a stale account-deletion error before the confirm dialog reopens. */
+    fun clearAccountError() {
+        _state.update { it.copy(accountError = null) }
     }
 }
 
-class SettingsViewModelFactory(private val childrenRepository: ChildrenRepository) : ViewModelProvider.Factory {
+class SettingsViewModelFactory(
+    private val childrenRepository: ChildrenRepository,
+    private val childrenApiClient: ChildrenApiClient,
+    private val notificationPreferencesRepository: NotificationPreferencesRepository,
+    private val notificationPreferencesApiClient: NotificationPreferencesApiClient
+) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return SettingsViewModel(childrenRepository) as T
+        return SettingsViewModel(
+            childrenRepository,
+            childrenApiClient,
+            notificationPreferencesRepository,
+            notificationPreferencesApiClient
+        ) as T
     }
 }
