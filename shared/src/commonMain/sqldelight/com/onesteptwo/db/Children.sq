@@ -27,3 +27,8 @@ SELECT * FROM children WHERE id = ?;
 
 deleteById:
 DELETE FROM children WHERE id = ?;
+
+update:
+UPDATE children
+SET nickname = ?, birth_month = ?, birth_year = ?, updated_at = ?
+WHERE id = ?;

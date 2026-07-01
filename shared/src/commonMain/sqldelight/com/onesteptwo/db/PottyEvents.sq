@@ -67,3 +67,10 @@ selectDailyCounts:
 SELECT date(occurred_at) AS day, COUNT(*) AS eventCount FROM potty_events
 WHERE child_id = ? AND occurred_at >= ? AND deleted_at IS NULL
 GROUP BY date(occurred_at);
+
+selectEarliestOccurredAt:
+SELECT MIN(occurred_at) AS earliest FROM potty_events
+WHERE child_id = ? AND deleted_at IS NULL;
+
+deleteAllByChildId:
+DELETE FROM potty_events WHERE child_id = ?;

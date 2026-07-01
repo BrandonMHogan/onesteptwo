@@ -43,6 +43,22 @@ class ChildrenRepository(private val db: OneStepTwoDatabase) {
         )
     }
 
+    suspend fun update(
+        id: String,
+        nickname: String,
+        birthMonth: Long,
+        birthYear: Long,
+        updatedAt: String
+    ) = withContext(Dispatchers.IO) {
+        db.childrenQueries.update(
+            nickname = nickname,
+            birth_month = birthMonth,
+            birth_year = birthYear,
+            updated_at = updatedAt,
+            id = id
+        )
+    }
+
     suspend fun deleteById(id: String) = withContext(Dispatchers.IO) {
         db.childrenQueries.deleteById(id)
     }

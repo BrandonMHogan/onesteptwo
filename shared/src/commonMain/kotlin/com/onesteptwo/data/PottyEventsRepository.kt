@@ -8,6 +8,7 @@ import com.onesteptwo.db.Potty_events
 import com.onesteptwo.db.SelectDailyCounts
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -93,4 +94,21 @@ class PottyEventsRepository(private val db: OneStepTwoDatabase) {
         withContext(Dispatchers.IO) {
             db.pottyEventsQueries.selectDailyCounts(childId, sinceInclusive).executeAsList()
         }
+
+    /** Reactive daily counts for the History heatmap (REQ-033) — updates live as events are logged/deleted. */
+    fun observeDailyCounts(childId: String, sinceInclusive: String): Flow<List<SelectDailyCounts>> =
+        db.pottyEventsQueries.selectDailyCounts(childId, sinceInclusive).asFlow().mapToList(Dispatchers.IO)
+
+    /** Earliest ever-logged event for this child (excluding soft-deleted) — anchors the heatmap's
+     * incremental-growth window (05-CONTEXT.md D-07) and doubles as "has this child ever logged
+     * anything" for the History empty state. MIN() over zero rows still returns one row with a
+     * null column, so this is always exactly one row — mapToOne, then unwrap the nullable field. */
+    fun observeEarliestOccurredAt(childId: String): Flow<String?> =
+        db.pottyEventsQueries.selectEarliestOccurredAt(childId)
+            .asFlow().mapToOne(Dispatchers.IO).map { it.earliest }
+
+    /** Settings "Remove child" local cleanup — potty_events has no SQLite FK cascade. */
+    suspend fun deleteAllForChild(childId: String) = withContext(Dispatchers.IO) {
+        db.pottyEventsQueries.deleteAllByChildId(childId)
+    }
 }

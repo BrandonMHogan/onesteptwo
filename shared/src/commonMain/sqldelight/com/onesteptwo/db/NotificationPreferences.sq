@@ -1,0 +1,23 @@
+-- Phase 5 Stage 2: local write-through cache of the caller's own per-child notification
+-- preference (mirrors the Go notification_preferences table's (clerk_user_id, child_id, enabled)
+-- shape for the caller only — REQ-022). Not a sync queue: Settings actions hit the real Go
+-- endpoint directly (05-CONTEXT.md D-02); this table only makes the last-known/default state
+-- available instantly and offline.
+CREATE TABLE notification_preferences (
+    child_id TEXT NOT NULL PRIMARY KEY,
+    enabled INTEGER NOT NULL DEFAULT 1
+);
+
+-- INSERT OR REPLACE (not ON CONFLICT DO UPDATE — the default sqldelight sqlite-3-18 dialect
+-- predates SQLite's UPSERT syntax). Table has only the PK and one other column, so a full-row
+-- REPLACE is semantically identical to updating just `enabled`; matches the INSERT OR REPLACE
+-- style already used by Children.sq's own upsert-style `insert` query.
+upsert:
+INSERT OR REPLACE INTO notification_preferences (child_id, enabled)
+VALUES (?, ?);
+
+selectByChildId:
+SELECT * FROM notification_preferences WHERE child_id = ?;
+
+deleteByChildId:
+DELETE FROM notification_preferences WHERE child_id = ?;
