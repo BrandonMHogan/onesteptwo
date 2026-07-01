@@ -46,6 +46,26 @@ Phase 5 delivers the onboarding wizard (family creation + consent + first child 
 ### Admin Model (clarified, not re-decided)
 - **D-11 (clarification, not new):** v1 supports exactly one admin per family. REQ-017 always assigns `org:caregiver` on invite — there is no promote-to-admin or invite-as-admin path. The Settings Family list therefore never renders a remove `[✕]` action on the admin's own row.
 
+### Persistent Cross-Tab Child Switcher + Swipe Gesture (post-Stage-2 revision)
+- **D-12:** This is a deliberate revision of REQ-031 and 04-UI-SPEC.md §Component 9, gathered via a `superpowers:grilling` session on 2026-07-01 per `05-FOLLOWUP-persistent-child-switcher.md`. It **supersedes** the Home-only, tap-only design Stage 1 built (not a bug — see the `post_stage2_followup` note below). Decisions:
+  - **Placement:** the switcher banner replaces the existing name element on all three tabs — Home's inline header, and newly-added banners on History (above the heatmap) and Progress (replacing the plain 14sp "Active child name" line from 04-UI-SPEC.md §Main App — Progress Tab item 1).
+  - **Single-child families:** the banner **always renders** (name + age, centered) even with one child — it is only the *interactive* affordance (tap-to-open-sheet, swipe-to-cycle) that is absent. This refines REQ-031's "shows no switcher" to mean "no interactive control," not "no banner." Layout stays visually consistent across family sizes and gives History/Progress a name label they previously lacked entirely.
+  - **Banner visual design:** centered stack — child name (Title 20sp semibold) centered at top, age (formatted "Xy Ym", computed from `birth_month`/`birth_year` vs. current date) as a smaller styled caption centered directly below it, and — only when the family has 2+ children — a row of carousel-style page-indicator dots centered below the age, one dot per child, active dot filled. The dots replace the old chevron icon as the "this is interactive" signal; no chevron in the new design. No letter-circle avatar (none exists in the current code either). A future per-child emoji/icon (not a photo — REQ-008 still forbids photos) will slot to the left of the name; that field does not exist yet and is out of scope here.
+  - **Swipe mechanism:** the entire tab screen becomes a horizontal pager (Compose `HorizontalPager`, one page per child) — banner and all tab content (heatmap, log button, streak stats) page together as a single unit, tracking the drag live. This is a "one-handed carousel" gesture, not a banner-only micro-interaction. `HorizontalPager` only claims the horizontal axis, so it does not conflict with History's/Progress's existing vertical scrolling.
+  - **Wrap-around:** looping — swiping past the last child goes to the first, and vice versa. `HorizontalPager` has no native loop support, so implementation needs a virtual/modulo page-index trick (flag this explicitly in the implementation plan).
+  - **Order:** matches the existing `ChildSwitcherSheet` order — `children` sorted by `created_at ASC` (`Children.sq` `selectAll`). No new ordering introduced.
+  - **Accessibility:** the existing tap-the-banner-to-open-`ChildSwitcherSheet` path is unchanged and remains the sole accessible path (swipe is not screen-reader-accessible). The banner's `contentDescription` is updated to mention both affordances, e.g. `"[Name], active child. Double tap to open child list, swipe left or right to switch."`
+  - **Scope limit:** the banner/pager appears **only** on the three tab roots (Home, History, Progress). It does **not** appear on History Day-Detail (full-screen push, tab bar hidden per REQ-035) or on any Settings sub-screen (Add/Edit child, Invite caregiver) — unchanged from today.
+  - **Animation:** `HorizontalPager`'s built-in default fling/snap animation, documented in 04-UI-SPEC.md as "Pager default" — same precedent as the Bottom Sheet open/close row (D-35), which also defers to platform/framework default rather than a hand-picked tween. No new duration/easing token invented.
+  - **Requirement numbering:** amended REQ-031 in place (a refinement of the same requirement — same control, wider reach — not additive new scope), per repo convention (see the Phase 2 D-04 event_type correction for precedent).
+  - **Verified in code, not re-decided:** History's heatmap (`HeatmapView.kt`) and the planned Progress layout already grow vertically (weeks stack as rows going down; no horizontal scroll exists today), so the new whole-screen horizontal pager does not require any heatmap/Progress layout-direction changes.
+
+### Child Switcher Swipe: Depth Transform (post-implementation revision)
+- **D-13:** After D-12 shipped and was tested live on-device, the user asked for more tactile depth on the swipe transition than the flat "Pager default" motion alone gave — this **revises** D-12's Animation line (04-UI-SPEC.md §Motion Tokens "Child switcher swipe/page (D-12)") to add a **subtle depth parallax page transform** layered on top of the same underlying scroll physics: as a page moves away from center (in either direction, by drag or by `animateScrollToPage`), it scales down from 100% to 95% and its `shadowElevation` drops from `elevation.raised` (2dp, per docs/DESIGN-TOKENS.md §Elevation Tokens) to `elevation.flat` (0dp); the centered page is always at 100% scale / 2dp elevation. Both values move together, driven by `((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction).absoluteValue.coerceIn(0f, 1f)`.
+  - **What this does NOT change:** the scroll/fling/snap animation itself is still 100% `HorizontalPager` built-in default — no `AnimationSpec` was added to `animateScrollToPage` or anywhere else. This is a per-frame **visual transform** (`Modifier.graphicsLayer { scaleX/scaleY/shadowElevation }`) read directly off the pager's live scroll position inside the page's `graphicsLayer` block (the standard, official Compose Foundation pattern for Pager page transformations — still Compose built-in APIs only, D-30/D-31 unaffected).
+  - **Why these exact values:** scale range (100%→95%) and elevation range (2dp→0dp) reuse existing docs/DESIGN-TOKENS.md tokens (`elevation.raised`/`elevation.flat`) rather than inventing new ones, consistent with this repo's "no new tokens without justification" pattern established elsewhere in 04-UI-SPEC.md.
+  - Two alternate interpretations were offered and rejected: (a) incoming-card-slides-fully-over-outgoing (asymmetric depth swap), and (b) outgoing-card-lifts-and-exits-while-incoming-stays-flat (asymmetric lift-and-toss). Both were rejected in favor of the symmetric, subtler "both cards gently depth-differentiate while sliding together" effect described above.
+
 </decisions>
 
 <canonical_refs>
@@ -114,7 +134,19 @@ Phase 5 delivers the onboarding wizard (family creation + consent + first child 
 
 </deferred>
 
+<post_stage2_followup>
+## Post-Stage-2 Follow-Up: Persistent Cross-Tab Child Switcher + Swipe Gesture
+
+**Status:** Designed (grilling session complete 2026-07-01, see D-12). Not yet implemented.
+
+The user requested extending the child switcher (04-UI-SPEC.md §Component 9 / REQ-031) beyond its original Home-only, tap-only design: a persistent switcher banner on Home, History, *and* Progress, plus a whole-screen swipe-left/right gesture (a `HorizontalPager` carousel) to rotate the active child, as an addition to the existing tap-to-open-sheet flow. The full design is now locked in as **D-12** above.
+
+**This is a deliberate, requested spec revision — not a Stage 1/2 implementation gap.** Stage 1 built exactly what 04-UI-SPEC.md Component 9 and REQ-031 specified at the time (Home-only header, tap-only). If you're auditing Phase 5 and comparing the shipped Stage-1/2 code against text written *before* D-12 landed, this is why they were out of sync — the follow-up hadn't been designed yet. See `.planning/phases/05-core-event-logging/05-FOLLOWUP-persistent-child-switcher.md` for the original brief, and D-12 for the resolved design. Remaining work: update REQUIREMENTS.md/04-UI-SPEC.md/WIREFRAMES.md/SCREEN-FLOWS.md per D-12, then implement.
+
+</post_stage2_followup>
+
 ---
 
 *Phase: 5-Core Event Logging*
 *Context gathered: 2026-06-30*
+*Post-Stage-2 follow-up noted: 2026-07-01*

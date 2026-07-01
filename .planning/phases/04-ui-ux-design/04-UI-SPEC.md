@@ -292,6 +292,7 @@ Source: D-29.
 | Toast enter (D-36) | 200ms | ease-out | `AnimatedVisibility(slideInVertically { it } + fadeIn(tween(200)))` | `.transition(.asymmetric(insertion: .move(edge: .bottom).combined(with: .opacity)))` |
 | Toast exit (D-36) | 150ms | ease-in | `AnimatedVisibility(slideOutVertically { it } + fadeOut(tween(150)))` | `.transition(.asymmetric(removal: .move(edge: .bottom).combined(with: .opacity)))` |
 | Bottom sheet open/close (D-35) | platform default | platform default | `ModalBottomSheet` default (~300ms) | `.sheet` modifier default (natural spring) |
+| Child switcher swipe/page (D-12, depth transform added D-13) | Pager default scroll + per-frame depth transform | Pager default scroll + per-frame depth transform | `HorizontalPager` default fling/snap (unchanged, no hand-picked tween — same precedent as D-35) **plus** a `Modifier.graphicsLayer` page transform: scale 100%→95% and `shadowElevation` `elevation.raised`(2dp)→`elevation.flat`(0dp) as a page moves away from center, driven by `((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction).absoluteValue.coerceIn(0f, 1f)` | `TabView(.page)` / custom `DragGesture` with `.interactiveSpring()` default, plus an equivalent `.scaleEffect`/`.shadow` page transform driven by scroll offset |
 
 Android animations use **Compose built-in APIs only** — no Lottie, no third-party (D-30).
 iOS animations use **SwiftUI built-in APIs only** — no Lottie, no third-party (D-31).
@@ -450,15 +451,30 @@ Two variants:
 - "N pending/syncing" chip: tapping triggers manual sync retry
 - Accessibility: each chip has `contentDescription` describing its state
 
-### 9. Child Switcher (D-22)
+### 9. Child Switcher (D-22, revised D-12 — see 05-CONTEXT.md)
 
-**Home header:**
-- Child name: Title (20sp) semibold, `color.on-background`
-- Chevron icon: `Icons.Outlined.ChevronRight` / `chevron.right` SF Symbol, Caption size, `color.outline`
-- Combined touch target: full header row, 48dp minimum height
-- Chevron and tappable state are hidden when family has exactly one child (REQ-031)
+> **Superseded text (Phase 4 original, kept for change-history legibility):** *"Home header: child name Title(20sp) semibold + chevron icon, combined 48dp touch target, tapping opens bottom sheet; chevron/tap hidden for single-child families."* This described a **Home-only, tap-only** control. It was superseded 2026-07-01 by `05-FOLLOWUP-persistent-child-switcher.md` → `.planning/phases/05-core-event-logging/05-CONTEXT.md` D-12, which extends the switcher to a persistent cross-tab banner with a swipe gesture. The text below is current.
 
-**Child switcher bottom sheet:**
+**Persistent switcher banner (Home, History, Progress — D-12):**
+- Appears at the top of all three tab-root screens, in the slot previously occupied by each screen's plain name text (Home's inline header; Progress's 14sp "Active child name" line). History gets this banner newly added above the heatmap — it had no header before.
+- Centered stack layout:
+  - Child name: Title (20sp) semibold, `color.on-background`, centered
+  - Age: Caption (12sp), `color.on-surface` 70% opacity, centered directly below the name, formatted "Xy Ym" (computed from `birth_month`/`birth_year` vs. current date)
+  - Page-indicator dots: only rendered when the family has 2+ children — one small dot per child, centered below the age, active child's dot filled (`color.primary`), inactive dots outlined (`color.outline` 38% opacity). Replaces the old chevron icon as the visual "this is interactive" signal.
+  - Reserved slot to the left of the name for a future per-child emoji/icon (not built yet — no icon field exists on `children` today; will never be a photo per REQ-008)
+- Single-child families: banner still renders (name + age, centered) for visual consistency across tabs, but with no page dots, no tap response, no swipe response (REQ-031)
+- Combined touch target for the tap-to-open-sheet path: full banner row, 48dp minimum height
+- Accessibility: `contentDescription` = `"[Name], active child. Double tap to open child list, swipe left or right to switch."` for multi-child families; just `"[Name], active child"` for single-child families. `role = Role.Button` only when interactive.
+- Scope: does **not** appear on History Day-Detail (tab bar hidden, REQ-035) or any Settings sub-screen (Add/Edit child, Invite caregiver) — unchanged from the original design.
+
+**Swipe-to-switch gesture (new, D-12):**
+- Each of Home/History/Progress is a `HorizontalPager` (Compose) with one page per child, banner and all screen content (heatmap, log button, streak stats) paging together as a single unit, tracking drag position live — a whole-screen "carousel," not a banner-only animation
+- Pager only claims the horizontal axis, so it does not conflict with History's/Progress's existing vertical scrolling
+- Order matches the switcher-sheet order: `children` sorted by `created_at ASC`
+- Wraps around: swiping past the last child pages to the first, and vice versa (requires a virtual/modulo page-index — `HorizontalPager` has no native loop)
+- Not accessible via swipe alone — the tap-to-open-sheet path below is the required accessible fallback and must always remain functional
+
+**Child switcher bottom sheet (unchanged):**
 - Same platform sheet as event detail bottom sheet
 - Title: "Switch child" — Title (20sp) semibold
 - Each child row: Title (20sp) label + checkmark if active, 48dp minimum row height
@@ -536,7 +552,7 @@ Non-scrollable layout (D-19), top to bottom:
 
 Primary focal point: Log button. All other home screen elements are subordinate in visual weight.
 
-1. **Child name header** — "[Child name] ›" (Title 20sp semibold); tap opens child switcher sheet; hidden chevron for single-child families
+1. **Child switcher banner** (§Component 9, revised D-12) — centered child name + age, page dots for 2+ children; tap opens child switcher sheet, swipe left/right pages to the next/previous child (whole-screen `HorizontalPager`); banner renders name-only, non-interactive for single-child families
 2. **Today's event count** — Display (28sp) semibold integer + Label "events today" below; `color.on-background`
 3. **Status chips area** — `[N need details]` + `[N syncing]` chips; hidden when both zero (D-20)
 4. **Log button** — wide pill, `color.primary`, "Log" label; haptic + animation on tap (D-15, D-16)
@@ -546,6 +562,7 @@ Admin-specific: no additional home screen content vs caregiver — role differen
 
 ### Main App — History Tab
 
+- **Child switcher banner** (§Component 9, revised D-12) at the top, above the heatmap — same shared component as Home/Progress; whole screen (banner + heatmap) is a `HorizontalPager` page per child
 - Rolling heatmap calendar grid (REQ-033), Github-contribution-graph style
 - Purple intensity tints (D-27)
 - Grid cells: square, `radius.sm`, 32dp minimum
@@ -568,7 +585,7 @@ Admin-specific: no additional home screen content vs caregiver — role differen
 
 Layout (scrollable if content overflows):
 
-1. **Active child name** — Label (14sp) `color.on-surface` 70% opacity
+1. **Child switcher banner** (§Component 9, revised D-12) — same shared component as Home/History, replacing the original plain-text name label; whole screen (banner + streaks/stats/badges) is a `HorizontalPager` page per child
 2. **Streak section**:
    - Current streak: Display (28sp) semibold number + Body "day streak" / "days" label
    - Best streak: Label (14sp) "Best: [N] days"
