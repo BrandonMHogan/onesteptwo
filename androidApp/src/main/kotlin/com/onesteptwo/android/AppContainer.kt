@@ -3,10 +3,13 @@ package com.onesteptwo.android
 import android.content.Context
 import com.onesteptwo.android.BuildConfig
 import com.onesteptwo.api.ChildrenApiClient
+import com.onesteptwo.api.NotificationPreferencesApiClient
 import com.onesteptwo.api.createChildrenApiClient
+import com.onesteptwo.api.createNotificationPreferencesApiClient
 import com.onesteptwo.auth.ClerkAuthRepository
 import com.onesteptwo.data.ChildrenRepository
 import com.onesteptwo.data.ConsentEventsRepository
+import com.onesteptwo.data.NotificationPreferencesRepository
 import com.onesteptwo.data.PottyEventsRepository
 import com.onesteptwo.db.DatabaseDriverFactory
 import com.onesteptwo.db.OneStepTwoDatabase
@@ -23,9 +26,19 @@ class AppContainer(context: Context) {
     val childrenRepository: ChildrenRepository by lazy { ChildrenRepository(database) }
     val pottyEventsRepository: PottyEventsRepository by lazy { PottyEventsRepository(database) }
     val consentEventsRepository: ConsentEventsRepository by lazy { ConsentEventsRepository(database) }
+    val notificationPreferencesRepository: NotificationPreferencesRepository by lazy {
+        NotificationPreferencesRepository(database)
+    }
 
     val childrenApiClient: ChildrenApiClient by lazy {
         createChildrenApiClient(
+            authRepository = ClerkAuthRepository(),
+            baseUrl = BuildConfig.API_BASE_URL,
+            isDebug = BuildConfig.DEBUG
+        )
+    }
+    val notificationPreferencesApiClient: NotificationPreferencesApiClient by lazy {
+        createNotificationPreferencesApiClient(
             authRepository = ClerkAuthRepository(),
             baseUrl = BuildConfig.API_BASE_URL,
             isDebug = BuildConfig.DEBUG

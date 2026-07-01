@@ -4,7 +4,9 @@ import com.onesteptwo.auth.AuthRepository
 import com.onesteptwo.auth.buildHttpClient
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
+import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -24,6 +26,13 @@ data class CreateChildRequest(
 )
 
 @Serializable
+data class PatchChildRequest(
+    val nickname: String? = null,
+    val birth_month: Int? = null,
+    val birth_year: Int? = null
+)
+
+@Serializable
 data class ChildResponse(
     val id: String,
     val clerk_org_id: String,
@@ -38,9 +47,9 @@ sealed interface ApiResult<out T> {
 }
 
 /**
- * Thin wrapper around the one endpoint Stage 1 needs (`POST /v1/children`, the consent-gate
- * handler — `backend/internal/api/server.go` `PostV1Children`). A fuller typed `ApiClient`
- * covering more endpoints is Stage 2 scope (`05-02-PLAN.md`).
+ * Typed wrapper around `/v1/children` and `/v1/account` (`backend/internal/api/server.go`).
+ * `createChild`/`getChildren` shipped in 05-01-PLAN.md (Stage 1); `patchChild`/`deleteChild`/
+ * `deleteAccount` are 05-02-PLAN.md Stage 2 additions.
  */
 class ChildrenApiClient(private val httpClient: HttpClient, private val baseUrl: String) {
     suspend fun createChild(
@@ -74,8 +83,7 @@ class ChildrenApiClient(private val httpClient: HttpClient, private val baseUrl:
 
     /**
      * Lists the caller's active-org children — used once on the post-auth routing path so a
-     * returning/invited caregiver with an empty local database skips the onboarding wizard
-     * (the wizard is admin-only per REQ-036; `GET /v1/children` ships in 05-01-PLAN.md M8).
+     * returning/invited caregiver with an empty local database skips the onboarding wizard.
      */
     suspend fun getChildren(): ApiResult<List<ChildResponse>> {
         return try {
@@ -84,6 +92,56 @@ class ChildrenApiClient(private val httpClient: HttpClient, private val baseUrl:
                 ApiResult.Success(response.body())
             } else {
                 ApiResult.Failure("Couldn't load your family. Try again.")
+            }
+        } catch (e: Exception) {
+            ApiResult.Failure("Couldn't connect. Check your internet connection and try again.")
+        }
+    }
+
+    /** Settings "Edit child" — partial update; only non-null params are changed server-side. */
+    suspend fun patchChild(
+        id: String,
+        nickname: String?,
+        birthMonth: Int?,
+        birthYear: Int?
+    ): ApiResult<ChildResponse> {
+        return try {
+            val response = httpClient.patch("$baseUrl/v1/children/$id") {
+                contentType(ContentType.Application.Json)
+                setBody(PatchChildRequest(nickname, birthMonth, birthYear))
+            }
+            if (response.status.isSuccess()) {
+                ApiResult.Success(response.body())
+            } else {
+                ApiResult.Failure("Couldn't update your child's profile. Try again.")
+            }
+        } catch (e: Exception) {
+            ApiResult.Failure("Couldn't connect. Check your internet connection and try again.")
+        }
+    }
+
+    /** Settings "Remove child" — REQ-011 erasure cascade. */
+    suspend fun deleteChild(id: String): ApiResult<Unit> {
+        return try {
+            val response = httpClient.delete("$baseUrl/v1/children/$id")
+            if (response.status.isSuccess()) {
+                ApiResult.Success(Unit)
+            } else {
+                ApiResult.Failure("Couldn't remove child. Try again.")
+            }
+        } catch (e: Exception) {
+            ApiResult.Failure("Couldn't connect. Check your internet connection and try again.")
+        }
+    }
+
+    /** Settings admin "Delete my data" — REQ-012 full family erasure cascade. */
+    suspend fun deleteAccount(): ApiResult<Unit> {
+        return try {
+            val response = httpClient.delete("$baseUrl/v1/account")
+            if (response.status.isSuccess()) {
+                ApiResult.Success(Unit)
+            } else {
+                ApiResult.Failure("Couldn't delete your data. Try again.")
             }
         } catch (e: Exception) {
             ApiResult.Failure("Couldn't connect. Check your internet connection and try again.")
