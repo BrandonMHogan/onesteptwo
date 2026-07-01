@@ -10,6 +10,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
@@ -61,11 +62,19 @@ fun ChildSwitcherPagerHost(
         initialPage = initialPageFor(activeIndex, children.size)
     ) { Int.MAX_VALUE }
 
+    val currentActiveChild by rememberUpdatedState(activeChild)
+
     // Local swipe settles on a new page -> propagate to the shared active-child context.
-    LaunchedEffect(pagerState, children, activeChild?.id) {
+    // Keyed only on (pagerState, children) — NOT on activeChild — so this effect's coroutine
+    // and its snapshotFlow collector run continuously for the composable's lifetime and never
+    // restart when activeChild changes externally (which would spuriously re-sample the
+    // unmoved settledPage before the reconciliation effect finishes animating the pager to
+    // match). rememberUpdatedState gives us a fresh activeChild value on every check anyway,
+    // without needing to restart anything.
+    LaunchedEffect(pagerState, children) {
         snapshotFlow { pagerState.settledPage }.collect { page ->
             val settledChild = children.getOrNull(realIndex(page, children.size)) ?: return@collect
-            if (settledChild.id != activeChild?.id) onSelectChild(settledChild)
+            if (settledChild.id != currentActiveChild?.id) onSelectChild(settledChild)
         }
     }
 
