@@ -73,6 +73,51 @@ paths:
           description: Unauthorized
         "404":
           description: Child not found
+  /v1/notification-preferences:
+    get:
+      operationId: getV1NotificationPreferences
+      summary: List the caller's per-child notification preferences for the active org (REQ-022)
+      responses:
+        "200":
+          description: Notification preferences for the caller's active-org children
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NotificationPreferenceResponse'
+        "401":
+          description: Unauthorized
+        "403":
+          description: No active organization in session
+    put:
+      operationId: putV1NotificationPreferences
+      summary: Upsert the caller's notification preference for one child (REQ-022)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PutNotificationPreferenceRequest'
+      responses:
+        "200":
+          description: Preference upserted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationPreferenceResponse'
+        "400":
+          description: Invalid request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Child not found
   /v1/account:
     delete:
       operationId: deleteV1Account
@@ -143,6 +188,25 @@ components:
           type: string
         requested_at:
           type: string
+    NotificationPreferenceResponse:
+      type: object
+      properties:
+        child_id:
+          type: string
+          format: uuid
+        enabled:
+          type: boolean
+    PutNotificationPreferenceRequest:
+      type: object
+      required:
+        - child_id
+        - enabled
+      properties:
+        child_id:
+          type: string
+          format: uuid
+        enabled:
+          type: boolean
     ProblemDetail:
       type: object
       properties:

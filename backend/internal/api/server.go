@@ -492,3 +492,130 @@ func (s *Server) DeleteV1Account(w http.ResponseWriter, r *http.Request) {
 		"requested_at":                     time.Now().UTC().Format(time.RFC3339),
 	})
 }
+
+// notificationPreferenceResponse mirrors the generated NotificationPreferenceResponse schema.
+type notificationPreferenceResponse struct {
+	ChildID string `json:"child_id"`
+	Enabled bool   `json:"enabled"`
+}
+
+// GetV1NotificationPreferences implements GET /v1/notification-preferences — lists the caller's
+// per-child notification preference for every child in their active org (REQ-022). A child with
+// no row yet defaults to enabled=true (REQ-023 opt-in default) via COALESCE, without requiring a
+// materialized row until the caregiver first toggles it.
+//
+// Auth paths return before touching s.DB, so a nil DB is safe for unit tests of the
+// validation/auth code paths. No admin gate — any org member manages their own preferences.
+func (s *Server) GetV1NotificationPreferences(w http.ResponseWriter, r *http.Request) {
+	claims, ok := clerk.SessionClaimsFromContext(r.Context())
+	if !ok || claims == nil {
+		WriteProblem(w, http.StatusUnauthorized, "about:blank", "Unauthorized", "missing or invalid session token")
+		return
+	}
+	if claims.ActiveOrganizationID == "" {
+		WriteProblem(w, http.StatusForbidden, "about:blank", "Forbidden", "no active organization in session")
+		return
+	}
+	clerkUserID := claims.Subject
+	clerkOrgID := claims.ActiveOrganizationID
+
+	rows, err := s.DB.QueryContext(r.Context(),
+		`SELECT c.id, COALESCE(np.enabled, TRUE)
+		 FROM children c
+		 LEFT JOIN notification_preferences np ON np.child_id = c.id AND np.clerk_user_id = $1
+		 WHERE c.clerk_org_id = $2
+		 ORDER BY c.created_at ASC`,
+		clerkUserID, clerkOrgID,
+	)
+	if err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not list notification preferences")
+		return
+	}
+	defer rows.Close() //nolint:errcheck // safe no-op
+
+	prefs := make([]notificationPreferenceResponse, 0)
+	for rows.Next() {
+		var p notificationPreferenceResponse
+		if err := rows.Scan(&p.ChildID, &p.Enabled); err != nil {
+			WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not read notification preferences")
+			return
+		}
+		prefs = append(prefs, p)
+	}
+	if err := rows.Err(); err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not list notification preferences")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(prefs)
+}
+
+// putNotificationPreferenceRequest is the REQ-022 upsert payload.
+type putNotificationPreferenceRequest struct {
+	ChildID string `json:"child_id"`
+	Enabled bool   `json:"enabled"`
+}
+
+// PutV1NotificationPreferences implements PUT /v1/notification-preferences — upserts the
+// caller's own preference for one child via ON CONFLICT (clerk_user_id, child_id) DO UPDATE
+// (REQ-022's exact required upsert shape). No admin gate — any org member manages their own
+// preferences.
+//
+// Auth and validation paths return before touching s.DB, so a nil DB is safe for unit tests.
+func (s *Server) PutV1NotificationPreferences(w http.ResponseWriter, r *http.Request) {
+	claims, ok := clerk.SessionClaimsFromContext(r.Context())
+	if !ok || claims == nil {
+		WriteProblem(w, http.StatusUnauthorized, "about:blank", "Unauthorized", "missing or invalid session token")
+		return
+	}
+	if claims.ActiveOrganizationID == "" {
+		WriteProblem(w, http.StatusForbidden, "about:blank", "Forbidden", "no active organization in session")
+		return
+	}
+
+	var req putNotificationPreferenceRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		WriteProblem(w, http.StatusBadRequest, "about:blank", "Bad Request", "invalid or missing JSON body")
+		return
+	}
+	if req.ChildID == "" {
+		WriteProblem(w, http.StatusBadRequest, "about:blank", "Bad Request", "child_id must not be empty")
+		return
+	}
+
+	clerkUserID := claims.Subject
+	clerkOrgID := claims.ActiveOrganizationID
+
+	// IDOR check (REQ-015): child must belong to the caller's active org.
+	var childOrgID string
+	err := s.DB.QueryRowContext(r.Context(), `SELECT clerk_org_id FROM children WHERE id = $1`, req.ChildID).Scan(&childOrgID)
+	if err == sql.ErrNoRows {
+		WriteProblem(w, http.StatusNotFound, "about:blank", "Not Found", "child not found")
+		return
+	}
+	if err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not look up child")
+		return
+	}
+	if childOrgID != clerkOrgID {
+		WriteProblem(w, http.StatusForbidden, "about:blank", "Forbidden", "access denied")
+		return
+	}
+
+	_, err = s.DB.ExecContext(r.Context(),
+		`INSERT INTO notification_preferences (clerk_user_id, child_id, enabled)
+		 VALUES ($1, $2, $3)
+		 ON CONFLICT (clerk_user_id, child_id) DO UPDATE SET enabled = EXCLUDED.enabled, updated_at = NOW()`,
+		clerkUserID, req.ChildID, req.Enabled,
+	)
+	if err != nil {
+		WriteProblem(w, http.StatusInternalServerError, "about:blank", "Internal Server Error", "could not save notification preference")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(notificationPreferenceResponse{ChildID: req.ChildID, Enabled: req.Enabled})
+}

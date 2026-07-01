@@ -149,7 +149,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 
 **Goal**: A parent completes the onboarding wizard (family creation + consent + first child profile), and any caregiver can immediately log potty events with one tap, optionally add details later, view the complete event history in a heatmap calendar, manage family and children settings, and switch between multiple children — all within the 4-tab navigation structure.
 **Depends on**: Phase 4
-**Requirements**: REQ-003, REQ-006, REQ-007, REQ-030, REQ-031, REQ-032, REQ-033, REQ-035, REQ-036
+**Requirements**: REQ-003, REQ-006, REQ-007, REQ-022, REQ-023, REQ-030, REQ-031, REQ-032, REQ-033, REQ-035, REQ-036
 **Success Criteria** (what must be TRUE):
 
   1. A new admin completes the full onboarding wizard: sign up via Clerk → enter family name → add first child (nickname + birth month/year) → read plain-language data explanation and check self-attestation consent box → a consent_events row is inserted before the children row → admin lands on the Home tab with the child's name displayed
@@ -198,7 +198,7 @@ Nine phases deliver a fully store-published, privacy-compliant, offline-first po
 
 **Goal**: Every opted-in family member receives an FCM push notification on both Android and iOS when any caregiver logs a new potty event; device tokens are managed correctly through their full lifecycle.
 **Depends on**: Phase 7
-**Requirements**: REQ-020, REQ-021, REQ-022, REQ-023, REQ-024
+**Requirements**: REQ-020, REQ-021, REQ-024
 **Success Criteria** (what must be TRUE):
 
   1. When a caregiver logs an event, all other family members with notifications enabled receive an FCM push notification on their registered Android and iOS devices within a few seconds

@@ -44,6 +44,12 @@ type ErasureConfirmation struct {
 	RequestedBy                    *string `json:"requested_by,omitempty"`
 }
 
+// NotificationPreferenceResponse defines model for NotificationPreferenceResponse.
+type NotificationPreferenceResponse struct {
+	ChildId *openapi_types.UUID `json:"child_id,omitempty"`
+	Enabled *bool               `json:"enabled,omitempty"`
+}
+
 // ProblemDetail defines model for ProblemDetail.
 type ProblemDetail struct {
 	Detail *string `json:"detail,omitempty"`
@@ -52,8 +58,17 @@ type ProblemDetail struct {
 	Type   *string `json:"type,omitempty"`
 }
 
+// PutNotificationPreferenceRequest defines model for PutNotificationPreferenceRequest.
+type PutNotificationPreferenceRequest struct {
+	ChildId openapi_types.UUID `json:"child_id"`
+	Enabled bool               `json:"enabled"`
+}
+
 // PostV1ChildrenJSONRequestBody defines body for PostV1Children for application/json ContentType.
 type PostV1ChildrenJSONRequestBody = CreateChildRequest
+
+// PutV1NotificationPreferencesJSONRequestBody defines body for PutV1NotificationPreferences for application/json ContentType.
+type PutV1NotificationPreferencesJSONRequestBody = PutNotificationPreferenceRequest
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -72,6 +87,12 @@ type ServerInterface interface {
 	// Delete a child profile and all associated data (GDPR/COPPA erasure)
 	// (DELETE /v1/children/{id})
 	DeleteV1ChildrenId(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// List the caller's per-child notification preferences for the active org (REQ-022)
+	// (GET /v1/notification-preferences)
+	GetV1NotificationPreferences(w http.ResponseWriter, r *http.Request)
+	// Upsert the caller's notification preference for one child (REQ-022)
+	// (PUT /v1/notification-preferences)
+	PutV1NotificationPreferences(w http.ResponseWriter, r *http.Request)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -156,6 +177,34 @@ func (siw *ServerInterfaceWrapper) DeleteV1ChildrenId(w http.ResponseWriter, r *
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.DeleteV1ChildrenId(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetV1NotificationPreferences operation middleware
+func (siw *ServerInterfaceWrapper) GetV1NotificationPreferences(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetV1NotificationPreferences(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PutV1NotificationPreferences operation middleware
+func (siw *ServerInterfaceWrapper) PutV1NotificationPreferences(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PutV1NotificationPreferences(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -290,6 +339,8 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/v1/children", wrapper.GetV1Children)
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/v1/children", wrapper.PostV1Children)
 	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/v1/children/{id}", wrapper.DeleteV1ChildrenId)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/v1/notification-preferences", wrapper.GetV1NotificationPreferences)
+	m.HandleFunc(http.MethodPut+" "+options.BaseURL+"/v1/notification-preferences", wrapper.PutV1NotificationPreferences)
 
 	return m
 }
